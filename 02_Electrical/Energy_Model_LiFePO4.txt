@@ -1,0 +1,62 @@
+OBSIDIAN-8 V3
+
+02_Electrical/Energy_Model_LiFePO4.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the energy storage model for OBSIDIAN-8 V3 using LiFePO4 batteries.
+
+Supports safe operation, predictable performance, and integration with reactive control.
+Provides reference for FMEA, deployment profiles, and CM documentation.
+Ensures compatibility with all actuators, sensors, and power electronics.
+2. BATTERY SPECIFICATIONS
+Parameter	Value / Range	Notes
+Chemistry	LiFePO4	High cycle life, safe chemistry
+Nominal Voltage	12.8 V	4 cells in series
+Capacity	20 Ah	Per module
+Max Continuous Discharge	15 A	Limited to prevent overheating
+Peak Discharge	30 A	Short duration < 10 s
+Charge Voltage	14.6 V	Constant voltage charge
+Charge Current	5 A	Recommended per module
+Depth of Discharge (DoD)	80%	Maintain long life
+Cycle Life	>2000 cycles	At 80% DoD
+3. ENERGY MANAGEMENT MODEL
+State-of-Charge (SOC) Calculation:
+SOC (%) = (Remaining Capacity / Total Capacity) × 100
+Updated in real-time via BMS telemetry.
+Voltage Modeling:
+Open-circuit voltage (OCV) curve mapped vs SOC.
+Load-dependent voltage drop considered for actuator torque calculation.
+Thermal Considerations:
+Temperature sensors integrated.
+Derate output current above 50°C to prevent damage.
+Overcurrent / Undervoltage Protection:
+BMS limits draw to max continuous discharge.
+System triggers safe shutdown at undervoltage (<10.5 V per module).
+4. DEPLOYMENT INTEGRATION
+Battery module identifiers stored in deployment_profile.
+SOC limits integrated with Energy Model FMEA:
+FM-003: Undervoltage during movement → triggers pre-cutoff stop.
+Batteries monitored via telemetry for predictive maintenance.
+5. CONTROL INTERFACES
+Actuator Power Management:
+Limits maximum torque based on available energy.
+Prevents simultaneous high-current draw across all actuators exceeding BMS limits.
+Reactive Safety Layer:
+Overrides mission compute if SOC drops below minimum safe threshold (20%).
+Ensures predictable behavior under low-energy conditions.
+Charging / Swapping:
+Supports hot-swap of modules with automatic SOC synchronization.
+Charging follows manufacturer-recommended CC-CV protocol.
+6. VALIDATION AND TESTING
+SOC calibration verified with full discharge tests.
+Voltage response under nominal and peak load simulated.
+Thermal performance tested in environmental chamber (-20°C to 60°C).
+Integration tested with Mass_and_CG_Model, Structural_Load_Model, and Actuation Systems for energy-aware motion.
+7. DESIGN INTENT
+Maintain predictable power availability under all operational scenarios.
+Ensure safety of electronics and actuators.
+Fully compatible with CM, FMEA, deployment profiles, and control authority.
+Support reactive and mission-level decision-making with accurate SOC and energy forecasting.
