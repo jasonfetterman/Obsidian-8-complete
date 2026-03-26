@@ -1,0 +1,192 @@
+OBSIDIAN-8 V3
+TEST & VALIDATION MASTER PLAN v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: FULL SYSTEM VERIFICATION PROTOCOL
+Units: Metric
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define structured validation sequence
+to confirm structural integrity,
+load tolerance,
+thermal stability,
+CG compliance,
+and system integration.
+
+No operational deployment
+prior to passing all required stages.
+
+---------------------------------------
+TEST PHASE OVERVIEW
+---------------------------------------
+
+PHASE 1 — Structural Geometry Validation
+PHASE 2 — Static Load Testing
+PHASE 3 — Torsional Rigidity Testing
+PHASE 4 — Landing Impact Simulation
+PHASE 5 — Wiring & EMI Inspection
+PHASE 6 — Thermal Run Test
+PHASE 7 — CG Verification
+PHASE 8 — Dynamic Vibration Observation
+
+All phases must pass sequentially.
+
+---------------------------------------
+PHASE 1 — STRUCTURAL GEOMETRY
+---------------------------------------
+
+Verify:
+
+- Primary ring diameter = 1143 mm ±1 mm
+- Frame height = 900 mm ±1 mm
+- Post vertical deviation < 0.5°
+- Upper ring concentricity ±2 mm
+
+Pass Criteria:
+No rocking on flat surface.
+No visible misalignment.
+
+---------------------------------------
+PHASE 2 — STATIC LOAD TEST
+---------------------------------------
+
+Apply distributed load:
+Equivalent to 60 kg (≈600 N).
+
+Method:
+Sandbags or calibrated weights.
+
+Observe:
+
+- Ring deflection < 3 mm
+- No permanent deformation
+- No printed part cracking
+
+Pass Criteria:
+Elastic return after load removal.
+
+---------------------------------------
+PHASE 3 — TORSIONAL TEST
+---------------------------------------
+
+Apply lateral force:
+300 N at 900 mm height.
+
+Equivalent torque:
+≈ 270 N·m
+
+Measure twist angle.
+
+Pass Criteria:
+< 2° deflection
+Full elastic return
+No insert pullout
+
+---------------------------------------
+PHASE 4 — LANDING IMPACT SIMULATION
+---------------------------------------
+
+Simulate 2.5 g vertical impulse.
+
+Method:
+Controlled drop of equivalent mass
+or calculated impulse test.
+
+Observe:
+
+- No foot block cracking
+- No post shift
+- Ring remains within tolerance
+
+---------------------------------------
+PHASE 5 — WIRING & EMI CHECK
+---------------------------------------
+
+Inspect:
+
+- Wire clearance from aluminum edges
+- Proper strain relief
+- Separation of power and signal
+
+Operational check:
+
+Run propulsion at low throttle.
+Verify no signal interference.
+
+---------------------------------------
+PHASE 6 — THERMAL RUN TEST
+---------------------------------------
+
+Run propulsion under load
+for minimum 5 minutes.
+
+Record peak temperatures:
+
+Motor < 90°C
+ESC < 80°C
+Battery < 60°C
+Electronics < 70°C
+
+Pass Criteria:
+No overheating
+No nylon deformation
+
+---------------------------------------
+PHASE 7 — CG VALIDATION
+---------------------------------------
+
+Suspend system from central lift point.
+
+Mark vertical line.
+
+Verify CG within:
+
+±50 mm horizontal center
+35–55% vertical height band
+
+---------------------------------------
+PHASE 8 — DYNAMIC OBSERVATION
+---------------------------------------
+
+Operate propulsion system.
+
+Observe for:
+
+- Structural resonance
+- Visible oscillation
+- Fastener loosening
+- Printed part creep
+
+Post-run inspection required.
+
+---------------------------------------
+DOCUMENTATION REQUIREMENT
+---------------------------------------
+
+Each phase must record:
+
+- Date
+- Configuration version
+- Observations
+- Pass / Fail result
+- Corrective actions (if required)
+
+No undocumented changes permitted.
+
+---------------------------------------
+FINAL ACCEPTANCE CRITERIA
+---------------------------------------
+
+System passes when:
+
+- All phases completed
+- No structural drift
+- No thermal overrun
+- No CG violation
+- No persistent vibration
+
+---------------------------------------
+END OF FILE
+---------------------------------------

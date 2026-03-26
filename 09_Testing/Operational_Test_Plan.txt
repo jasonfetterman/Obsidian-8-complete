@@ -1,0 +1,207 @@
+OBSIDIAN-8 V3
+Operational_Test_Plan.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define structured operational testing required to validate
+OBSIDIAN-8 V3 readiness for field deployment.
+
+Operational testing verifies:
+
+- Mission execution capability
+- Safety enforcement under real use
+- Energy performance under mission load
+- Human supervision workflow
+- Recovery from faults
+
+------------------------------------------------------------
+2. TEST OBJECTIVES
+------------------------------------------------------------
+
+Validate that the system:
+
+- Executes assigned missions deterministically
+- Maintains authority hierarchy
+- Enforces energy constraints
+- Preserves safety dominance
+- Logs operational events correctly
+
+------------------------------------------------------------
+3. PRE-TEST REQUIREMENTS
+------------------------------------------------------------
+
+Before operational testing:
+
+- Deployment configuration locked
+- Software baseline tagged
+- Hardware baseline verified
+- Environmental qualification completed
+- Risk review up to date
+- FMEA reviewed
+
+------------------------------------------------------------
+4. TEST SCENARIOS
+------------------------------------------------------------
+
+4.1 Basic Mobility Test
+
+Procedure:
+- Power on system
+- Enter active mode
+- Execute predefined walking pattern
+
+Acceptance Criteria:
+- Stable gait
+- No reactive violation
+- No fault flags
+
+------------------------------------------------------------
+
+4.2 Terrain Traversal Test
+
+Procedure:
+- Traverse Class I–III terrain
+- Include slopes within allowed limit
+
+Acceptance Criteria:
+- No slip beyond threshold
+- No instability
+- Energy consumption within model
+
+------------------------------------------------------------
+
+4.3 Energy-Constrained Mission
+
+Procedure:
+- Start mission at 40% SOC
+- Observe transition to reduced capability
+- Verify return-to-base initiation
+
+Acceptance Criteria:
+- Correct SOC-triggered transitions
+- No brownout
+- Controlled stop if required
+
+------------------------------------------------------------
+
+4.4 Docking Validation
+
+Procedure:
+- Execute docking under mission control
+- Perform 5 repeat cycles
+
+Acceptance Criteria:
+- Dock alignment within tolerance
+- No collision
+- Stable recharge state
+
+------------------------------------------------------------
+
+4.5 Fault Injection During Operation
+
+Simulate:
+
+- Remote link loss
+- Sensor dropout
+- Mission node failure
+
+Acceptance Criteria:
+- Deterministic fallback behavior
+- Reactive STOP when required
+- No uncontrolled motion
+
+------------------------------------------------------------
+
+4.6 Emergency Stop Validation
+
+Procedure:
+- Trigger hardware E-stop during motion
+
+Acceptance Criteria:
+- Immediate servo disable
+- Stable halt
+- Manual reset required
+
+------------------------------------------------------------
+
+4.7 Continuous Operation Test
+
+Procedure:
+- Operate system for 2 hours cumulative
+- Mixed idle and motion
+
+Acceptance Criteria:
+- No thermal exceedance
+- No unexpected reset
+- No memory leak symptoms
+
+------------------------------------------------------------
+5. LOGGING REQUIREMENTS
+------------------------------------------------------------
+
+All operational tests must log:
+
+- Core state
+- Authority layer transitions
+- Energy state
+- Fault codes
+- Thermal data
+- Mission duration
+
+Logs archived in lifecycle database.
+
+------------------------------------------------------------
+6. FAILURE CRITERIA
+------------------------------------------------------------
+
+Operational test fails if:
+
+- Uncontrolled motion observed
+- Authority hierarchy violated
+- Brownout occurs
+- Kill-line fails to activate
+- Mission abort does not trigger when required
+- Critical fault unlogged
+
+------------------------------------------------------------
+7. REPORTING
+------------------------------------------------------------
+
+Operational Test Report must include:
+
+- Test date
+- Software version
+- Hardware revision
+- Scenario results
+- Observed anomalies
+- Corrective actions (if required)
+
+------------------------------------------------------------
+8. EXIT CRITERIA
+------------------------------------------------------------
+
+Operational readiness declared when:
+
+- All scenarios pass
+- No unresolved critical defects
+- Logs validated
+- Safety enforcement confirmed
+
+------------------------------------------------------------
+9. DESIGN INTENT
+------------------------------------------------------------
+
+Operational testing ensures the system behaves
+predictably under realistic mission conditions
+and preserves safety dominance during field use.
+
+Operational readiness requires deterministic behavior
+under both nominal and fault conditions.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

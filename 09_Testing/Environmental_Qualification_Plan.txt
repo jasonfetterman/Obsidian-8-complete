@@ -1,0 +1,208 @@
+OBSIDIAN-8 V3
+Environmental_Qualification_Plan.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define environmental qualification testing required to validate
+OBSIDIAN-8 V3 operation within defined deployment envelope.
+
+This plan covers:
+
+- Temperature
+- Humidity
+- Shock
+- Vibration
+- Dust / Ingress
+- Electromagnetic compatibility
+
+Qualification must precede scaled deployment.
+
+------------------------------------------------------------
+2. ENVIRONMENTAL ENVELOPE
+------------------------------------------------------------
+
+Operating Temperature:
+-10°C to +45°C
+
+Storage Temperature:
+-20°C to +60°C
+
+Relative Humidity:
+10% to 90% non-condensing
+
+Maximum Wind Exposure:
+Defined in Deployment_Profile.txt
+
+Terrain Classes:
+I–III (as defined in Real_World_Terrain_Model.txt)
+
+------------------------------------------------------------
+3. TEMPERATURE QUALIFICATION
+------------------------------------------------------------
+
+3.1 Cold Start Test
+
+Procedure:
+- Stabilize unit at -10°C for 4 hours
+- Power on system
+- Perform motion validation
+
+Acceptance Criteria:
+- Successful boot
+- Stable motion
+- No thermal fault triggered
+
+------------------------------------------------------------
+
+3.2 High Temperature Test
+
+Procedure:
+- Stabilize unit at +45°C for 4 hours
+- Perform walking cycle
+- Monitor battery and servo temperatures
+
+Acceptance Criteria:
+- No thermal runaway
+- No BMS cutoff
+- No motion instability
+
+------------------------------------------------------------
+4. HUMIDITY TEST
+------------------------------------------------------------
+
+Procedure:
+- Expose system to 90% RH at 30°C for 6 hours
+- Perform operational test
+
+Acceptance Criteria:
+- No condensation-induced fault
+- No corrosion indicators
+- All electronics functional
+
+------------------------------------------------------------
+5. SHOCK TEST
+------------------------------------------------------------
+
+Procedure:
+- Controlled drop test (defined height within tolerance)
+- Simulated obstacle impact
+
+Acceptance Criteria:
+- No structural fracture
+- No servo misalignment
+- No power interruption
+
+------------------------------------------------------------
+6. VIBRATION TEST
+------------------------------------------------------------
+
+Procedure:
+- Subject unit to vibration profile consistent with field operation
+- Duration: 1 hour per axis
+
+Acceptance Criteria:
+- No fastener loosening
+- No connector detachment
+- No internal wiring damage
+
+------------------------------------------------------------
+7. DUST / INGRESS TEST
+------------------------------------------------------------
+
+Procedure:
+- Expose system to dust environment
+- Perform operational movement
+
+Acceptance Criteria:
+- No servo contamination affecting motion
+- No cooling obstruction
+- No sensor occlusion beyond tolerance
+
+------------------------------------------------------------
+8. EMC / EMI TEST
+------------------------------------------------------------
+
+Procedure:
+- Subject system to electromagnetic interference
+- Validate command integrity
+
+Acceptance Criteria:
+- No unintended motion
+- No command corruption
+- Watchdog unaffected
+
+------------------------------------------------------------
+9. BATTERY SAFETY VALIDATION
+------------------------------------------------------------
+
+Procedure:
+- High load discharge at temperature extremes
+- Monitor thermal behavior
+
+Acceptance Criteria:
+- BMS protection functions correctly
+- No thermal instability
+- No swelling or leakage
+
+------------------------------------------------------------
+10. POST-TEST INSPECTION
+------------------------------------------------------------
+
+After each environmental test:
+
+- Inspect frame
+- Inspect harness routing
+- Inspect connectors
+- Verify torque specs
+- Verify calibration
+
+No structural or electrical degradation permitted.
+
+------------------------------------------------------------
+11. DOCUMENTATION REQUIREMENTS
+------------------------------------------------------------
+
+Each qualification test must record:
+
+- Date
+- Test environment parameters
+- Duration
+- Observed behavior
+- Fault logs
+- Acceptance result
+
+All records archived in lifecycle database.
+
+------------------------------------------------------------
+12. FAILURE RESPONSE
+------------------------------------------------------------
+
+If any qualification test fails:
+
+- Immediate root cause analysis
+- Update Risk Register
+- Update FMEA if required
+- Implement corrective action
+- Re-test before approval
+
+------------------------------------------------------------
+13. DESIGN INTENT
+------------------------------------------------------------
+
+Environmental qualification ensures:
+
+- Operational reliability within defined envelope
+- Protection against environmental-induced faults
+- Preservation of safety architecture
+- Confidence prior to scaled deployment
+
+Environmental resilience is mandatory
+for real-world field operation.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
