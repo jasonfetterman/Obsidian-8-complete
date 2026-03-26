@@ -1,0 +1,267 @@
+OBSIDIAN-8 V3
+System_Requirements_Specification.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define formal, testable system-level requirements for OBSIDIAN-8 V3.
+
+All architectural documents, test protocols, and validation
+activities must trace back to these requirements.
+
+Each requirement is uniquely identified.
+
+
+------------------------------------------------------------
+2. REQUIREMENT IDENTIFICATION FORMAT
+------------------------------------------------------------
+
+Format:
+
+REQ-[CATEGORY]-[NUMBER]
+
+Categories:
+
+MECH  – Mechanical
+ELEC  – Electrical
+CTRL  – Control
+SAFE  – Safety
+NAV   – Navigation
+ENER  – Energy
+SW    – Software
+COMM  – Communication
+OPS   – Operational
+LIFE  – Lifecycle
+
+
+------------------------------------------------------------
+3. MECHANICAL REQUIREMENTS
+------------------------------------------------------------
+
+REQ-MECH-001  
+System shall maintain structural integrity under defined deployment load.
+
+REQ-MECH-002  
+System shall withstand torsional loading within stability envelope.
+
+REQ-MECH-003  
+Center of gravity shall remain within defined stability polygon during stance.
+
+REQ-MECH-004  
+Frame shall tolerate vibration profile defined in Testing domain.
+
+REQ-MECH-005  
+All load-bearing fasteners shall be torque-specified and documented.
+
+
+------------------------------------------------------------
+4. ELECTRICAL REQUIREMENTS
+------------------------------------------------------------
+
+REQ-ELEC-001  
+System shall segment servo and compute power rails.
+
+REQ-ELEC-002  
+Battery Management System shall enforce overcurrent protection.
+
+REQ-ELEC-003  
+Battery Management System shall enforce undervoltage protection.
+
+REQ-ELEC-004  
+Kill-line shall disable servo rail within defined latency threshold.
+
+REQ-ELEC-005  
+System shall prevent reverse polarity connection.
+
+
+------------------------------------------------------------
+5. CONTROL REQUIREMENTS
+------------------------------------------------------------
+
+REQ-CTRL-001  
+System shall implement layered control authority model.
+
+REQ-CTRL-002  
+Reactive layer shall override mission commands when safety violated.
+
+REQ-CTRL-003  
+Heartbeat timeout shall result in deterministic fallback state.
+
+REQ-CTRL-004  
+System shall log authority transitions.
+
+REQ-CTRL-005  
+No motion shall occur without validated reactive authority.
+
+
+------------------------------------------------------------
+6. SAFETY REQUIREMENTS
+------------------------------------------------------------
+
+REQ-SAFE-001  
+Hardware emergency stop shall directly disable servo rail.
+
+REQ-SAFE-002  
+Watchdog shall independently monitor reactive and mission heartbeats.
+
+REQ-SAFE-003  
+System shall default to STOP upon authority ambiguity.
+
+REQ-SAFE-004  
+Software shall not override hardware kill-line.
+
+REQ-SAFE-005  
+System shall prevent operation below defined energy critical threshold.
+
+
+------------------------------------------------------------
+7. NAVIGATION REQUIREMENTS
+------------------------------------------------------------
+
+REQ-NAV-001  
+System shall classify terrain before traversal.
+
+REQ-NAV-002  
+System shall refuse traversal of hazardous terrain class.
+
+REQ-NAV-003  
+Navigation shall incorporate energy-aware constraints.
+
+REQ-NAV-004  
+System shall perform controlled docking within tolerance.
+
+REQ-NAV-005  
+System shall maintain slope traversal limits defined in Deployment Profile.
+
+
+------------------------------------------------------------
+8. ENERGY REQUIREMENTS
+------------------------------------------------------------
+
+REQ-ENER-001  
+System shall estimate state-of-charge using coulomb counting.
+
+REQ-ENER-002  
+System shall initiate mission termination at defined SOC threshold.
+
+REQ-ENER-003  
+System shall avoid BMS hard cutoff during active motion.
+
+REQ-ENER-004  
+System shall log battery temperature excursions.
+
+REQ-ENER-005  
+Charging shall not occur during active mission state.
+
+
+------------------------------------------------------------
+9. SOFTWARE REQUIREMENTS
+------------------------------------------------------------
+
+REQ-SW-001  
+All motion commands shall include sequence identifier.
+
+REQ-SW-002  
+All safety-critical messages shall include timestamp.
+
+REQ-SW-003  
+System shall reject stale or malformed motion commands.
+
+REQ-SW-004  
+Message definitions shall be version-controlled.
+
+REQ-SW-005  
+System shall log critical faults persistently.
+
+
+------------------------------------------------------------
+10. COMMUNICATION REQUIREMENTS
+------------------------------------------------------------
+
+REQ-COMM-001  
+Remote control channel shall be encrypted.
+
+REQ-COMM-002  
+Unauthorized command attempts shall be rejected and logged.
+
+REQ-COMM-003  
+Loss of remote link shall trigger defined fallback behavior.
+
+REQ-COMM-004  
+System shall display current authority layer externally.
+
+REQ-COMM-005  
+Swarm commands shall not override local safety authority.
+
+
+------------------------------------------------------------
+11. OPERATIONAL REQUIREMENTS
+------------------------------------------------------------
+
+REQ-OPS-001  
+System shall operate within defined environmental envelope.
+
+REQ-OPS-002  
+System shall require pre-deployment checklist validation.
+
+REQ-OPS-003  
+System shall log mission duration and fault events.
+
+REQ-OPS-004  
+System shall require manual reset after emergency stop.
+
+REQ-OPS-005  
+Maintenance intervals shall be defined and enforced.
+
+
+------------------------------------------------------------
+12. LIFECYCLE REQUIREMENTS
+------------------------------------------------------------
+
+REQ-LIFE-001  
+All production units shall be serialized.
+
+REQ-LIFE-002  
+Engineering changes shall require documented impact analysis.
+
+REQ-LIFE-003  
+Calibration results shall be stored per unit.
+
+REQ-LIFE-004  
+Decommissioned units shall be marked in fleet registry.
+
+REQ-LIFE-005  
+System documentation shall be version-controlled.
+
+
+------------------------------------------------------------
+13. VERIFICATION TRACEABILITY
+------------------------------------------------------------
+
+Each requirement must map to:
+
+- Design document
+- Test protocol
+- Validation result
+
+No requirement shall remain unverified prior to Phase 2 exit.
+
+
+------------------------------------------------------------
+14. DESIGN INTENT
+------------------------------------------------------------
+
+This specification establishes measurable, testable,
+and enforceable system-level requirements.
+
+Architecture, code, testing, and lifecycle processes
+must remain traceable to these requirements.
+
+Safety and deterministic behavior are mandatory.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

@@ -1,0 +1,222 @@
+OBSIDIAN-8 V3
+Failure_Modes_and_Effects_Analysis.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Provide structured Failure Modes and Effects Analysis (FMEA)
+for OBSIDIAN-8 V3.
+
+Each failure mode includes:
+
+- Failure ID
+- Subsystem
+- Failure Mode
+- Cause
+- Effect
+- Severity (S)
+- Occurrence (O)
+- Detection (D)
+- Risk Priority Number (RPN = S × O × D)
+- Mitigation
+
+Severity, Occurrence, Detection scale: 1 (Low) to 5 (High).
+
+------------------------------------------------------------
+2. FAILURE MODE TABLE
+------------------------------------------------------------
+
+FM-001
+Subsystem: Reactive Controller
+Failure Mode: Process crash during motion
+Cause: Software exception
+Effect: Loss of motion supervision
+S: 4
+O: 2
+D: 1
+RPN: 8
+Mitigation: Watchdog kill-line activation
+
+------------------------------------------------------------
+
+FM-002
+Subsystem: Mission Compute
+Failure Mode: Navigation process freeze
+Cause: Deadlock or memory exhaustion
+Effect: Stalled commands
+S: 2
+O: 3
+D: 2
+RPN: 12
+Mitigation: Reactive heartbeat timeout → STOP
+
+------------------------------------------------------------
+
+FM-003
+Subsystem: Battery System
+Failure Mode: Undervoltage during movement
+Cause: SOC miscalculation or overload
+Effect: Brownout, instability
+S: 4
+O: 3
+D: 2
+RPN: 24
+Mitigation: Energy-aware navigation + pre-cutoff stop
+
+------------------------------------------------------------
+
+FM-004
+Subsystem: Servo Actuator
+Failure Mode: Overheating under sustained load
+Cause: High torque demand
+Effect: Torque loss or shutdown
+S: 3
+O: 3
+D: 3
+RPN: 27
+Mitigation: Thermal monitoring + torque limiting
+
+------------------------------------------------------------
+
+FM-005
+Subsystem: Frame Structure
+Failure Mode: Structural crack
+Cause: Fatigue or impact
+Effect: Reduced stability
+S: 4
+O: 2
+D: 3
+RPN: 24
+Mitigation: Scheduled inspection + load testing
+
+------------------------------------------------------------
+
+FM-006
+Subsystem: Watchdog
+Failure Mode: Pi power failure
+Cause: Regulator fault
+Effect: Loss of supervision
+S: 4
+O: 1
+D: 1
+RPN: 4
+Mitigation: Fail-safe kill-line default open
+
+------------------------------------------------------------
+
+FM-007
+Subsystem: Communication
+Failure Mode: Encrypted link compromise
+Cause: Credential leak
+Effect: Unauthorized command injection
+S: 4
+O: 2
+D: 3
+RPN: 24
+Mitigation: Auth validation + logging + revocation
+
+------------------------------------------------------------
+
+FM-008
+Subsystem: Sensor Suite
+Failure Mode: IMU drift
+Cause: Calibration error
+Effect: Pose misestimation
+S: 3
+O: 3
+D: 3
+RPN: 27
+Mitigation: Calibration routine + sanity checks
+
+------------------------------------------------------------
+
+FM-009
+Subsystem: Power Distribution
+Failure Mode: Servo rail short circuit
+Cause: Harness damage
+Effect: Immediate power instability
+S: 5
+O: 1
+D: 2
+RPN: 10
+Mitigation: Current limiting + BMS cutoff
+
+------------------------------------------------------------
+
+FM-010
+Subsystem: Docking System
+Failure Mode: Misalignment collision
+Cause: Perception error
+Effect: Minor structural impact
+S: 3
+O: 2
+D: 3
+RPN: 18
+Mitigation: Reduced docking speed + tolerance enforcement
+
+------------------------------------------------------------
+
+FM-011
+Subsystem: Authority Model
+Failure Mode: Dual control conflict
+Cause: Software bug
+Effect: Command inconsistency
+S: 3
+O: 2
+D: 2
+RPN: 12
+Mitigation: Watchdog authority coherence validation
+
+------------------------------------------------------------
+
+FM-012
+Subsystem: Energy Model
+Failure Mode: SOC estimation drift
+Cause: Sensor offset
+Effect: Premature shutdown or late shutdown
+S: 3
+O: 3
+D: 3
+RPN: 27
+Mitigation: Calibration + telemetry validation
+
+------------------------------------------------------------
+3. RPN INTERPRETATION
+------------------------------------------------------------
+
+RPN ≥ 25:
+Requires engineering review and mitigation strengthening.
+
+RPN 15–24:
+Acceptable with monitoring and validation.
+
+RPN < 15:
+Controlled risk with defined mitigation.
+
+------------------------------------------------------------
+4. REVIEW POLICY
+------------------------------------------------------------
+
+FMEA must be reviewed:
+
+- Before Phase 2 exit
+- After Class A design changes
+- After critical field incident
+- Annually during production
+
+------------------------------------------------------------
+5. DESIGN INTENT
+------------------------------------------------------------
+
+FMEA ensures structured evaluation of failure pathways,
+prioritizes mitigation effort,
+and enforces proactive engineering discipline.
+
+Failure must be predictable and contained.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

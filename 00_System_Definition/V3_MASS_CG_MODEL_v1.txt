@@ -1,0 +1,112 @@
+OBSIDIAN-8 V3
+MASS & CENTER OF GRAVITY MODEL v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: MASS DISTRIBUTION DEFINITION
+Units: Metric
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define estimated mass distribution
+and center of gravity (CG) target zone
+for frame validation and stability control.
+
+---------------------------------------
+STRUCTURAL MASS ESTIMATE
+---------------------------------------
+
+3030 Aluminum Total Length ≈ 10.7 m
+Estimated mass ≈ 1.8–2.0 kg per meter
+Primary 3030 Mass ≈ 19–21 kg
+
+2020 Aluminum Total Length ≈ 7 m
+Estimated mass ≈ 0.8–1.0 kg per meter
+Secondary 2020 Mass ≈ 6–7 kg
+
+Printed CF Nylon Components:
+Estimated total mass ≈ 2–3 kg
+
+Fasteners & Hardware:
+Estimated ≈ 2 kg
+
+---------------------------------------
+FRAME-ONLY MASS ESTIMATE
+---------------------------------------
+
+Total Structural Frame Mass:
+≈ 29–33 kg
+
+---------------------------------------
+PROJECTED FULL SYSTEM MASS
+---------------------------------------
+
+Add:
+Propulsion System
+Electronics
+Power System
+Payload
+
+Projected All-Up Mass (AUM):
+40–55 kg target
+60 kg structural design maximum
+
+---------------------------------------
+CENTER OF GRAVITY TARGET
+---------------------------------------
+
+Horizontal CG:
+Must fall within 50 mm of geometric center.
+
+Vertical CG Target:
+Between 35% and 55% of FRAME_HEIGHT.
+
+For FRAME_HEIGHT = 900 mm:
+CG Target Zone:
+315 mm – 495 mm above base ring.
+
+---------------------------------------
+CG CONTROL RULES
+---------------------------------------
+
+- Heavy components mounted low when possible.
+- Batteries placed below mid-height.
+- Symmetrical mass distribution around center.
+- Avoid cantilevered mass beyond ring perimeter.
+
+---------------------------------------
+STATIC STABILITY CONDITION
+---------------------------------------
+
+Projected CG must remain inside primary ring
+under 10° tilt condition.
+
+No tipping moment under static imbalance.
+
+---------------------------------------
+CG VALIDATION METHOD
+---------------------------------------
+
+1. Assemble frame.
+2. Install simulated component masses.
+3. Suspend system from single lift point.
+4. Mark vertical line from suspension.
+5. Verify line intersects central 100 mm circle.
+
+---------------------------------------
+DYNAMIC STABILITY CONSIDERATION
+---------------------------------------
+
+Lower CG improves:
+- Torsional resistance
+- Landing stability
+- Vibration control
+
+Excessively low CG may:
+- Increase landing shock loads on base
+
+Balanced vertical distribution preferred.
+
+---------------------------------------
+END OF FILE
+---------------------------------------

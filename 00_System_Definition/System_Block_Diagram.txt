@@ -1,0 +1,188 @@
+OBSIDIAN-8 V3
+System_Block_Diagram.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Provide a single authoritative high-level system architecture
+representation for OBSIDIAN-8 V3.
+
+This document defines:
+
+- Major subsystems
+- Data flow pathways
+- Power flow pathways
+- Authority flow hierarchy
+- Safety enforcement boundaries
+
+------------------------------------------------------------
+2. HIGH-LEVEL SYSTEM BLOCKS
+------------------------------------------------------------
+
+                     +------------------------+
+                     |   Remote Operator      |
+                     |  (Encrypted Channel)   |
+                     +-----------+------------+
+                                 |
+                                 v
+                     +------------------------+
+                     | Remote Control Node    |
+                     | Authentication Layer   |
+                     +-----------+------------+
+                                 |
+                                 v
+                     +------------------------+
+                     | Mission & Autonomy     |
+                     | - Navigation           |
+                     | - Docking              |
+                     | - Energy Manager       |
+                     +-----------+------------+
+                                 |
+                                 v
+                     +------------------------+
+                     | Reactive Controller    |
+                     | - Motion Envelope      |
+                     | - Stability Monitor    |
+                     +-----------+------------+
+                                 |
+                                 v
+                     +------------------------+
+                     | Duet Bridge Interface  |
+                     +-----------+------------+
+                                 |
+                                 v
+                     +------------------------+
+                     | Servo Actuators        |
+                     +------------------------+
+
+------------------------------------------------------------
+3. PERCEPTION FLOW
+------------------------------------------------------------
+
+Sensors:
+- Camera
+- Depth Sensor
+- IMU
+
+         +----------------------+
+         |   Perception Nodes   |
+         | - Camera Node        |
+         | - Depth Node         |
+         | - IMU Node           |
+         | - Terrain Classifier |
+         +----------+-----------+
+                    |
+                    v
+            Mission & Autonomy
+
+Perception data must not directly command actuators.
+
+------------------------------------------------------------
+4. POWER FLOW ARCHITECTURE
+------------------------------------------------------------
+
+                 +------------------+
+                 |  Battery Pack    |
+                 |  + BMS           |
+                 +--------+---------+
+                          |
+                          v
+              +----------------------+
+              | Power Distribution   |
+              | - Servo Rail         |
+              | - Compute Rail       |
+              +-----+-----------+----+
+                    |           |
+                    v           v
+              Servo Actuators   Compute Stack
+
+Kill-Line Relay:
+Between Power Distribution and Servo Rail.
+
+Hardware E-Stop:
+Interrupts Servo Rail directly.
+
+------------------------------------------------------------
+5. SAFETY SUPERVISION BLOCK
+------------------------------------------------------------
+
+            +-----------------------+
+            | Pi Watchdog           |
+            | - Heartbeat Monitor   |
+            | - Authority Check     |
+            +-----------+-----------+
+                        |
+                        v
+                Kill-Line Relay
+
+Watchdog supervises:
+- Reactive Node
+- Mission Node
+- Authority Consistency
+
+------------------------------------------------------------
+6. AUTHORITY FLOW
+------------------------------------------------------------
+
+Layer 4 – Maintenance  
+Layer 3 – Remote  
+Layer 2 – Mission  
+Layer 1 – Reactive  
+Layer 0 – Hardware Kill  
+
+Authority flows downward.
+Safety overrides upward.
+
+Lower layer always dominates higher.
+
+------------------------------------------------------------
+7. DATA FLOW SUMMARY
+------------------------------------------------------------
+
+Sensors → Perception → Mission → Reactive → Duet → Actuators
+
+Remote → Mission → Reactive → Duet → Actuators
+
+Watchdog monitors Reactive + Mission.
+
+Hardware kill interrupts Servo rail regardless of software state.
+
+------------------------------------------------------------
+8. FAILURE CONTAINMENT BOUNDARIES
+------------------------------------------------------------
+
+Mission failure:
+Reactive STOP.
+
+Reactive failure:
+Watchdog kill-line.
+
+Watchdog failure:
+Kill-line defaults open.
+
+BMS fault:
+Power isolation.
+
+No single failure may result in uncontrolled motion.
+
+------------------------------------------------------------
+9. DESIGN INTENT
+------------------------------------------------------------
+
+The system block diagram ensures:
+
+- Clear subsystem separation
+- Deterministic authority enforcement
+- Hardware-dominant safety cutoff
+- Transparent data and power pathways
+- Isolation between perception and actuation
+
+This diagram represents the canonical architecture
+for OBSIDIAN-8 V3.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

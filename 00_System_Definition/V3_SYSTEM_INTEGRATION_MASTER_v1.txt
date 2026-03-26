@@ -1,0 +1,163 @@
+OBSIDIAN-8 V3
+SYSTEM INTEGRATION MASTER DOCUMENT v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: FULL PLATFORM INTEGRATION CONTROL
+Units: Metric
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define integration rules across:
+
+- Structure
+- Propulsion
+- Core systems
+- Electronics
+- Power
+- Wiring
+- Thermal
+- Landing interface
+
+Prevent subsystem conflicts
+and maintain architecture integrity.
+
+---------------------------------------
+ARCHITECTURE LOCK
+---------------------------------------
+
+The following are FIXED:
+
+- 45-inch (1143 mm) footprint
+- 12-segment 3030 primary ring
+- 8 vertical 3030 posts
+- 2020 secondary bracing system
+- 300 mm central clearance cylinder
+- CF nylon printed interface parts
+- No primary load path through printed parts
+
+No modification without documented revision.
+
+---------------------------------------
+INTEGRATION HIERARCHY
+---------------------------------------
+
+Load Order Priority:
+
+1. Aluminum structural members
+2. Fasteners (Grade 10.9)
+3. Secondary aluminum bracing
+4. Printed interface parts (shear only)
+5. Electronics
+6. Wiring
+7. Thermal control components
+
+Lower-priority systems must not compromise higher-priority structure.
+
+---------------------------------------
+CLEARANCE MANAGEMENT
+---------------------------------------
+
+Reserved volumes:
+
+- Central 300 mm cylinder
+- 50 mm inward buffer from primary ring
+- Upper airflow path
+
+No subsystem may intrude into reserved zones
+without documented approval.
+
+---------------------------------------
+MASS DISTRIBUTION CONTROL
+---------------------------------------
+
+Target AUM: 40–55 kg
+Structural max: 60 kg
+
+CG must remain:
+
+Within 50 mm of geometric center (horizontal)
+Between 35–55% of frame height (vertical)
+
+Subsystem placement must respect CG model.
+
+---------------------------------------
+INTERFACE CONTROL RULES
+---------------------------------------
+
+Propulsion mounts:
+Direct aluminum contact only.
+
+Electronics deck:
+Mounted to secondary structure only.
+
+Battery:
+Lower core region.
+
+Wiring:
+Follow routing spec strictly.
+
+Thermal:
+No sealed heat traps.
+
+---------------------------------------
+REVISION CONTROL
+---------------------------------------
+
+Any geometry change requires:
+
+1. Updated geometry file.
+2. Updated cut list (if affected).
+3. Updated load assumption (if mass changes).
+4. Version increment.
+
+No silent geometry drift allowed.
+
+---------------------------------------
+VALIDATION FLOW
+---------------------------------------
+
+1. Structural assembly verification
+2. Torsion test
+3. Landing load test
+4. Wiring integrity check
+5. Thermal run test
+6. CG validation
+7. Dynamic vibration observation
+
+Each stage must pass
+before proceeding to next.
+
+---------------------------------------
+FAILURE ESCALATION
+---------------------------------------
+
+If subsystem conflicts occur:
+
+Priority resolution order:
+
+1. Structural integrity
+2. Load path correctness
+3. CG stability
+4. Thermal safety
+5. Electrical integrity
+6. Serviceability
+
+Aesthetic considerations are lowest priority.
+
+---------------------------------------
+END STATE DEFINITION
+---------------------------------------
+
+System considered integrated when:
+
+- All geometry files locked
+- Assembly completed to spec
+- Load tests passed
+- Thermal limits respected
+- CG validated
+- No visible structural drift
+
+---------------------------------------
+END OF FILE
+---------------------------------------

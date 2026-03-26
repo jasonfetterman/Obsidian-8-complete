@@ -1,0 +1,189 @@
+OBSIDIAN-8 V3
+Risk_Register.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Identify, classify, and mitigate risks associated with
+design, operation, and lifecycle of OBSIDIAN-8 V3.
+
+Each risk includes:
+
+- Risk ID
+- Description
+- Severity
+- Likelihood
+- Mitigation
+- Verification Method
+
+------------------------------------------------------------
+2. SEVERITY SCALE
+------------------------------------------------------------
+
+1 – Minor (No injury, minor inconvenience)
+2 – Moderate (System interruption)
+3 – Major (Hardware damage possible)
+4 – Critical (Injury risk or uncontrolled motion)
+5 – Catastrophic (Severe injury or irreversible damage)
+
+------------------------------------------------------------
+3. LIKELIHOOD SCALE
+------------------------------------------------------------
+
+1 – Rare
+2 – Unlikely
+3 – Possible
+4 – Likely
+5 – Frequent
+
+------------------------------------------------------------
+4. RISK TABLE
+------------------------------------------------------------
+
+RISK-001  
+Description: Uncontrolled servo motion due to software crash  
+Severity: 4  
+Likelihood: 2  
+Mitigation: Reactive authority dominance + hardware kill-line  
+Verification: Reactive crash test + kill latency test  
+
+------------------------------------------------------------
+
+RISK-002  
+Description: Brownout during active motion  
+Severity: 4  
+Likelihood: 3  
+Mitigation: Energy-aware navigation + BMS undervoltage enforcement  
+Verification: Low-SOC shutdown test  
+
+------------------------------------------------------------
+
+RISK-003  
+Description: Authority conflict between mission and reactive layer  
+Severity: 3  
+Likelihood: 2  
+Mitigation: Watchdog authority coherence check  
+Verification: Authority mismatch simulation  
+
+------------------------------------------------------------
+
+RISK-004  
+Description: Thermal runaway of battery pack  
+Severity: 5  
+Likelihood: 1  
+Mitigation: BMS thermal cutoff + temperature monitoring  
+Verification: Thermal overlimit test  
+
+------------------------------------------------------------
+
+RISK-005  
+Description: Mechanical frame failure under load  
+Severity: 4  
+Likelihood: 2  
+Mitigation: Structural validation + load testing  
+Verification: Static load test  
+
+------------------------------------------------------------
+
+RISK-006  
+Description: Remote control hijack or unauthorized access  
+Severity: 4  
+Likelihood: 2  
+Mitigation: Encrypted channel + authentication  
+Verification: Penetration test  
+
+------------------------------------------------------------
+
+RISK-007  
+Description: Watchdog failure during motion  
+Severity: 4  
+Likelihood: 1  
+Mitigation: Fail-safe kill-line default open  
+Verification: Pi power loss simulation  
+
+------------------------------------------------------------
+
+RISK-008  
+Description: Sensor failure causing navigation error  
+Severity: 3  
+Likelihood: 3  
+Mitigation: Redundant validation + terrain confidence thresholds  
+Verification: Sensor dropout test  
+
+------------------------------------------------------------
+
+RISK-009  
+Description: Servo overheating during sustained load  
+Severity: 3  
+Likelihood: 3  
+Mitigation: Thermal monitoring + torque limiting  
+Verification: Thermal endurance test  
+
+------------------------------------------------------------
+
+RISK-010  
+Description: Docking collision with fixed structure  
+Severity: 3  
+Likelihood: 2  
+Mitigation: Reduced docking speed + positional tolerance validation  
+Verification: Docking test protocol  
+
+------------------------------------------------------------
+
+RISK-011  
+Description: EMI interference causing command corruption  
+Severity: 3  
+Likelihood: 2  
+Mitigation: Shielded wiring + command validation + sequence ID  
+Verification: EMI injection test  
+
+------------------------------------------------------------
+
+RISK-012  
+Description: Loss of communication during supervised operation  
+Severity: 2  
+Likelihood: 3  
+Mitigation: Defined link-loss fallback behavior  
+Verification: Communication loss simulation  
+
+------------------------------------------------------------
+5. RISK REVIEW POLICY
+------------------------------------------------------------
+
+Risk register must be reviewed:
+
+- Before Phase 2 exit
+- Before scaled production
+- After any Class A engineering change
+- After critical field incident
+
+------------------------------------------------------------
+6. ACCEPTANCE CRITERIA
+------------------------------------------------------------
+
+No catastrophic (Severity 5) risk may remain without
+documented mitigation and validation.
+
+Risks must be traceable to:
+
+- Safety Architecture
+- System Requirements
+- Test Protocols
+
+------------------------------------------------------------
+7. DESIGN INTENT
+------------------------------------------------------------
+
+The Risk Register formalizes hazard awareness,
+ensures mitigation tracking,
+and enforces validation discipline.
+
+Safety risk ownership is continuous,
+not a one-time activity.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

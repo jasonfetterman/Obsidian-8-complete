@@ -1,0 +1,204 @@
+OBSIDIAN-8 V3
+Configuration_Management_Plan.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define configuration control, version management,
+change control procedures, and baseline governance
+for OBSIDIAN-8 V3.
+
+Configuration management ensures:
+
+- Traceability
+- Reproducibility
+- Controlled evolution
+- Audit readiness
+
+------------------------------------------------------------
+2. CONFIGURATION BASELINES
+------------------------------------------------------------
+
+The following baselines are defined:
+
+2.1 System Baseline  
+Complete document set and architecture state.
+
+2.2 Hardware Baseline  
+Frame revision  
+Actuator models  
+Battery chemistry  
+BMS revision  
+Power distribution revision  
+
+2.3 Software Baseline  
+ROS2 package versions  
+Message definitions version  
+Firmware versions  
+Launch configurations  
+
+2.4 Production Baseline  
+BOM revision  
+Assembly instructions  
+Calibration procedures  
+
+No baseline may change without formal approval.
+
+------------------------------------------------------------
+3. VERSION IDENTIFICATION
+------------------------------------------------------------
+
+Version format:
+
+V[Major].[Minor].[Revision]
+
+Major:
+Architecture-level change.
+
+Minor:
+Feature addition or improvement.
+
+Revision:
+Documentation correction or minor update.
+
+All files must display version identifier.
+
+------------------------------------------------------------
+4. CHANGE CONTROL PROCESS
+------------------------------------------------------------
+
+4.1 Change Request (CR)
+
+Any modification must begin with a documented CR including:
+
+- Description
+- Justification
+- Affected subsystems
+- Risk assessment
+- Impact analysis
+
+4.2 Classification
+
+Class A – Safety or structural impact  
+Class B – Performance affecting  
+Class C – Documentation only  
+
+Class A requires full regression testing.
+
+------------------------------------------------------------
+5. APPROVAL AUTHORITY
+------------------------------------------------------------
+
+Changes must be approved by:
+
+- System Architect (authority)
+- Safety reviewer (for Class A)
+- Production manager (if production impacted)
+
+No unilateral changes permitted.
+
+------------------------------------------------------------
+6. CONFIGURATION RECORDS
+------------------------------------------------------------
+
+Each production unit must record:
+
+- Serial number
+- Hardware revision
+- Software version
+- Calibration version
+- Battery configuration
+- Deployment profile
+
+Records must be retained ≥ 5 years.
+
+------------------------------------------------------------
+7. SOFTWARE CONTROL
+------------------------------------------------------------
+
+Source code must be:
+
+- Version-controlled (Git)
+- Tagged per release
+- Linked to SRS revision
+- Linked to test validation record
+
+No production deployment from untagged commit.
+
+------------------------------------------------------------
+8. DOCUMENT CONTROL
+------------------------------------------------------------
+
+All engineering documents must:
+
+- Include revision number
+- Include status (Draft / Review / Authoritative)
+- Be archived on update
+- Maintain change history
+
+Uncontrolled copies prohibited.
+
+------------------------------------------------------------
+9. CONFIGURATION AUDITS
+------------------------------------------------------------
+
+Periodic audits must verify:
+
+- Software version matches baseline
+- Hardware matches BOM revision
+- Calibration records complete
+- Safety architecture intact
+
+Audit required before:
+
+- Phase 2 exit
+- Scaled production
+- Field deployment
+
+------------------------------------------------------------
+10. FIELD CHANGE MANAGEMENT
+------------------------------------------------------------
+
+Field modifications require:
+
+- Documented CR
+- Risk evaluation
+- Verification testing
+- Baseline update
+- Registry update
+
+Unauthorized field modification prohibited.
+
+------------------------------------------------------------
+11. END-OF-LIFE CONTROL
+------------------------------------------------------------
+
+When unit decommissioned:
+
+- Configuration record archived
+- Serial marked inactive
+- Firmware version recorded
+
+No decommissioned unit may re-enter fleet
+without full requalification.
+
+------------------------------------------------------------
+12. DESIGN INTENT
+------------------------------------------------------------
+
+Configuration Management ensures:
+
+- Predictable system evolution
+- Safety preservation across revisions
+- Traceable engineering changes
+- Audit-ready documentation
+- Production consistency
+
+Control of change preserves system integrity.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
