@@ -1,0 +1,219 @@
+OBSIDIAN-8 V3
+Power_Budget_Analysis.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define quantitative power consumption model for OBSIDIAN-8 V3.
+
+This document establishes:
+
+- Peak current draw
+- Average current draw
+- Energy capacity modeling
+- Mission duration estimates
+- Safety energy margins
+
+All energy-aware navigation logic must align with this model.
+
+------------------------------------------------------------
+2. BATTERY CONFIGURATION ASSUMPTION
+------------------------------------------------------------
+
+Example Baseline Configuration:
+
+Chemistry: LiFePO4  
+Nominal Voltage: 25.6 V (8S)  
+Capacity: 20 Ah  
+Total Energy:  
+
+Energy (Wh) = Voltage × Capacity  
+Energy = 25.6 V × 20 Ah = 512 Wh  
+
+Usable energy (80% safety window):  
+
+512 Wh × 0.80 = 409.6 Wh usable
+
+------------------------------------------------------------
+3. SUBSYSTEM POWER DRAW
+------------------------------------------------------------
+
+3.1 Servo Actuators
+
+Idle current per servo: 0.2 A  
+Active walking average per servo: 1.5 A  
+Peak torque per servo: 4.0 A  
+
+Assume 12 servos.
+
+Idle total:
+0.2 A × 12 = 2.4 A
+
+Active walking average:
+1.5 A × 12 = 18 A
+
+Peak load:
+4.0 A × 12 = 48 A
+
+------------------------------------------------------------
+
+3.2 Compute Stack
+
+Main compute: 3.0 A @ 5V → 15 W  
+Reactive MCU: 0.5 A @ 5V → 2.5 W  
+Sensors (camera + depth + IMU): 10 W  
+
+Total compute power ≈ 27.5 W  
+
+At 25.6 V system rail:  
+27.5 W ÷ 25.6 V ≈ 1.07 A
+
+------------------------------------------------------------
+
+3.3 Auxiliary Systems
+
+Wireless communication: 5 W  
+Cooling fans (if active): 5 W  
+
+Total auxiliary ≈ 10 W  
+Current at 25.6 V ≈ 0.39 A
+
+------------------------------------------------------------
+4. TOTAL CURRENT DRAW ESTIMATION
+------------------------------------------------------------
+
+Idle (standing):
+
+Servo idle: 2.4 A  
+Compute: 1.07 A  
+Auxiliary: 0.39 A  
+
+Total idle ≈ 3.86 A  
+
+------------------------------------------------------------
+
+Walking (average terrain):
+
+Servo average: 18 A  
+Compute: 1.07 A  
+Auxiliary: 0.39 A  
+
+Total walking ≈ 19.46 A  
+
+------------------------------------------------------------
+
+Peak dynamic maneuver:
+
+Servo peak: 48 A  
+Compute: 1.07 A  
+Auxiliary: 0.39 A  
+
+Total peak ≈ 49.46 A  
+
+BMS and wiring must support ≥ 50 A continuous margin.
+
+------------------------------------------------------------
+5. MISSION DURATION ESTIMATION
+------------------------------------------------------------
+
+Using usable energy: 409.6 Wh  
+
+Average walking power:
+
+Power = Voltage × Current  
+Power = 25.6 V × 19.46 A ≈ 498 W  
+
+Mission duration (continuous walking):
+
+409.6 Wh ÷ 498 W ≈ 0.82 hours  
+
+≈ 49 minutes continuous walking
+
+------------------------------------------------------------
+
+Idle mission duration:
+
+Idle power ≈ 25.6 V × 3.86 A ≈ 99 W  
+
+409.6 Wh ÷ 99 W ≈ 4.1 hours idle
+
+------------------------------------------------------------
+6. ENERGY SAFETY MARGINS
+------------------------------------------------------------
+
+Mandatory reserve margin: 20%
+
+Mission planner must:
+
+- Trigger reduced capability at 30% SOC
+- Trigger return-to-base at 25% SOC
+- Trigger critical stop at 15% SOC
+- Never allow drop below 10% SOC during motion
+
+Pre-BMS cutoff margin must be enforced.
+
+------------------------------------------------------------
+7. THERMAL POWER CONSIDERATION
+------------------------------------------------------------
+
+Peak power events generate:
+
+Peak servo power:
+25.6 V × 48 A ≈ 1228 W instantaneous
+
+Thermal design must dissipate
+sustained loads without exceeding:
+
+Servo temperature limit
+Battery temperature limit
+Regulator temperature limit
+
+------------------------------------------------------------
+8. WIRING AND CONNECTOR REQUIREMENTS
+------------------------------------------------------------
+
+Continuous rating must exceed:
+
+1.5 × maximum sustained current
+
+Recommended continuous rating ≥ 75 A
+
+Voltage drop under peak load must remain
+within acceptable tolerance.
+
+------------------------------------------------------------
+9. RANGE ESTIMATION EXAMPLE
+------------------------------------------------------------
+
+If average walking speed = 0.5 m/s  
+
+Distance per hour:
+0.5 m/s × 3600 s = 1800 m/hour  
+
+At 49 minutes continuous walking:
+
+~1470 meters theoretical max range  
+
+Range must subtract 20% reserve margin.
+
+------------------------------------------------------------
+10. DESIGN INTENT
+------------------------------------------------------------
+
+This power budget ensures:
+
+- Energy-aware navigation remains grounded in physics
+- Battery sizing matches mission expectations
+- Wiring and BMS rated appropriately
+- Thermal envelope not exceeded
+- Brownout risk minimized
+
+Energy modeling must remain synchronized
+with real-world telemetry calibration.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

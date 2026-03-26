@@ -1,0 +1,161 @@
+OBSIDIAN-8 V3
+ELECTRONICS DECK GEOMETRY v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: AVIONICS MOUNTING STRUCTURE DEFINITION
+Units: Millimeters
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define geometry and mounting rules
+for flight controller, power distribution,
+communications, and sensor modules.
+
+Electronics must:
+- Be structurally stable
+- Be vibration-controlled
+- Remain within CG control zone
+- Be serviceable
+
+---------------------------------------
+LOCATION
+---------------------------------------
+
+Primary Electronics Deck Height:
+40–55% of FRAME_HEIGHT
+
+For 900 mm frame:
+Deck zone = 360 mm – 495 mm above base ring
+
+Deck must remain within:
+300 mm central clearance cylinder
+
+---------------------------------------
+DECK STRUCTURE
+---------------------------------------
+
+Support Structure:
+Mounted to 2020 secondary bracing
+
+Do NOT mount directly to:
+Motor posts without bracing tie-in
+
+Recommended Deck Plate:
+Material: 3–5 mm aluminum or composite
+Diameter: 180–240 mm
+
+---------------------------------------
+MOUNTING PATTERN
+---------------------------------------
+
+Deck Fasteners:
+M5 or M6
+
+Minimum 4 mounting points
+Evenly spaced
+
+Bolt spacing:
+≥ 40 mm
+
+---------------------------------------
+VIBRATION ISOLATION
+---------------------------------------
+
+Electronics stack must use:
+
+Moderate-stiffness isolation standoffs
+(Shore 60–80A equivalent)
+
+Isolation applied:
+Between deck plate and electronics,
+NOT between deck and frame.
+
+Frame-to-deck must remain rigid.
+
+---------------------------------------
+COMPONENT ZONES
+---------------------------------------
+
+Zone A — Flight Controller
+Centered within ±20 mm of origin
+
+Zone B — Power Distribution
+Below flight controller if possible
+
+Zone C — Communication Modules
+Upper deck region, clear line-of-sight
+
+Zone D — Sensor Modules
+Isolated from high-current wiring
+
+---------------------------------------
+WIRING CLEARANCE
+---------------------------------------
+
+Minimum wire bend radius:
+5× wire diameter
+
+No wire runs across:
+Motor mounting bolts
+Sharp aluminum edges
+
+Provide:
+Cable pass-through gaps in radial bracing
+
+---------------------------------------
+THERMAL RULES
+---------------------------------------
+
+Maintain airflow path
+through center cylinder.
+
+Do not enclose electronics fully
+without venting.
+
+Minimum 15 mm spacing
+between high-power components.
+
+---------------------------------------
+SERVICE ACCESS
+---------------------------------------
+
+Deck must be removable
+without disassembling primary ring.
+
+No hidden fasteners under propulsion mounts.
+
+---------------------------------------
+CG CONTROL
+---------------------------------------
+
+Avoid stacking heavy batteries
+above 50% frame height.
+
+Place:
+Heavier modules lower within deck zone.
+
+---------------------------------------
+EMI CONTROL
+---------------------------------------
+
+High-current wiring separated
+from signal wiring by ≥ 30 mm.
+
+Twist motor power pairs
+to reduce EMI.
+
+---------------------------------------
+FAILURE CONDITIONS
+---------------------------------------
+
+Redesign required if:
+
+- Electronics visibly oscillate under vibration
+- Deck flex exceeds 2 mm under manual load
+- Wire chafing observed
+- Fasteners loosen during dynamic testing
+
+---------------------------------------
+END OF FILE
+---------------------------------------

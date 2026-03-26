@@ -1,0 +1,153 @@
+OBSIDIAN-8 V3
+THERMAL MANAGEMENT SPECIFICATION v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: HEAT CONTROL & DISSIPATION DEFINITION
+Units: Metric
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define thermal management strategy for:
+
+- Motors
+- ESCs
+- Power distribution
+- Batteries
+- Flight electronics
+
+Prevent thermal runaway,
+component derating,
+and structural heat damage.
+
+---------------------------------------
+THERMAL DESIGN PRINCIPLES
+---------------------------------------
+
+1. Use open-air convection wherever possible.
+2. Avoid sealed enclosures without venting.
+3. Separate heat-generating components from printed nylon.
+4. Maintain airflow path through central core.
+
+---------------------------------------
+MOTOR THERMAL CONTROL
+---------------------------------------
+
+Motors mounted externally at ring perimeter.
+
+Requirements:
+- No printed parts directly contacting motor housing.
+- Maintain 5–10 mm air gap to any CF nylon.
+- Allow unobstructed radial airflow.
+
+Do not shroud motors unless forced-air cooling provided.
+
+---------------------------------------
+ESC PLACEMENT
+---------------------------------------
+
+Preferred Location:
+Near motors on vertical posts or radial braces.
+
+Mounting:
+Directly to aluminum (heat sink effect).
+
+Avoid:
+Mounting ESCs to printed parts without metal interface.
+
+Minimum spacing between ESCs:
+20 mm
+
+---------------------------------------
+BATTERY THERMAL CONTROL
+---------------------------------------
+
+Battery location:
+Lower central core (< 50% frame height).
+
+Mounting:
+Secure but not fully encapsulated.
+
+Provide:
+Ventilation gap on at least two sides.
+
+Do not:
+Sandwich battery between insulating materials.
+
+Temperature monitoring recommended.
+
+---------------------------------------
+ELECTRONICS DECK
+---------------------------------------
+
+Flight controller and signal electronics:
+
+- Keep separated from ESC heat zones.
+- Maintain 15 mm minimum spacing between high-power modules.
+- Avoid enclosing deck in sealed housing.
+
+Optional:
+Perforated shield for debris protection.
+
+---------------------------------------
+STRUCTURAL HEAT PATHS
+---------------------------------------
+
+Aluminum members act as passive heat sinks.
+
+Encourage:
+ESC-to-aluminum contact where appropriate.
+
+Do not rely on:
+Printed nylon for heat transfer.
+
+---------------------------------------
+AIRFLOW MANAGEMENT
+---------------------------------------
+
+Central 300 mm clearance cylinder must remain open.
+
+Do not obstruct vertical airflow path.
+
+Wiring bundles must not block
+core ventilation path.
+
+---------------------------------------
+OPERATING TEMPERATURE TARGETS
+---------------------------------------
+
+Motor surface:
+< 90°C
+
+ESC casing:
+< 80°C
+
+Battery:
+< 60°C
+
+Flight electronics:
+< 70°C
+
+---------------------------------------
+THERMAL TEST PROCEDURE
+---------------------------------------
+
+1. Operate propulsion system under load.
+2. Measure component temperatures.
+3. Record peak temperature after 5-minute run.
+4. Inspect printed parts for softening or creep.
+
+---------------------------------------
+FAILURE CONDITIONS
+---------------------------------------
+
+Redesign required if:
+
+- Printed parts show heat deformation.
+- ESC exceeds rated temp.
+- Battery exceeds safe operating temp.
+- Electronics performance degrades due to heat.
+
+---------------------------------------
+END OF FILE
+---------------------------------------

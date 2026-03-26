@@ -1,0 +1,161 @@
+OBSIDIAN-8 V3
+WIRING & ROUTING SPECIFICATION v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: ELECTRICAL PATH CONTROL DEFINITION
+Units: Millimeters
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define controlled routing paths for:
+
+- Motor power lines
+- Main battery leads
+- Signal wiring
+- Sensor wiring
+- Communication antennas
+
+Prevent:
+- EMI interference
+- Mechanical abrasion
+- CG imbalance
+- Service difficulty
+
+---------------------------------------
+GENERAL RULES
+---------------------------------------
+
+No loose wiring spans.
+
+All wiring must:
+- Be mechanically secured
+- Follow defined routing channels
+- Avoid sharp edges
+- Avoid load-bearing contact points
+
+Minimum clearance from aluminum edge:
+2 mm (with edge protection if closer)
+
+---------------------------------------
+POWER DISTRIBUTION PATH
+---------------------------------------
+
+Battery location:
+Lower core region (< 50% frame height)
+
+Main power leads:
+Route vertically through central core volume.
+
+Motor power leads:
+Route along vertical posts.
+
+Secure every:
+80–120 mm with clamp or tie anchor.
+
+No diagonal free-span runs allowed.
+
+---------------------------------------
+SIGNAL WIRING PATH
+---------------------------------------
+
+Signal wiring must:
+
+- Remain ≥ 30 mm away from high-current lines
+- Cross power lines at 90° only if unavoidable
+- Be twisted where possible
+
+Dedicated routing channel:
+Opposite side of vertical post from motor power lines.
+
+---------------------------------------
+ANTENNA PLACEMENT
+---------------------------------------
+
+Mount height:
+Above electronics deck if possible.
+
+Minimum distance from motor wiring:
+100 mm
+
+Maintain clear air volume
+around antenna elements.
+
+---------------------------------------
+WIRE STRAIN RELIEF
+---------------------------------------
+
+At every connection:
+
+- Provide slack loop (20–40 mm)
+- Anchor wire before connector
+
+No connector should bear mechanical load.
+
+---------------------------------------
+PASS-THROUGH POINTS
+---------------------------------------
+
+All brace intersections must:
+
+- Include cable clearance gap
+OR
+- Use printed cable guide
+
+No wire pinched between:
+2020 and 3030 members.
+
+---------------------------------------
+THERMAL CONSIDERATIONS
+---------------------------------------
+
+High-current wires must not:
+
+Contact motor housing directly.
+
+Maintain airflow clearance.
+
+Do not bundle:
+Signal and power lines tightly together.
+
+---------------------------------------
+SERVICEABILITY
+---------------------------------------
+
+Electronics deck removable
+without cutting wire ties.
+
+Primary battery removable
+without removing structural bracing.
+
+Label both ends of:
+
+- Motor leads
+- Sensor cables
+- Power distribution lines
+
+---------------------------------------
+EMI CONTROL
+---------------------------------------
+
+Twist motor phase wires.
+
+Keep ESCs close to motors if applicable.
+
+Avoid running power leads
+parallel to sensor lines for long spans.
+
+---------------------------------------
+FAILURE CONDITIONS
+---------------------------------------
+
+Redesign required if:
+
+- EMI interference detected
+- Wire insulation abrasion observed
+- Excess wire vibration visible
+- Connector stress or loosening detected
+
+---------------------------------------
+END OF FILE
+---------------------------------------
