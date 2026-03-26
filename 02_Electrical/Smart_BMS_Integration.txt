@@ -1,0 +1,102 @@
+OBSIDIAN-8 V3
+
+02_Electrical/Smart_BMS_Integration.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define integration of the Smart Battery Management System (BMS) within OBSIDIAN-8 V3.
+
+Ensures safe battery operation and system-wide power awareness
+Provides real-time telemetry for control and safety systems
+Enables predictive maintenance and fault detection
+Integrates with Main Power System, Energy Models, and Control Authority
+2. SYSTEM OVERVIEW
+
+The Smart BMS is responsible for:
+
+Monitoring battery health and operating conditions
+Protecting against unsafe electrical states
+Providing telemetry to Mission Compute and Reactive Safety layers
+Enforcing hardware-level safety shutdown when required
+
+BMS operates as a critical safety subsystem with direct authority over power delivery.
+
+3. MONITORED PARAMETERS
+Parameter	Description	Source
+Pack Voltage	Total battery voltage	BMS ADC
+Cell Voltages	Individual cell monitoring	BMS ADC
+Current	Charge/discharge current	Shunt sensor
+Temperature	Cell and pack temperature	Thermistors
+State of Charge (SOC)	Remaining capacity (%)	Calculated
+State of Health (SOH)	Battery degradation estimate	Calculated
+All parameters updated in real-time and logged for diagnostics.
+4. PROTECTION FUNCTIONS
+Overvoltage Protection
+Undervoltage Protection
+Overcurrent Protection
+Short-Circuit Protection
+Thermal Shutdown (High/Low temperature limits)
+Cell Balancing (passive or active)
+
+Protection actions include:
+
+Limiting current draw
+Isolating battery from system
+Triggering system-wide safe shutdown
+5. CONTROL INTERFACES
+Mission Compute Interface:
+Receives telemetry via UART / CAN / I2C (implementation dependent)
+Uses SOC and current data for energy-aware motion planning
+Reactive Safety Layer:
+Receives critical alerts (undervoltage, thermal fault)
+Initiates immediate safe-stop if thresholds exceeded
+Hardware Interface:
+Direct control of power cutoff (main bus disconnect)
+Independent of software execution
+6. COMMUNICATION PROTOCOLS
+Supported interfaces:
+CAN bus (preferred for robustness)
+UART (fallback / simple integration)
+Requirements:
+Error detection (CRC or equivalent)
+Message timeout handling
+Redundant reporting of critical parameters
+7. FAILSAFE AND AUTHORITY BEHAVIOR
+BMS has hardware-level authority to:
+Disconnect battery under fault conditions
+Override Mission Compute commands
+In failure scenarios:
+Loss of communication → system assumes worst-case and reduces load
+Critical fault → immediate power cutoff
+Safety priority rule enforced:
+BMS actions must not interfere with kill-line or watchdog operation
+Power cutoff must result in predictable safe-stop behavior
+8. INTEGRATION WITH OTHER SYSTEMS
+Energy Models:
+LiFePO4 and LiPo SOC/voltage curves derived from BMS data
+Main Power System:
+BMS sits between battery and main bus
+Servo Bank Architecture:
+BMS informs load balancing and current limiting
+Deployment Profile:
+Records BMS firmware version, configuration, and calibration
+FMEA References:
+FM-003 (undervoltage)
+FM-009 (power fault)
+9. VALIDATION AND TESTING
+Functional testing of all protection triggers
+SOC accuracy validation via full charge/discharge cycles
+Communication reliability under load
+Thermal shutdown verification
+Fault injection testing (overcurrent, undervoltage, sensor failure)
+
+All results documented per Configuration Management Plan.
+
+10. DESIGN INTENT
+Provide intelligent, autonomous battery protection
+Enable real-time energy awareness across the system
+Ensure safe and deterministic response to electrical faults
+Support predictive maintenance and long-term reliability
+Fully integrate with control authority, FMEA, and deployment systems
