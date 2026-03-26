@@ -1,0 +1,130 @@
+OBSIDIAN-8 V3
+
+04_Autonomy/Energy_Aware_Navigation_Model.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Energy-Aware Navigation Model (EANM) for OBSIDIAN-8 V3.
+
+Ensures missions are executed within battery and thermal constraints
+Integrates actuator load, terrain, and energy model data
+Coordinates with Mission Compute, Reactive Controller, and BMS
+Provides deterministic energy budgeting and predictive load management
+2. INPUT PARAMETERS
+Parameter	Source	Notes
+Battery SOC / Voltage	Smart BMS	Real-time update
+Battery Type	Deployment profile	LiFePO4 / LiPo curves
+Actuator Power Demand	Servo Bank Architecture / ROS2	Per-joint torque
+Terrain Resistance	Sensor suite / terrain maps	Friction and slope
+Thermal Status	Thermal Management Model	Adjust allowed motion
+Mission Objective	Mission Compute	Target path, duration
+3. ENERGY BUDGETING MODEL
+Compute predicted energy consumption per trajectory segment:
+𝐸
+𝑠
+𝑒
+𝑔
+𝑚
+𝑒
+𝑛
+𝑡
+=
+∑
+𝑗
+𝑜
+𝑖
+𝑛
+𝑡
+𝑠
+𝑃
+𝑎
+𝑐
+𝑡
+𝑢
+𝑎
+𝑡
+𝑜
+𝑟
+⋅
+𝑡
+𝑚
+𝑜
+𝑡
+𝑖
+𝑜
+𝑛
++
+𝐸
+𝑏
+𝑎
+𝑠
+𝑒
+𝑙
+𝑖
+𝑛
+𝑒
+_
+𝑐
+𝑜
+𝑚
+𝑝
+𝑢
+𝑡
+𝑒
+E
+segment
+	​
+
+=
+joints
+∑
+	​
+
+P
+actuator
+	​
+
+⋅t
+motion
+	​
+
++E
+baseline_compute
+	​
+
+Adjust speed, gait, and trajectory based on:
+SOC thresholds
+Predicted thermal limits
+Actuator load distribution
+Energy budget updated continuously for adaptive planning
+4. NAVIGATION ADJUSTMENTS
+Speed Scaling: slower motion for low SOC or high temperature
+Gait Selection: tripod / neutral / stair modes based on terrain and energy cost
+Segment Prioritization: favor lower-energy paths if mission constraints allow
+Dynamic Replanning: reactive adjustment in case of unexpected load spikes
+5. INTEGRATION WITH CONTROL AND SAFETY
+Mission Compute: executes energy-aware trajectories
+Reactive Controller: overrides motion if thermal or actuator limits exceeded
+BMS: provides real-time SOC, voltage, and temperature constraints
+Thermal Management Model: informs allowable load and duty cycles
+Energy-aware decisions never override hardware kill-line or reactive safety stops
+6. FAILURE MODES AND MITIGATION
+Failure Mode	Cause	Mitigation
+Energy underestimation	Incorrect SOC / terrain model	Conservative margin + recalculation
+Unexpected actuator load	Terrain irregularity	Adaptive gait / speed adjustment
+Thermal limit exceeded	Sustained high torque	Reactive Controller stop + speed reduction
+FMEA references: FM-003 (battery undervoltage), FM-004 (servo overheating)
+7. VALIDATION AND TESTING
+Simulate full mission paths under varying SOC and terrain conditions
+Monitor predicted vs actual energy consumption
+Verify speed and gait adjustments trigger appropriately
+Test fail-safe response when energy drops below threshold
+Log and audit all energy-aware navigation decisions
+8. DESIGN INTENT
+Enable safe, predictable mission completion within energy constraints
+Integrate fully with BMS, actuators, thermal models, and reactive safety
+Minimize risk of mission abort due to energy depletion or thermal overload
+Provide scalable framework for multi-terrain and multi-mission deployment
+Maintain deterministic behavior and audit-ready operation
