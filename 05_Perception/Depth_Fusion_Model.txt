@@ -1,0 +1,60 @@
+OBSIDIAN-8 V3
+
+05_Perception/Depth_Fusion_Model.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Depth Fusion Model for OBSIDIAN-8 V3.
+
+Combines depth data from stereo cameras, LiDAR, and optional structured light sensors
+Generates unified 3D point cloud for navigation, obstacle avoidance, and mapping
+Supports real-time autonomous decision-making
+Ensures redundancy and fault tolerance in perception
+2. SENSOR INPUTS
+Sensor Type	Role	Update Rate	Notes
+Stereo Cameras	Depth estimation via disparity	30–60 Hz	Front, diagonal pairs
+LiDAR	360° range measurement	10–20 Hz	Optional top or side mount
+Structured Light / ToF	Short-range obstacle detection	60 Hz	Optional
+IMU	Provides pose for depth stabilization	200 Hz	Integrated with sensor fusion
+3. FUSION ALGORITHM
+Sensor Preprocessing:
+Noise filtering (median / bilateral filter)
+Outlier rejection (temporal and spatial)
+Timestamp synchronization
+Depth Alignment:
+Transform all depth measurements to common world frame using extrinsic calibration
+Compensate for motion using IMU and frame kinematics
+Point Cloud Fusion:
+Merge overlapping points from multiple sensors
+Weighted averaging based on sensor confidence (e.g., stereo confidence maps, LiDAR reliability)
+Generate unified 3D occupancy map
+Data Downsampling:
+Voxel grid filter or similar for efficient real-time processing
+Maintain resolution necessary for obstacle detection and navigation
+4. FAILSAFE AND REDUNDANCY
+If a sensor fails:
+Stereo cameras provide primary depth coverage
+LiDAR provides fallback 3D map if available
+Autonomy layer degrades gracefully to reduced FOV or slower speed
+Depth map validity checked each cycle:
+Missing points or excessive noise → trigger alert to Reactive Controller
+Escalation follows Authority Escalation Model
+5. INTERFACES
+Output: 3D point cloud published on ROS2 topic depth_fusion/pointcloud
+Subscribers:
+Mission Compute / Energy-Aware Navigation
+Reactive Controller for collision avoidance
+Mapping and logging modules for audit and deployment verification
+6. VALIDATION AND TESTING
+Compare fused depth map against ground-truth environment
+Test under varied lighting, texture, and surface conditions
+Verify latency and real-time throughput meets control cycle requirements
+Simulate partial sensor failures to validate redundancy logic
+Log all fusion results for post-mission verification
+7. DESIGN INTENT
+Provide robust, redundant, and accurate 3D perception for navigation and safety
+Ensure deterministic response under normal and degraded sensor conditions
+Integrate tightly with autonomy, control, and mission planning layers
+Maintain auditability and configuration traceability
