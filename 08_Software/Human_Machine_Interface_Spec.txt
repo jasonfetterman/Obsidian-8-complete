@@ -1,0 +1,229 @@
+OBSIDIAN-8 V3
+Human_Machine_Interface_Spec.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define operator interface requirements, visual indicators,
+control inputs, and safety annunciation for OBSIDIAN-8 V3.
+
+The HMI must:
+
+- Clearly communicate system state
+- Preserve authority transparency
+- Provide deterministic operator control
+- Prevent unsafe ambiguity
+- Reinforce safety dominance model
+
+------------------------------------------------------------
+2. OPERATOR ROLES
+------------------------------------------------------------
+
+Operator Levels:
+
+Level A – Supervisor (Remote Operator)  
+Level B – Field Technician  
+Level C – Maintenance Technician  
+
+Each level has defined control privileges.
+
+------------------------------------------------------------
+3. REQUIRED DISPLAY ELEMENTS
+------------------------------------------------------------
+
+3.1 System Mode Indicator
+
+Display current mode:
+
+- Standby
+- Active
+- Mission
+- Docking
+- Reduced Capability
+- Critical
+- Emergency Stop
+
+Mode must be unambiguous and always visible.
+
+------------------------------------------------------------
+
+3.2 Authority Layer Indicator
+
+Display current authority layer:
+
+- Layer 0 – Hardware Kill
+- Layer 1 – Reactive
+- Layer 2 – Mission
+- Layer 3 – Remote
+
+Operator must know which layer currently controls motion.
+
+------------------------------------------------------------
+
+3.3 Energy State Display
+
+Display:
+
+- Battery voltage
+- State of charge (%)
+- Energy state classification
+- Estimated remaining range
+
+Critical SOC must display visual and audible alert.
+
+------------------------------------------------------------
+
+3.4 Fault Indicator Panel
+
+Display:
+
+- Active fault code
+- Severity level
+- Source subsystem
+- Recommended action (if defined)
+
+Critical faults must require operator acknowledgment.
+
+------------------------------------------------------------
+4. CONTROL INPUT REQUIREMENTS
+------------------------------------------------------------
+
+4.1 Remote Motion Command
+
+Manual control allowed only in Active mode.
+
+Velocity limits must be enforced by reactive layer.
+
+------------------------------------------------------------
+
+4.2 Emergency Stop Control
+
+Physical E-Stop must:
+
+- Be red
+- Be clearly labeled
+- Be immediately accessible
+
+Activation must:
+
+- Cut servo rail
+- Require manual reset
+
+------------------------------------------------------------
+
+4.3 Mode Selection Control
+
+Mode change must:
+
+- Require confirmation
+- Validate safety state
+- Log transition
+
+Unsafe transitions must be rejected.
+
+------------------------------------------------------------
+5. STATUS ANNUNCIATION
+------------------------------------------------------------
+
+The system must provide:
+
+- Visual indicator (LED or UI state)
+- Audible alert for critical faults
+- Clear transition indication
+
+Status must update within defined latency.
+
+------------------------------------------------------------
+6. LINK STATUS DISPLAY
+------------------------------------------------------------
+
+If remote connected:
+
+- Display connection strength
+- Display authentication status
+
+If link lost:
+
+- Show link-loss indicator
+- Display fallback state
+
+------------------------------------------------------------
+7. SAFETY COMMUNICATION RULES
+------------------------------------------------------------
+
+The HMI must:
+
+- Never conceal critical fault
+- Never allow hidden authority state
+- Never mask energy critical threshold
+- Always prioritize safety alerts over mission data
+
+------------------------------------------------------------
+8. MAINTENANCE MODE INTERFACE
+------------------------------------------------------------
+
+Maintenance mode must:
+
+- Clearly indicate restricted state
+- Disable mission execution
+- Require authentication
+- Log entry and exit
+
+------------------------------------------------------------
+9. DATA LOG ACCESS
+------------------------------------------------------------
+
+Operators may:
+
+- View recent logs
+- Export logs (authorized roles only)
+- View configuration summary
+
+Modification of logs prohibited.
+
+------------------------------------------------------------
+10. HUMAN FACTOR REQUIREMENTS
+------------------------------------------------------------
+
+Interface must:
+
+- Use clear labeling
+- Avoid ambiguous terminology
+- Maintain consistent color coding
+- Minimize cognitive overload
+
+Critical alerts must be distinguishable from informational alerts.
+
+------------------------------------------------------------
+11. FAILURE HANDLING
+------------------------------------------------------------
+
+If HMI fails:
+
+- System must continue under safety hierarchy
+- Reactive layer remains dominant
+- Watchdog supervision unaffected
+
+HMI failure must not compromise safety.
+
+------------------------------------------------------------
+12. DESIGN INTENT
+------------------------------------------------------------
+
+The HMI ensures:
+
+- Transparent authority awareness
+- Immediate fault visibility
+- Clear energy state communication
+- Deterministic operator interaction
+- Reinforcement of safety-first architecture
+
+Human understanding is essential
+for safe autonomous deployment.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------

@@ -1,0 +1,228 @@
+OBSIDIAN-8 V3
+Software_Node_Architecture.txt
+Revision: V3.2
+Status: Authoritative
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+
+Define formal ROS2 node architecture, topic interfaces,
+data flow, authority separation, and execution model
+for OBSIDIAN-8 V3.
+
+This document ensures:
+
+- Deterministic control structure
+- Clear authority boundaries
+- Transparent inter-node communication
+- Safety dominance preservation
+
+------------------------------------------------------------
+2. ARCHITECTURAL LAYERS
+------------------------------------------------------------
+
+Layer 0 – Hardware (Servo rail, BMS, Kill-line)  
+Layer 1 – Reactive Control  
+Layer 2 – Mission & Autonomy  
+Layer 3 – Remote Supervision  
+Layer 4 – Maintenance / Diagnostics  
+
+Software nodes must respect this hierarchy.
+
+------------------------------------------------------------
+3. CORE NODE GROUPS
+------------------------------------------------------------
+
+3.1 Reactive Layer Nodes
+
+reactive_controller_node  
+- Subscribes: /motion_command  
+- Publishes: /filtered_motion_command  
+- Publishes: /core_state  
+- Enforces motion envelope  
+
+stability_monitor_node  
+- Subscribes: /joint_state  
+- Subscribes: /imu_data  
+- Publishes: /stability_status  
+
+duet_bridge_node  
+- Subscribes: /filtered_motion_command  
+- Publishes: /joint_state  
+- Interfaces with Duet hardware  
+
+------------------------------------------------------------
+
+3.2 Mission Layer Nodes
+
+mission_planner_node  
+- Subscribes: /terrain_state  
+- Subscribes: /energy_status  
+- Publishes: /motion_command  
+
+navigation_node  
+- Subscribes: /pose  
+- Subscribes: /terrain_state  
+- Publishes: /path_plan  
+
+energy_manager_node  
+- Subscribes: /battery_data  
+- Publishes: /energy_status  
+
+docking_controller_node  
+- Subscribes: /pose  
+- Publishes: /motion_command  
+
+------------------------------------------------------------
+
+3.3 Perception Nodes
+
+camera_node  
+- Publishes: /camera_image  
+
+depth_node  
+- Publishes: /depth_map  
+
+imu_node  
+- Publishes: /imu_data  
+
+terrain_classifier_node  
+- Subscribes: /depth_map  
+- Publishes: /terrain_state  
+
+------------------------------------------------------------
+
+3.4 Watchdog & Safety Nodes
+
+heartbeat_node  
+- Publishes: /heartbeat  
+
+watchdog_monitor_node  
+- Subscribes: /heartbeat  
+- Controls: kill-line via GPIO  
+
+system_logger_node  
+- Subscribes: /fault_report  
+- Writes persistent logs  
+
+------------------------------------------------------------
+
+3.5 Remote Interface Nodes
+
+remote_control_node  
+- Subscribes: secure remote channel  
+- Publishes: /motion_command  
+- Publishes: /mode_request  
+
+authentication_node  
+- Validates operator credentials  
+- Authorizes command publication  
+
+------------------------------------------------------------
+4. CRITICAL TOPICS
+------------------------------------------------------------
+
+/motion_command  
+/filtered_motion_command  
+/joint_state  
+/core_state  
+/heartbeat  
+/energy_status  
+/terrain_state  
+/fault_report  
+/mode_request  
+
+All safety-critical topics must use reliable QoS.
+
+------------------------------------------------------------
+5. AUTHORITY FLOW
+------------------------------------------------------------
+
+Mission layer may publish motion commands.
+
+Reactive layer filters and validates.
+
+Duet bridge executes only validated commands.
+
+Watchdog monitors heartbeat and authority.
+
+Hardware kill-line overrides all layers.
+
+No node may bypass reactive controller.
+
+------------------------------------------------------------
+6. EXECUTION MODEL
+------------------------------------------------------------
+
+Reactive layer must run with:
+
+- Highest scheduling priority
+- Deterministic timing
+
+Mission layer may operate asynchronously.
+
+Watchdog operates independently on Pi.
+
+------------------------------------------------------------
+7. NODE FAILURE HANDLING
+------------------------------------------------------------
+
+If mission node fails:
+Reactive STOP.
+
+If reactive node fails:
+Watchdog kill-line.
+
+If perception node fails:
+Mission degrade or halt.
+
+If remote node fails:
+Fallback behavior defined.
+
+------------------------------------------------------------
+8. LAUNCH STRUCTURE
+------------------------------------------------------------
+
+Launch groups:
+
+core.launch.py  
+- reactive_controller  
+- duet_bridge  
+- stability_monitor  
+
+mission.launch.py  
+- mission_planner  
+- navigation  
+- energy_manager  
+- docking_controller  
+
+perception.launch.py  
+- camera  
+- depth  
+- imu  
+- terrain_classifier  
+
+safety.launch.py  
+- heartbeat  
+- watchdog_monitor  
+- system_logger  
+
+------------------------------------------------------------
+9. DESIGN INTENT
+------------------------------------------------------------
+
+The node architecture enforces:
+
+- Clear authority separation
+- Deterministic safety control
+- Transparent data flow
+- Modular scalability
+- Isolation of safety-critical execution paths
+
+Software structure must always preserve
+hardware-dominant safety enforcement.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
