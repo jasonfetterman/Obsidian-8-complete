@@ -1,0 +1,89 @@
+OBSIDIAN-8 V3
+
+02_Electrical/Servo_Bank_Architecture.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the architecture, grouping, power distribution, and control interfaces for servo actuator banks in OBSIDIAN-8 V3.
+
+Ensures stable and scalable actuator control
+Prevents power overload and signal interference
+Integrates with Main Power System, Control Authority Model, and FMEA
+Supports modular limb configurations (e.g., Leg_MK1, future variants)
+2. SYSTEM OVERVIEW
+
+Servo actuators are organized into independent banks, each responsible for a subset of limbs or joints.
+
+Each servo bank includes:
+
+Dedicated power distribution line
+Signal/control interface (PWM / serial bus)
+Local protection (fuse or current limiter)
+Ground reference tied to system ground
+3. SERVO BANK GROUPING
+Bank ID	Assigned Subsystem	Typical Load	Notes
+SB-01	Front Left Leg (FL)	High	Hip, knee, ankle
+SB-02	Front Right Leg (FR)	High	
+SB-03	Rear Left Leg (RL)	High	
+SB-04	Rear Right Leg (RR)	High	
+Each bank operates independently to prevent cascading failures.
+Additional banks may be defined for arms or payload actuators.
+4. POWER DISTRIBUTION
+Servo banks powered from Actuator Bus (12V nominal).
+Each bank includes:
+Inline fuse or resettable breaker
+Local bulk capacitance for transient load smoothing
+Design constraints:
+Max current per bank limited per actuator specifications
+Simultaneous peak loads across banks controlled by Mission Compute
+5. SIGNAL AND CONTROL INTERFACE
+Control methods:
+PWM (standard servo control) or
+Serial bus (preferred for scalability and noise resistance)
+Requirements:
+Shielded signal lines in high EMI environments
+Common ground reference with power system
+Update rate sufficient for real-time motion control
+ROS2 interface connects Mission Compute to servo controllers.
+6. LOAD MANAGEMENT AND PROTECTION
+Current Limiting:
+Prevents overload during high torque demand
+Thermal Monitoring:
+Servo temperature monitored where supported
+Dynamic Load Balancing:
+Mission Compute staggers motion to avoid simultaneous peak draw
+Fault Isolation:
+Failure in one bank must not affect others
+7. CONTROL AUTHORITY INTEGRATION
+Hardware Level:
+Kill-line disables power to all servo banks
+Reactive Controller:
+Overrides servo commands for collision avoidance or instability
+Mission Compute:
+Issues coordinated movement commands across banks
+Failsafe Behavior:
+On communication loss or watchdog trigger → all banks enter safe-stop state
+8. CABLE ROUTING AND PHYSICAL INTEGRATION
+Power and signal cables routed per Cable_Routing_and_Strain_Control.txt
+Strain relief applied at:
+Joint entry points
+Servo connectors
+Banks physically distributed to:
+Minimize cable length
+Reduce voltage drop
+Improve modularity
+9. VALIDATION AND TESTING
+Load testing per bank under maximum torque conditions
+Simulated multi-bank peak load scenarios
+Signal integrity testing under full system operation
+FMEA references:
+FM-004 (servo overheating)
+FM-009 (power distribution fault)
+10. DESIGN INTENT
+Provide scalable and fault-tolerant actuator control architecture
+Ensure stable power delivery and signal integrity
+Prevent cascading failures across actuator systems
+Enable precise, coordinated motion across all limbs
+Fully integrate with CM, FMEA, deployment profiles, and control authority hierarchy
