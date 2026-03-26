@@ -1,0 +1,53 @@
+OBSIDIAN-8 V3
+
+05_Perception/Camera_Array_Layout.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Camera Array Layout for OBSIDIAN-8 V3.
+
+Provides 360° situational awareness
+Supports navigation, obstacle detection, and mission-specific vision tasks
+Integrates with perception stack, autonomy, and control architecture
+Ensures deterministic coverage and redundancy
+2. CAMERA ARRAY CONFIGURATION
+Camera ID	Position / Orientation	Resolution	Field of View (FOV)	Purpose
+CAM-FRONT	Front-center, forward-facing	12 MP	90° horizontal	Forward obstacle detection, navigation
+CAM-RIGHT	Right lateral, angled 45° forward	12 MP	90° horizontal	Lateral obstacle detection, mapping
+CAM-LEFT	Left lateral, angled 45° forward	12 MP	90° horizontal	Lateral obstacle detection, mapping
+CAM-REAR	Rear-center, backward-facing	12 MP	90° horizontal	Rear collision avoidance
+CAM-TOP	Top-mounted, downward-facing	8 MP	120° vertical	Terrain mapping, stair detection
+CAM-DIAG1	Front-right diagonal, 30° down	8 MP	60°	Stereo vision, depth estimation
+CAM-DIAG2	Front-left diagonal, 30° down	8 MP	60°	Stereo vision, depth estimation
+3. MOUNTING AND COVERAGE
+Cameras mounted on rigid frame sections with vibration damping
+Lens aligned with forward kinematic axes for consistent perception
+Redundant overlap ensures no blind spots in primary navigation directions
+Top and diagonal cameras provide terrain awareness and stereo depth
+4. INTERFACES
+Cameras connected via high-speed MIPI CSI or USB 3.0 depending on sensor type
+Feeds processed by Mission Compute and Perception Compute Unit
+ROS2 topics expose frames to autonomy stack and obstacle detection algorithms
+Synchronization: hardware trigger ensures consistent timestamping for stereo/depth calculations
+5. CALIBRATION AND ALIGNMENT
+Intrinsic calibration for each camera (focal length, distortion, principal point)
+Extrinsic calibration to define relative pose between cameras and frame
+Calibration data stored in configuration repository, linked to deployment profile
+Recalibration required after mechanical modification or sensor replacement
+6. FAILSAFE AND REDUNDANCY
+Overlapping FOV ensures continued perception if a single camera fails
+Missing camera frame → autonomy stack switches to redundant data source
+Critical navigation tasks rely on primary front stereo pair, with fallback lateral coverage
+Logs all camera failures and switches for audit
+7. VALIDATION AND TESTING
+Verify field-of-view coverage in all directions
+Test obstacle detection accuracy with all active cameras
+Validate depth estimation and stereo processing under varied lighting
+Perform vibration, shock, and thermal stress tests on mounts and connectors
+8. DESIGN INTENT
+Provide robust, redundant perception for safe autonomous operation
+Ensure complete coverage for navigation, obstacle avoidance, and mission execution
+Integrate seamlessly with autonomy, control, and sensor fusion layers
+Maintain deterministic performance and fully auditable configuration
