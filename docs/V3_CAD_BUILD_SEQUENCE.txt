@@ -1,0 +1,112 @@
+OBSIDIAN-8 V3
+CAD BUILD SEQUENCE
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: GEOMETRY EXECUTION ORDER
+
+---------------------------------------
+STEP 1 — SCENE SETUP
+---------------------------------------
+
+UNITS = Millimeters
+ORIGIN = Center of platform
+Z_AXIS = Up
+
+Create reference circle:
+DIAMETER = 1143 mm
+SEGMENTS = 128
+Layer = REF_BOUNDARY
+Freeze transforms.
+
+---------------------------------------
+STEP 2 — PRIMARY RING NODE LAYOUT
+---------------------------------------
+
+Create 12 locator nodes.
+
+Radius = 556.5 mm
+Even angular spacing = 360 / 12 = 30 degrees
+
+Locator naming convention:
+RING_NODE_01 through RING_NODE_12
+
+Layer = 3030_PRIMARY
+
+---------------------------------------
+STEP 3 — PRIMARY 3030 SEGMENTS
+---------------------------------------
+
+Segment count = 12
+Segment length = 288.3 mm
+Profile = 3030
+Miter angle = 15 degrees per side
+
+Each segment connects:
+RING_NODE_n to RING_NODE_n+1
+
+Freeze transforms after placement.
+
+---------------------------------------
+STEP 4 — VERTICAL POSTS
+---------------------------------------
+
+Post count = 8
+Profile = 3030
+Height = 900 mm
+
+Placement:
+Every other ring node
+Aligned directly above node
+
+Naming:
+POST_01 through POST_08
+
+Layer = 3030_PRIMARY
+
+---------------------------------------
+STEP 5 — SECONDARY 2020 BRACING
+---------------------------------------
+
+Radial braces:
+Count = 6
+Profile = 2020
+From center toward alternating ring nodes
+
+Upper brace ring:
+Radius = 520 mm
+Height = 60% of FRAME_HEIGHT
+Profile = 2020
+
+Cross bracing:
+2020 between vertical posts
+Attached via printed gussets
+
+Layer = 2020_SECONDARY
+
+---------------------------------------
+STEP 6 — CLEARANCE ZONES
+---------------------------------------
+
+Central reserved cylinder:
+Diameter = 300 mm
+Height = Full frame
+
+Outer buffer:
+50 mm inward from primary ring
+
+Layer = CLEARANCE_ZONES
+
+---------------------------------------
+STEP 7 — PRINTED PARTS LAYER
+---------------------------------------
+
+Material = CF Nylon
+Shrink compensation = 1.002 to 1.005 scale
+Bolt hole oversize = +0.2 mm
+Wall thickness minimum = 6 mm
+Reinforced zones = 10–12 mm
+
+Layer = CF_PRINTED
+
+---------------------------------------
+END OF FILE
+---------------------------------------

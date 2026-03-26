@@ -1,0 +1,140 @@
+OBSIDIAN-8 V3
+MAYA LAYER & NAMING STANDARD v1
+Based on: V3_LARGE_FORMAT_BASELINE
+Status: CAD STRUCTURE LOCK
+Units: Millimeters
+
+---------------------------------------
+PURPOSE
+---------------------------------------
+
+Define strict object naming and layer structure
+to prevent geometry drift and misalignment
+during frame development.
+
+No ad-hoc naming permitted.
+
+---------------------------------------
+SCENE SETTINGS
+---------------------------------------
+
+Units = Millimeters
+Origin = Center of footprint
+Z+ = Up
+
+All transforms frozen after placement.
+No negative scaling allowed.
+
+---------------------------------------
+LAYER STRUCTURE
+---------------------------------------
+
+REF_BOUNDARY
+3030_PRIMARY
+2020_SECONDARY
+CF_PRINTED
+CLEARANCE_ZONES
+FASTENERS
+REFERENCE_GEOMETRY
+
+No geometry placed on default layer.
+
+---------------------------------------
+PRIMARY RING OBJECT NAMES
+---------------------------------------
+
+RING_NODE_01 through RING_NODE_12
+RING_SEG_01 through RING_SEG_12
+
+Naming order:
+Clockwise when viewed from top.
+RING_SEG_01 connects:
+RING_NODE_01 → RING_NODE_02
+
+---------------------------------------
+VERTICAL POSTS
+---------------------------------------
+
+POST_01 through POST_08
+
+Numbering rule:
+POST_01 aligned above RING_NODE_01
+Every other node used.
+
+---------------------------------------
+RADIAL BRACES
+---------------------------------------
+
+RADIAL_01 through RADIAL_06
+
+RADIAL_01 aligned toward RING_NODE_01
+Even angular spacing.
+
+---------------------------------------
+UPPER RING
+---------------------------------------
+
+UPPER_NODE_01 through UPPER_NODE_12
+UPPER_SEG_01 through UPPER_SEG_12
+
+Must align vertically above primary nodes.
+
+---------------------------------------
+CROSS BRACING
+---------------------------------------
+
+CROSS_A_01 through CROSS_A_08
+CROSS_B_01 through CROSS_B_08
+
+Naming reflects X-pattern direction.
+
+---------------------------------------
+PRINTED PARTS
+---------------------------------------
+
+CORNER_BLOCK_01 through CORNER_BLOCK_12
+POST_FOOT_01 through POST_FOOT_08
+RADIAL_CLAMP_01 through RADIAL_CLAMP_06
+GUSSET_01 through GUSSET_16
+
+---------------------------------------
+CLEARANCE GEOMETRY
+---------------------------------------
+
+CLEARANCE_CENTER_CYL
+CLEARANCE_OUTER_BUFFER
+
+These objects:
+Display only.
+Never exported to fabrication.
+
+---------------------------------------
+GROUPING STRUCTURE
+---------------------------------------
+
+MASTER_FRAME_GRP
+    PRIMARY_RING_GRP
+    VERTICAL_POSTS_GRP
+    RADIAL_BRACING_GRP
+    UPPER_RING_GRP
+    CROSS_BRACING_GRP
+    PRINTED_PARTS_GRP
+    CLEARANCE_GRP
+
+No loose objects allowed outside MASTER_FRAME_GRP.
+
+---------------------------------------
+VERSION CONTROL RULE
+---------------------------------------
+
+Before major change:
+Save increment:
+V3_FRAME_LAYOUT_v01.mb
+V3_FRAME_LAYOUT_v02.mb
+etc.
+
+Never overwrite previous stable file.
+
+---------------------------------------
+END OF FILE
+---------------------------------------
