@@ -1,0 +1,61 @@
+OBSIDIAN-8 V3
+
+07_Swarm_and_Network/Secure_Comms_Model.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Secure Communications Model (SCM) for OBSIDIAN-8 V3.
+
+Ensures confidentiality, integrity, and authenticity of all inter-robot and remote communications
+Protects swarm coordination, telemetry, and remote mission control data
+Supports redundant and deterministic network operation
+Maintains auditability and compliance with cybersecurity requirements
+2. THREAT MITIGATION
+Eavesdropping: encrypt all channels using TLS 1.3 or equivalent
+Unauthorized Access: mutual authentication with unique device identities and digital certificates
+Message Tampering: HMAC or digital signatures to verify message integrity
+Replay Attacks: sequence numbers and timestamp validation on all messages
+Denial of Service (DoS): rate limiting and network monitoring to mitigate congestion or flooding
+3. NETWORK ARCHITECTURE
+Mesh Topology: each robot node can relay and verify messages
+Redundant Paths: ensures command delivery even if some nodes fail
+Priority Channels:
+High-priority: kill-line, emergency stop, authority overrides
+Medium-priority: swarm commands, mission tasking
+Low-priority: telemetry, logs, sensor data
+Encryption & Authentication:
+TLS 1.3 with ephemeral keys
+Certificate-based authentication per unit
+Mutual validation on join and handshake
+Automatic certificate rotation for long deployments
+4. MESSAGE STRUCTURE
+Header: source ID, destination ID, timestamp, sequence number
+Payload: mission command, swarm update, telemetry, or data packet
+Integrity: HMAC or signature
+Encryption: AES-256-GCM or equivalent symmetric encryption
+5. FAILSAFE AND REDUNDANCY
+Loss of communication triggers local autonomy to continue mission safely
+High-priority safety commands can use backup channels or repeated transmission
+Message verification failures logged and trigger alert
+Redundant network paths maintain delivery under partial network failure
+6. INTERFACES
+Swarm Network: all peer-to-peer robot communications
+Remote Mission Control: secure command and telemetry channels
+ROS2 Topics:
+swarm/secure_msgs — encrypted swarm messages
+remote/secure_comm — remote operator commands
+swarm/network_status — link health and authentication status
+7. VALIDATION AND TESTING
+Test encrypted message delivery under normal and degraded network conditions
+Verify mutual authentication and certificate validation
+Simulate replay attacks, tampering, and node compromise
+Validate high-priority command delivery latency
+Audit message logs for traceability and compliance
+8. DESIGN INTENT
+Provide robust, encrypted, and authenticated communication for swarm and remote control
+Ensure safety-first operation, deterministic performance, and redundancy
+Maintain auditability for all network messages
+Protect against external and internal threats while supporting autonomous mission execution
+Integrate seamlessly with swarm coordination, remote mission control, and local autonomy
