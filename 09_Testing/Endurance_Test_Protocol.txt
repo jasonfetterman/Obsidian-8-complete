@@ -1,0 +1,76 @@
+OBSIDIAN-8 V3
+
+09_Testing/Endurance_Test_Protocol.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Endurance Test Protocol (ETP) for OBSIDIAN-8 V3.
+
+Evaluates long-duration system operation under mission-representative conditions
+Validates energy management, thermal behavior, actuator reliability, and software stability
+Ensures predictable system behavior and safety over extended periods
+Provides objective criteria for acceptance and operational readiness
+2. TEST OBJECTIVES
+Verify continuous operation over mission duration (nominal: 8–12 hours, extended: up to 24 hours)
+Validate energy system performance and SOC accuracy
+Monitor actuator wear, thermal limits, and frame stress
+Confirm software stability, ROS2 node uptime, and communication reliability
+Ensure safety systems (kill-line, watchdog, reactive control) function consistently
+Capture logs and telemetry for audit and post-test analysis
+3. TEST SETUP
+Environment: controlled lab or outdoor test field
+Energy Profile: fully charged battery (LiFePO4 or LiPo depending on deployment profile)
+Sensors & Monitoring: IMU, temperature sensors, energy meters, actuator feedback
+Deployment Profile: FIELD_STANDARD or ENERGY_SAVER as appropriate
+Logging: all ROS2 topics, actuator telemetry, and watchdog logs
+4. TEST PROCEDURE
+
+Step 1 – Initialization:
+
+Power up system and verify readiness of all subsystems
+Confirm software deployment profile and baseline configuration
+Initialize data logging and telemetry
+
+Step 2 – Continuous Operation:
+
+Execute repetitive mission tasks (navigation, gaits, perception routines)
+Maintain nominal speed and sensor operation
+Record energy consumption, actuator currents, and temperature data
+
+Step 3 – Periodic Checks:
+
+Every hour: verify battery SOC matches predicted values
+Inspect actuator temperatures and servo currents
+Check ROS2 node health and kill-line responsiveness
+
+Step 4 – Simulated Stress Events:
+
+Introduce intermittent network loss to test autonomous behavior
+Apply temporary high-load tasks to stress actuators
+Observe reactive safety system response
+
+Step 5 – Completion:
+
+Safely power down system at end of test duration
+Verify energy remaining, thermal limits, and actuator conditions
+Archive logs, telemetry, and performance metrics
+5. ACCEPTANCE CRITERIA
+Continuous operation achieved for target duration without critical fault
+SOC accuracy within ±3% over entire test
+Actuator temperature below safety threshold for 100% of test
+No ROS2 node crashes or unhandled exceptions
+Kill-line and reactive safety remain fully operational throughout
+All logs captured and verified for audit
+6. FAILSAFE AND MONITORING
+Watchdog service monitors system responsiveness at all times
+Kill-line activated immediately if any critical fault occurs
+Thermal or energy thresholds trigger safe slowdown or shutdown
+Logs include all override events and emergency stop activations
+7. DESIGN INTENT
+Ensure long-duration reliability, energy predictability, and safety
+Validate system integration across mechanical, electrical, software, perception, and navigation layers
+Provide objective and auditable criteria for operational readiness
+Confirm robustness under normal, high-load, and degraded network conditions
+Maintain traceable records for continuous improvement and fleet deployment
