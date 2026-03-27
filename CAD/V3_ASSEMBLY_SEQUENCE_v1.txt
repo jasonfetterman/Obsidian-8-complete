@@ -1,0 +1,99 @@
+OBSIDIAN-8 V3
+
+CAD/V3_ASSEMBLY_SEQUENCE_v1.txt
+Revision: V3.1
+Status: Authoritative
+
+1. PURPOSE
+
+Provide a step-by-step assembly sequence for OBSIDIAN-8 V3, ensuring:
+
+Mechanical integrity
+Electrical correctness
+Software readiness
+Safety compliance
+2. PRE-ASSEMBLY REQUIREMENTS
+Verify all BOM items are present and correct
+Confirm frame revision matches V3 baseline
+Verify servo, actuator, and sensor hardware revisions
+Ensure calibrated power supply available for testing
+Ensure ESD-safe workstation and torque tools ready
+3. ASSEMBLY SEQUENCE
+
+3.1 Frame Assembly
+
+Assemble main frame rails and cross-members.
+Install mechanical brackets for actuators and sensor mounts.
+Torque all fasteners per structural load spec.
+Verify neutral stance geometry and CG alignment.
+
+3.2 Actuation System Installation
+
+Mount leg MK1 actuators and joints.
+Install servo banks in designated mounting plates.
+Connect actuator linkages, verify free motion in tripod gait positions.
+Confirm thermal clearance for all servos under full range of motion.
+
+3.3 Cable Routing & Strain Control
+
+Route all sensor, actuator, and power cables per routing plan.
+Secure cables with strain relief and tie-downs.
+Verify no pinching or interference with mechanical joints.
+
+3.4 Power System Integration
+
+Install LiFePO4 or LiPo battery packs.
+Connect BMS and main power distribution components.
+Verify voltage and current at battery terminals.
+Integrate watchdog and kill-line connections.
+
+3.5 Sensor Suite Installation
+
+Mount camera array and IMU sensors per layout spec.
+Install additional force and range sensors.
+Connect sensor power and data lines to controller interface.
+
+3.6 Control System & Network
+
+Install Pi or compute module and ROS2 stack.
+Mount Duet controller and ensure proper communication interface.
+Connect network interfaces for remote mission control.
+Verify secure comms links (TLS, authenticated).
+
+3.7 Software Deployment & Calibration
+
+Load deployment profile from versioned configuration.
+Apply firmware updates to all actuators.
+Run energy-aware navigation and reactive controller tests.
+Execute sensor calibration routines: IMU, camera, and force sensors.
+Verify authority escalation and watchdog integration.
+
+3.8 Final Mechanical Inspection
+
+Verify structural fasteners and torque values.
+Inspect cable routing and strain relief.
+Confirm neutral stance and leg range of motion.
+Ensure thermal clearance around actuators.
+
+3.9 Test Protocol Execution
+
+Execute movement tests: neutral gait, tripod gait, stair climb.
+Run endurance tests per battery and actuator limits.
+Execute failure injection and safety protocol checks.
+Confirm all sensor feeds publish correctly to ROS2 topics.
+
+3.10 Documentation & Configuration
+
+Record serial number, hardware revisions, software versions, and calibration data.
+Archive assembly sequence, test logs, and configuration in CM database.
+Mark unit as ready for Phase 2 deployment.
+4. SAFETY NOTES
+Always use hardware kill-line when testing mechanical actuation.
+Use ESD precautions when handling electronics.
+Verify torque limits on all fasteners to avoid structural failure.
+Battery connections must follow polarity and fuse specifications.
+5. DESIGN INTENT
+Ensure predictable and repeatable assembly
+Maintain baseline configuration integrity
+Enable audit-ready documentation
+Facilitate fleet-wide consistency for deployment
