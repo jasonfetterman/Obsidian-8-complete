@@ -1,0 +1,142 @@
+OBSIDIAN-8 V3
+
+06_Navigation/Path_Planning_Model.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Path Planning Model (PPM) for OBSIDIAN-8 V3.
+
+Provides deterministic, safe, and energy-aware path planning
+Integrates perception, autonomy, and energy models
+Supports multi-terrain, multi-objective mission execution
+Ensures paths respect system constraints, safety, and operational hierarchy
+2. INPUT PARAMETERS
+Parameter	Source / Notes
+Current Robot Pose	IMU, Odometry, localization stack
+Goal Pose / Mission Waypoints	Mission Compute
+Terrain Classification	Terrain Classification Model
+Obstacle Map	Depth Fusion Model / Object Classification Model
+Energy Constraints	Energy-Aware Navigation Model / BMS
+Gait / Actuator Limits	Mechanical & Control architecture
+3. PATH PLANNING ALGORITHM
+Global Planner:
+Generates overall path from current position to mission goal
+Uses A*, D*, or RRT* for efficiency and obstacle avoidance
+Incorporates terrain type and energy constraints into cost function
+Local Planner:
+Reactive adjustments to avoid dynamic obstacles
+Adapts gait, speed, and trajectory based on terrain and actuator load
+Ensures smooth transitions and stability
+Cost Function:
+𝐶
+𝑜
+𝑠
+𝑡
+=
+𝑤
+1
+⋅
+𝐷
+𝑖
+𝑠
+𝑡
+𝑎
+𝑛
+𝑐
+𝑒
++
+𝑤
+2
+⋅
+𝐸
+𝑛
+𝑒
+𝑟
+𝑔
+𝑦
++
+𝑤
+3
+⋅
+𝑇
+𝑒
+𝑟
+𝑟
+𝑎
+𝑖
+𝑛
+𝑃
+𝑒
+𝑛
+𝑎
+𝑙
+𝑡
+𝑦
++
+𝑤
+4
+⋅
+𝑂
+𝑏
+𝑠
+𝑡
+𝑎
+𝑐
+𝑙
+𝑒
+𝑃
+𝑟
+𝑜
+𝑥
+𝑖
+𝑚
+𝑖
+𝑡
+𝑦
+Cost=w
+1
+	​
+
+⋅Distance+w
+2
+	​
+
+⋅Energy+w
+3
+	​
+
+⋅TerrainPenalty+w
+4
+	​
+
+⋅ObstacleProximity
+Weights configurable per deployment profile
+Penalizes high-risk terrain or low-energy segments
+4. FAILSAFE AND OVERRIDES
+Local obstacles or unexpected terrain → Reactive Controller can modify path or halt motion
+Energy depletion → switch to Energy Saver mode, recalculate path
+Communication or perception loss → degrade to safe, conservative path or stop
+All path changes logged for audit
+5. INTERFACES
+Mission Compute: receives global path goals and constraints
+Reactive Controller: receives local trajectory adjustments
+Energy-Aware Navigation Model: provides real-time energy constraints
+Terrain Classification Model: informs allowable paths and gait selection
+ROS2 topics:
+navigation/global_path
+navigation/local_path
+navigation/path_status
+6. VALIDATION AND TESTING
+Simulate varied terrain, slopes, obstacles, and energy constraints
+Verify path optimality and adherence to energy budget
+Test reaction to dynamic obstacle insertion and sensor failure
+Log global and local paths for post-mission audit
+Validate integration with gait and actuator models
+7. DESIGN INTENT
+Provide safe, efficient, and energy-aware path planning
+Integrate deterministically with perception, autonomy, and control
+Support dynamic replanning while preserving safety-first hierarchy
+Maintain auditable logs of all path planning decisions
+Enable modular and scalable navigation for multi-mission deployment
