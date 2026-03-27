@@ -1,0 +1,61 @@
+OBSIDIAN-8 V3
+
+05_Perception/Terrain_Classification_Model.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Terrain Classification Model (TCM) for OBSIDIAN-8 V3.
+
+Classifies terrain type in real-time for adaptive navigation and gait selection
+Integrates depth fusion, camera imagery, IMU, and other sensors
+Supports energy-aware and safe motion planning
+Ensures deterministic behavior under all operational conditions
+2. INPUT PARAMETERS
+Input Type	Source	Notes
+Fused 3D Point Cloud	Depth Fusion Model	Provides terrain geometry
+RGB Images	Camera Array	Visual texture analysis
+IMU / Orientation	Sensor Suite	Slope, roll, pitch estimation
+Proximity / Range	LiDAR / stereo sensors	Surface discontinuities
+Optional Thermal / IR	Sensor Suite	Detect hazardous terrain (hot surfaces, snow/ice)
+3. CLASSIFICATION ALGORITHM
+Preprocessing:
+Filter point cloud to remove noise and outliers
+Normalize slopes relative to robot frame
+Project 3D points onto a terrain mesh
+Feature Extraction:
+Geometric: slope, roughness, step height, curvature
+Visual: texture, color gradients
+Optional: thermal contrast for hazards
+Terrain Classes:
+Flat / Smooth: standard gait, max performance possible
+Rough / Rocky: reduced speed, energy-aware gait
+Stairs / Steps: stair gait mode, adjust leg articulation
+Sloped: gait adjusted to maintain stability and energy efficiency
+Hazardous / Unstable: reactive safety overrides, reduced motion or stop
+Classification Decision:
+Weighted combination of geometric, visual, and IMU-derived features
+Confidence score threshold ensures only reliable terrain classifications are used
+4. FAILSAFE AND REDUNDANCY
+If classification confidence is low → fallback to Reactive Controller safe motion
+Multiple sensor inputs (depth + visual + IMU) provide redundancy
+Unexpected terrain changes trigger immediate speed/gait adjustments
+All events logged for audit and analysis
+5. INTERFACES
+Output: terrain classification grid published on ROS2 topic perception/terrain_map
+Subscribers:
+Mission Compute / Energy-Aware Navigation for gait and speed planning
+Reactive Controller for safe motion overrides
+Logging and deployment profile modules
+6. VALIDATION AND TESTING
+Test over a variety of terrains: flat, rocky, slopes, stairs
+Simulate sensor degradation (camera occlusion, noisy depth data)
+Verify real-time classification latency meets control cycle requirements
+Compare classifications against ground-truth survey data
+Log all classification results for audit and performance verification
+7. DESIGN INTENT
+Provide accurate, redundant, and real-time terrain classification
+Enable safe and energy-efficient autonomous navigation
+Integrate seamlessly with gait selection, energy-aware planning, and reactive safety
+Maintain deterministic, predictable, and auditable system behavior
