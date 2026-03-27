@@ -1,0 +1,74 @@
+OBSIDIAN-8 V3
+
+10_Lifecycle/Spare_Parts_Strategy.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Spare Parts Strategy (SPS) for OBSIDIAN-8 V3.
+
+Ensure rapid replacement of failed components to maintain operational readiness
+Support fleet management, lifecycle sustainability, and cost control
+Integrate with maintenance, reliability, and configuration management
+2. OBJECTIVES
+Maintain adequate inventory levels of critical spare parts
+Enable rapid field replacement and minimize downtime
+Track spare parts usage and link to serial-numbered units
+Ensure spare parts comply with baseline configurations
+Forecast replacement needs based on MTBF, mission profiles, and usage patterns
+3. SPARE PARTS CATEGORIZATION
+
+3.1 Critical Components:
+
+Actuators, servo banks, and drive motors
+Battery packs (LiFePO4 / LiPo)
+Frame modules and structural subassemblies
+Sensor suite (IMU, cameras, LiDAR)
+Control computer boards and communication modules
+
+3.2 Standard Components:
+
+Wiring harnesses and connectors
+Mounting brackets, fasteners, and protective covers
+Thermal management parts (fans, heatsinks, coolant lines)
+Software flash keys or deployment media
+
+3.3 Consumables:
+
+Lubricants, cleaning supplies, and sealants
+Backup cables and fuse elements
+4. INVENTORY MANAGEMENT
+Maintain a minimum stock level for all critical components (typically ≥2 units per deployed unit)
+Track inventory via serial numbers, batch IDs, and version
+Implement first-in, first-out (FIFO) for parts usage
+Update configuration and maintenance records when parts are installed or replaced
+5. REPLACEMENT PROCEDURES
+
+5.1 Field Replacement:
+
+Authorized technicians follow documented procedure for removing and installing parts
+Verify part version matches baseline for unit’s deployment profile
+Log all replacements, including date, technician, and serial number
+
+5.2 Depot-Level Replacement:
+
+Complex components or assemblies sent to central depot for repair or calibration
+Replace failed parts with verified units from inventory
+Update all configuration records and maintenance logs
+
+5.3 Calibration & Verification:
+
+Post-replacement calibration of sensors, actuators, and energy systems
+Verify functional operation against acceptance criteria
+Ensure system logs updated for audit
+6. FORECASTING AND LIFECYCLE INTEGRATION
+Use operational logs and FMEA data to predict part replacement cycles
+Align spare parts procurement with Phase 2 Industrialization and Phase 3 Deployment
+Review usage trends annually and adjust stock levels
+Ensure spares support fleet readiness and mission continuity
+7. DESIGN INTENT
+Minimize downtime and maximize operational availability
+Ensure parts compatibility and adherence to baseline configurations
+Maintain traceable records for inventory and replacement actions
+Support long-term fleet sustainability and reliability
