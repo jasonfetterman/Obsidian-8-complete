@@ -1,0 +1,65 @@
+OBSIDIAN-8 V3
+
+08_Software/Duet_Interface.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Duet Interface Model (DIM) for OBSIDIAN-8 V3.
+
+Provides a standardized interface between ROS2 control software and Duet motion controllers
+Supports precise actuator control for limbs, joints, and auxiliary devices
+Ensures deterministic, safe, and auditable operation
+Integrates with reactive safety, energy, and navigation models
+2. INTERFACE ARCHITECTURE
+Communication Protocols:
+Primary: HTTP/REST API over local network or USB
+Optional: G-code commands for low-level actuator control
+ROS2 topics for integration with control stack
+Control Channels:
+Motion command input: joint positions, velocities, torques
+Status output: actuator feedback, temperature, fault conditions
+Safety override: kill-line monitoring, watchdog integration
+Data Flow:
+ROS2 → Duet Controller → Actuators → Sensor Feedback → ROS2
+3. SOFTWARE MODULES
+Motion Command Translator:
+Converts ROS2 trajectory messages to Duet-compatible G-code or API commands
+Supports velocity, acceleration, and torque constraints
+Actuator Monitoring Module:
+Reads real-time feedback from Duet (position, current, temperature)
+Detects actuator faults, overheat, or overload conditions
+Safety & Watchdog Integration:
+Monitors Duet for response timeouts
+Interfaces with hardware kill-line for immediate stop
+Logs all safety-critical events
+Configuration Loader:
+Loads actuator parameters per deployment profile
+Configures microstepping, torque limits, and joint bounds
+4. FAILSAFE AND REDUNDANCY
+Unresponsive Duet controller triggers immediate kill-line activation
+Actuator limit violations automatically reduce speed or halt motion
+Dual communication paths supported: primary via ROS2, secondary via direct USB/G-code interface
+All events logged for post-mission analysis and audit
+5. INTERFACES
+ROS2 Topics:
+duet/command — joint position, velocity, and torque commands
+duet/status — actuator position, current, temperature, and fault codes
+duet/safety — watchdog and kill-line status
+Control Integration:
+Reactive Controller: safety overrides
+Trajectory Execution Model: feeds trajectories to Duet Interface
+Energy-Aware Navigation Model: adjusts motion commands to conserve power
+6. VALIDATION AND TESTING
+Verify command translation accuracy for joint positions, velocity, and torque
+Test safety overrides and kill-line responsiveness
+Simulate actuator faults, overcurrent, and overtemperature events
+Validate ROS2 feedback matches Duet telemetry
+Ensure deterministic timing for motion execution
+7. DESIGN INTENT
+Provide a robust, safe, and deterministic interface between OBSIDIAN-8 software and Duet motion controllers
+Enable full integration with reactive safety, trajectory execution, and energy management
+Maintain auditability and traceability of all motion commands and safety events
+Ensure fallback and redundancy mechanisms for mission-critical operations
+Support deployment-profile-specific actuator configurations
