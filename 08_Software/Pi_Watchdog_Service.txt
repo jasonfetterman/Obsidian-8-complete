@@ -1,0 +1,65 @@
+OBSIDIAN-8 V3
+
+08_Software/Pi_Watchdog_Service.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Pi Watchdog Service (PWS) for OBSIDIAN-8 V3.
+
+Monitors system health and responsiveness of critical subsystems
+Provides hardware kill-line activation in case of faults
+Ensures deterministic reaction to software or hardware failures
+Logs all events for audit, post-mission review, and regulatory compliance
+2. SERVICE ARCHITECTURE
+Platform: Raspberry Pi 4 or equivalent embedded controller
+Monitoring Targets:
+Main control computer (ROS2 nodes)
+Duet and Maestro interfaces
+Energy system and BMS status
+Network heartbeat and swarm communication
+Output:
+Kill-line actuation for emergency stop
+Status messages to ROS2 topics
+Log files stored locally and optionally synced to remote system
+3. FUNCTIONAL MODULES
+Heartbeat Monitor:
+Receives periodic heartbeat signals from critical subsystems
+Detects missing or delayed heartbeats
+Triggers fault protocol if timeout exceeded
+Kill-Line Controller:
+Hardware GPIO output connected to emergency stop circuit
+Immediate actuation if watchdog detects critical failure
+Manual override disabled unless authenticated and logged
+System Logger:
+Records all watchdog events with timestamp, subsystem ID, and fault type
+Supports post-mission review and audit
+Configuration Loader:
+Loads timeout thresholds, monitored nodes, and logging parameters from deployment profile
+Allows profile-specific sensitivity for testing, field, or energy-critical missions
+4. FAILSAFE AND REDUNDANCY
+Multiple heartbeat channels monitored independently
+Redundant kill-line paths ensure emergency stop even if Pi fails
+Watchdog operates independently of ROS2 or main compute
+Logs mirrored to external storage for audit if Pi fails during critical event
+5. INTERFACES
+ROS2 Topics:
+watchdog/status — current state of watchdog, heartbeat health, and active kill-line
+watchdog/log — fault and event logs
+Control Integration:
+Reactive Controller: receives kill-line signal for immediate motion stop
+Energy Model: can trigger safe shutdown if energy-critical subsystem fails
+Swarm & Remote Control: broadcasts watchdog faults for multi-unit coordination
+6. VALIDATION AND TESTING
+Simulate subsystem failures and verify kill-line activation
+Test heartbeat timeout detection for all monitored nodes
+Validate redundant kill-line actuation under Pi failure
+Confirm ROS2 topic reporting matches hardware output
+Test across all deployment profiles (FIELD_STANDARD, ENERGY_SAVER, HAZARD_ZONE, etc.)
+7. DESIGN INTENT
+Provide robust, independent, and deterministic safety supervision
+Ensure emergency stop functionality under all mission conditions
+Maintain auditability and traceability of all fault events
+Integrate seamlessly with control, energy, swarm, and deployment systems
+Enable mission-specific configuration while preserving core failsafe behavior
