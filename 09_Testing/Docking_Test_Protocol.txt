@@ -1,0 +1,87 @@
+OBSIDIAN-8 V3
+
+09_Testing/Docking_Test_Protocol.txt
+Revision: V3.2
+Status: Authoritative
+
+1. PURPOSE
+
+Define the Docking Test Protocol (DTP) for OBSIDIAN-8 V3.
+
+Verifies physical docking alignment, engagement, and disengagement of units with docking stations or other robots
+Ensures collision avoidance, accuracy, and repeatability
+Validates integration with perception, navigation, and reactive control systems
+Provides pass/fail criteria for acceptance testing
+2. TEST OBJECTIVES
+Confirm docking alignment within specified tolerance
+Validate engagement and latch mechanisms
+Ensure safe disengagement without structural damage
+Test system response to misalignment or obstacle interference
+Confirm integration with perception and navigation for autonomous docking
+Verify logging and telemetry capture for audit
+3. TEST SETUP
+Environment: controlled lab or designated test field
+Docking Target: standard docking station or partner robot
+Sensors Required: cameras, LiDAR, IMU, proximity sensors
+Software Profile: FIELD_STANDARD deployment with Docking subsystem active
+Logging: all ROS2 topics, actuator feedback, and event logs recorded
+4. TEST PROCEDURE
+
+Step 1 – Initialization:
+
+Power up robot and docking station
+Verify system health: actuators, sensors, energy, and communication
+
+Step 2 – Approach:
+
+Execute autonomous approach trajectory to docking target
+Monitor sensor data to detect position and orientation relative to dock
+Verify reactive safety layer prevents collisions
+
+Step 3 – Alignment:
+
+Engage precision alignment using perception system
+Confirm angular and translational alignment within ±5 mm and ±2°
+
+Step 4 – Engagement:
+
+Activate docking mechanism
+Verify mechanical engagement sensors indicate full latch
+Monitor actuator currents and forces for anomalies
+
+Step 5 – Stability Check:
+
+Maintain docked state for 10–30 seconds
+Check structural stability and sensor integrity
+Verify energy and communication subsystems remain operational
+
+Step 6 – Disengagement:
+
+Command autonomous disengagement
+Confirm smooth separation without collision or excessive force
+Log all actuator feedback and docking status
+
+Step 7 – Misalignment Test:
+
+Repeat approach with intentional offsets of ±10 mm or ±5°
+Verify system detects misalignment and safely aborts or corrects
+
+Step 8 – Data Collection & Analysis:
+
+Compile all sensor logs, ROS2 topics, and actuator feedback
+Compare alignment, forces, and timing to acceptance thresholds
+5. ACCEPTANCE CRITERIA
+Docking alignment within ±5 mm translation and ±2° rotation
+Engagement latch confirmed on first attempt ≥95% of trials
+Disengagement occurs smoothly with no collisions or structural stress
+Misalignment detection triggers safe abort or correction ≥100% of trials
+All relevant logs captured and timestamped
+6. FAILSAFE AND MONITORING
+Kill-line or emergency stop immediately halts docking if unsafe conditions detected
+Watchdog service monitors actuator responsiveness
+All safety overrides logged for post-test audit
+7. DESIGN INTENT
+Ensure reliable, repeatable, and safe docking under autonomous and remote-controlled operation
+Validate integration of mechanical, perception, navigation, and control subsystems
+Maintain auditability, traceability, and reproducibility of test results
+Provide clear acceptance metrics for deployment readiness
