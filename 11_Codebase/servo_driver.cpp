@@ -1,87 +1,88 @@
+//
 // servo_driver.cpp
 // OBSIDIAN-8 V3 — REV D
-// Low-level driver for AGFRC 400 kg·cm HV servos
-// Sends joint commands via PWM / CAN / serial depending on servo configuration
+// Converts leg target positions into servo angles and drives servos
+//
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <thread>
 #include <chrono>
-#include "pid_controller.h"
 
-#define NUM_LEGS 8
-#define JOINTS_PER_LEG 3
+// Include your hardware interface here, e.g., serial or PWM lib
+#include "servo_interface.h"
 
-// Simulated servo interface (replace with actual hardware API)
-class ServoInterface {
-public:
-    void send_angle(int servo_id, double angle_deg) {
-        // Hardware-specific command to set servo angle
-        std::cout << "[ServoInterface] Servo " << servo_id
-                  << " -> " << angle_deg << " deg" << std::endl;
-    }
+struct LegCommand {
+    double x;     // meters
+    double y;     // meters
+    double z;     // meters
+    std::string phase;  // "swing" or "stance"
 };
 
-// -------------------- GLOBALS --------------------
-ServoInterface servo_bus;
-PIDController pid_controllers[NUM_LEGS][JOINTS_PER_LEG]; // PID per joint
-double current_joint_angles[NUM_LEGS][JOINTS_PER_LEG] = {0};
+// Kinematic constants (example lengths in meters)
+const double COXA = 0.05;
+const double FEMUR = 0.15;
+const double TIBIA = 0.15;
 
-// -------------------- FUNCTIONS --------------------
-double apply_limits(double angle, double min_deg, double max_deg) {
-    if (angle < min_deg) return min_deg;
-    if (angle > max_deg) return max_deg;
-    return angle;
+// Forward declaration
+std::vector<double> inverse_kinematics(double x, double y, double z);
+
+// Send servo angles to hardware
+void send_servo_angles(const std::vector<double>& angles) {
+    // Replace with actual servo interface code
+    for (size_t i = 0; i < angles.size(); i++) {
+        ServoInterface::setAngle(i, angles[i]);
+    }
 }
 
-// -------------------- CLASS --------------------
-class ServoDriver {
-public:
-    ServoDriver() {
-        // Initialize PID controllers for each joint
-        for(int leg=0; leg<NUM_LEGS; leg++) {
-            for(int joint=0; joint<JOINTS_PER_LEG; joint++) {
-                pid_controllers[leg][joint] = PIDController(1.0, 0.01, 0.05);
-            }
-        }
+void drive_legs(const std::vector<LegCommand>& leg_commands) {
+    for (size_t i = 0; i < leg_commands.size(); i++) {
+        LegCommand cmd = leg_commands[i];
+        std::vector<double> angles = inverse_kinematics(cmd.x, cmd.y, cmd.z);
+        send_servo_angles(angles);
     }
+}
 
-    void send_joint_targets(std::vector<std::vector<double>> joint_targets) {
-        for(int leg=0; leg<NUM_LEGS; leg++) {
-            for(int joint=0; joint<JOINTS_PER_LEG; joint++) {
-                double target = joint_targets[leg][joint];
-                // Apply joint limits (example values, replace as needed)
-                double limited = apply_limits(target, -90.0, 90.0);
-                // PID computation
-                double pid_out = pid_controllers[leg][joint].compute(limited, current_joint_angles[leg][joint]);
-                current_joint_angles[leg][joint] = pid_out;
-                // Send to hardware
-                int servo_id = leg * JOINTS_PER_LEG + joint;
-                servo_bus.send_angle(servo_id, pid_out);
-            }
-        }
-    }
+// Simple inverse kinematics for 3-DOF leg (Coxa, Femur, Tibia)
+std::vector<double> inverse_kinematics(double x, double y, double z) {
+    std::vector<double> angles(3, 0.0);
 
-    void halt_motion() {
-        std::cout << "[ServoDriver] Halting all servos." << std::endl;
-        for(int leg=0; leg<NUM_LEGS; leg++) {
-            for(int joint=0; joint<JOINTS_PER_LEG; joint++) {
-                int servo_id = leg * JOINTS_PER_LEG + joint;
-                servo_bus.send_angle(servo_id, current_joint_angles[leg][joint]);
-            }
-        }
-    }
-};
+    // Coxa rotation (horizontal)
+    angles[0] = atan2(y, x);
+
+    // Distance in horizontal plane minus coxa
+    double r = sqrt(x*x + y*y) - COXA;
+    double s = z;
+
+    double D = (r*r + s*s - FEMUR*FEMUR - TIBIA*TIBIA) / (2 * FEMUR * TIBIA);
+    if (D > 1.0) D = 1.0;      // clamp
+    if (D < -1.0) D = -1.0;
+
+    // Knee angle (Tibia)
+    angles[2] = acos(D);
+
+    // Hip angle (Femur)
+    angles[1] = atan2(s, r) - atan2(TIBIA*sin(angles[2]), FEMUR + TIBIA*cos(angles[2]));
+
+    return angles;  // radians
+}
 
 // -------------------- TEST LOOP --------------------
-#ifdef TEST_SERVO_DRIVER
 int main() {
-    ServoDriver driver;
-    std::vector<std::vector<double>> test_targets(NUM_LEGS, std::vector<double>(JOINTS_PER_LEG, 30.0));
-    driver.send_joint_targets(test_targets);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    driver.halt_motion();
+    // Initialize servo interface
+    ServoInterface::init();
+
+    // Example: 8 legs
+    std::vector<LegCommand> test_legs(8);
+    for (int i = 0; i < 8; i++) {
+        test_legs[i] = {0.2, (i%2==0?0.15:-0.15), -0.2, "stance"};
+    }
+
+    while (true) {
+        drive_legs(test_legs);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));  // 50 Hz
+    }
+
     return 0;
 }
-#endif
