@@ -1,111 +1,95 @@
-# autonomous_mode.py
-# OBSIDIAN-8 V3 — REV D
-# Full autonomous control integrating vision, sensors, swarm, and persistent mapping
+"""
+autonomous_mode.py
+OBSIDIAN-8 V3 — REV D
+Integrates sensor data, object tracking, depth maps, and swarm comms
+for fully autonomous navigation and task execution
+"""
 
 import time
-from vision_interface import VisionInterface
-from object_detection import ObjectDetection
+import numpy as np
+from imu_reader import IMUReader
+from foot_sensor import FootSensor
+from stereo_depth import StereoDepth
+from image_preprocessing import ImagePreprocessor
+from object_detection import ObjectDetector
+from object_tracking import ObjectTracker
 from swarm_comms import SwarmComms
-from map_manager import MapManager
-import ctypes
-import threading
-
-# Load foot_sensor shared library compiled from foot_sensor.cpp
-foot_lib = ctypes.CDLL('./foot_sensor.so')
-foot_lib.read.restype = ctypes.POINTER(ctypes.c_bool * 8)
 
 class AutonomousMode:
-    def __init__(self, node_id="OB8-Node1", map_manager=None):
-        # Vision and object detection
-        self.vision = VisionInterface(use_oak=True)
-        self.detector = ObjectDetection(use_oak=True)
-        self.tracker = self.vision.tracker
+    def __init__(self, robot_id="OBS8-01"):
+        # Sensors
+        self.imu = IMUReader()
+        self.foot_sensors = FootSensor()
+        self.stereo = StereoDepth()
+        self.preprocessor = ImagePreprocessor(target_size=(640,480))
+        self.detector = ObjectDetector(model_path="yolov8n.pt", device="cuda")
+        self.tracker = ObjectTracker()
+        
+        # Swarm communication
+        self.swarm = SwarmComms(robot_id=robot_id, port=5000)
+        self.swarm.start()
+        
+        self.running = False
 
-        # Swarm communications
-        self.swarm = SwarmComms(node_id=node_id)
+    def get_robot_state(self):
+        imu_data = {
+            "quaternion": self.imu.getQuaternion(),
+            "accel": self.imu.getAccel(),
+            "gyro": self.imu.getGyro()
+        }
+        foot_state = self.foot_sensors.read()
+        return {"imu": imu_data, "foot": foot_state}
 
-        # Foot sensor data
-        self.foot_state = [False]*8
+    def perceive_environment(self):
+        oak_depth = self.stereo.get_oakd_depth()
+        rs_depth = self.stereo.get_realsense_depth()
 
-        # Map Manager for persistent environment memory
-        self.map_manager = map_manager
+        # Choose best available depth
+        depth = oak_depth if oak_depth is not None else rs_depth
 
+        ret, frame = True, np.zeros((480,640,3), dtype=np.uint8)
+        if ret:
+            processed = self.preprocessor.preprocess(frame)
+            detections = self.detector.detect(processed)
+            tracked = self.tracker.update(detections)
+            return depth, tracked
+        return depth, []
+
+    def broadcast_state(self):
+        state = {
+            "robot_state": self.get_robot_state(),
+            "timestamp": time.time()
+        }
+        self.swarm.broadcast(state)
+
+    def autonomous_loop(self):
+        self.foot_sensors.start()
         self.running = True
-
-    def read_feet(self):
-        """Reads foot contact sensors via compiled C++ shared library"""
-        raw_ptr = foot_lib.read()
-        self.foot_state = list(raw_ptr.contents)
-
-    def process_vision(self):
-        """Runs detection and updates tracker"""
-        detections = self.detector.detect_objects()
-        # Extract only bounding boxes for tracker
-        rects = [(x1, y1, x2, y2) for (x1, y1, x2, y2, cls, conf) in detections]
-        tracked_objects = self.tracker.update(rects)
-
-        # Feed detected obstacles into the map_manager
-        if self.map_manager:
-            for obj_id, bbox in tracked_objects.items():
-                # Convert bbox centroid to meters
-                x_m = (bbox[0] + bbox[2]) / 2.0 * 0.001  # example conversion
-                y_m = (bbox[1] + bbox[3]) / 2.0 * 0.001
-                self.map_manager.update_cell(x_m, y_m, 1)  # mark occupied
-
-        return tracked_objects
-
-    def swarm_heartbeat(self):
-        """Periodically broadcast status to swarm"""
-        while self.running:
-            self.swarm.send({
-                "type": "heartbeat",
-                "node_id": self.swarm.node_id,
-                "timestamp": time.time(),
-                "foot_state": self.foot_state
-            })
-            time.sleep(1)
-
-    def run(self):
-        """Main autonomous loop"""
-        # Start swarm heartbeat thread
-        heartbeat_thread = threading.Thread(target=self.swarm_heartbeat)
-        heartbeat_thread.start()
-
         try:
             while self.running:
-                # 1. Read foot sensors
-                self.read_feet()
+                # Update sensors
+                self.imu.update()
+                
+                # Perceive environment
+                depth_map, tracked_objects = self.perceive_environment()
+                
+                # Broadcast to swarm
+                self.broadcast_state()
+                
+                # Here, path planning / motion commands would be issued
+                # Example: plan next footstep or trajectory
+                # This can be integrated with motion_planner.py and path_planner.py
 
-                # 2. Vision processing
-                tracked_objects = self.process_vision()
-                print("Tracked objects:", tracked_objects)
-                print("Foot states:", self.foot_state)
-
-                # 3. Swarm messages
-                messages = self.swarm.get_messages()
-                for msg in messages:
-                    print("Received swarm msg:", msg)
-
-                # 4. TODO: Motion planner integration
-                # Use tracked_objects + foot_state + map_manager for gait commands
-
-                time.sleep(0.05)  # 20 Hz loop
+                time.sleep(0.05)  # 20 Hz main loop
         finally:
-            self.shutdown()
-            heartbeat_thread.join()
-
-    def shutdown(self):
-        self.running = False
-        self.vision.shutdown()
-        self.detector.shutdown()
-        self.swarm.shutdown()
-        if self.map_manager:
-            self.map_manager.shutdown()
-        print("[AutonomousMode] Shutdown complete.")
-
+            self.foot_sensors.stop()
+            self.swarm.stop()
+            self.stereo.shutdown()
 
 # -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    map_mgr = MapManager()
-    autonomous = AutonomousMode(node_id="OB8-Node1", map_manager=map_mgr)
-    autonomous.run()
+    auto_mode = AutonomousMode(robot_id="OBS8-01")
+    try:
+        auto_mode.autonomous_loop()
+    except KeyboardInterrupt:
+        print("[AutonomousMode] Stopped by user")
