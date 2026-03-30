@@ -1,60 +1,66 @@
-# path_planner.py
-# OBSIDIAN-8 V3 — REV D
-# Generates collision-free paths using tracked objects and persistent maps
+"""
+path_planner.py
+OBSIDIAN-8 V3 — REV D
+Generates safe trajectories and footstep plans based on sensor input
+"""
 
 import numpy as np
-from map_manager import MapManager
+from motion_planner import MotionPlanner
 
 class PathPlanner:
-    def __init__(self, map_manager=None):
+    def __init__(self, num_legs=8):
+        self.motion_planner = MotionPlanner(num_legs=num_legs)
+        self.safe_distance = 100.0  # mm, minimum clearance from obstacles
+
+    def plan_step(self, current_pos, obstacles):
         """
-        map_manager: instance of MapManager for occupancy grid
+        Plan next step for robot body given obstacles
+        current_pos: np.array([x, y, z])
+        obstacles: list of dict {"pos": [x,y,z], "radius": r}
+        Returns: velocity command dict {"forward": , "turn": }
         """
-        self.map_manager = map_manager
-        self.num_legs = 8
-        self.max_step = 0.1   # meters per step
+        forward_cmd = 0.0
+        turn_cmd = 0.0
 
-        # Default leg positions relative to body
-        self.default_leg_positions = np.array([
-            [0.25, 0.15], [0.25, -0.15],
-            [0.0, 0.2], [0.0, -0.2],
-            [-0.25, 0.15], [-0.25, -0.15],
-            [-0.5, 0.1], [-0.5, -0.1]
-        ])
+        # Simple avoidance logic
+        for obs in obstacles:
+            obs_pos = np.array(obs["pos"])
+            distance = np.linalg.norm(obs_pos - current_pos)
+            if distance < self.safe_distance:
+                # Obstacle too close, adjust velocity
+                forward_cmd = -0.5  # back up
+                if obs_pos[1] > current_pos[1]:
+                    turn_cmd = -0.3  # turn left
+                else:
+                    turn_cmd = 0.3   # turn right
+                break
+        else:
+            forward_cmd = 0.5  # normal forward
+            turn_cmd = 0.0
 
-    def plan(self, tracked_objects):
+        return {"forward": forward_cmd, "turn": turn_cmd}
+
+    def execute_plan(self, current_pos, obstacles):
         """
-        tracked_objects: dict {object_id: (x, y)}
-        Returns: adjusted leg positions (num_legs x 2)
+        High-level execution loop
         """
-        leg_positions = self.default_leg_positions.copy()
+        cmd = self.plan_step(current_pos, obstacles)
+        self.motion_planner.set_velocity(cmd["forward"], cmd["turn"])
+        return cmd
 
-        # Shift legs away from tracked objects (real-time obstacles)
-        for obj_id, centroid in tracked_objects.items():
-            obj_x, obj_y = centroid
-            for i in range(self.num_legs):
-                dx = leg_positions[i][0] - obj_x
-                dy = leg_positions[i][1] - obj_y
-                distance = np.hypot(dx, dy)
-                safe_distance = 0.15  # meters
-                if distance < safe_distance:
-                    shift = (safe_distance - distance) * 0.5
-                    leg_positions[i][0] += (dx / distance) * shift
-                    leg_positions[i][1] += (dy / distance) * shift
+# -------------------- TEST LOOP --------------------
+if __name__ == "__main__":
+    planner = PathPlanner()
+    current_pos = np.array([0.0, 0.0, 0.0])
 
-        # Use map_manager to avoid remembered obstacles
-        if self.map_manager:
-            for i in range(self.num_legs):
-                x, y = leg_positions[i]
-                cell_value = self.map_manager.query_cell(x, y)
-                if cell_value == 1:  # occupied
-                    # Push leg away from occupied cell
-                    leg_positions[i][0] += np.sign(x) * self.max_step
-                    leg_positions[i][1] += np.sign(y) * self.max_step
+    # Example obstacles
+    obstacles = [{"pos": [150, 0, 0], "radius": 50}]
 
-        # Clamp step size
-        deltas = leg_positions - self.default_leg_positions
-        deltas = np.clip(deltas, -self.max_step, self.max_step)
-        leg_positions = self.default_leg_positions + deltas
-
-        return leg_positions
+    try:
+        while True:
+            cmd = planner.execute_plan(current_pos, obstacles)
+            print(f"[PathPlanner] Velocity command: {cmd}")
+            # Simulate movement
+            current_pos[0] += cmd["forward"] * 10  # mm per loop
+    except KeyboardInterrupt:
+        print("[PathPlanner] Stopped")
