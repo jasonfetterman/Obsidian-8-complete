@@ -1,71 +1,75 @@
-# teleop_interface.py
-# OBSIDIAN-8 V3 — REV D
-# Handles teleoperation commands from joystick or remote controller
+"""
+teleop_interface.py
+OBSIDIAN-8 V3 — REV D
+Provides remote manual control via joystick or network commands
+"""
 
 import pygame
-import numpy as np
+import threading
+import time
+from motion_planner import MotionPlanner
 
-# -------------------- CONFIG --------------------
-JOYSTICK_DEADZONE = 0.1
-JOINT_DELTA_SCALE = 2.0  # degrees per input unit
-UPDATE_RATE_HZ = 50
-
-# Mapping axes to joints
-AXIS_TO_JOINT = {
-    0: 'coxa',   # X-axis left/right
-    1: 'femur',  # Y-axis forward/back
-    2: 'tibia',  # Z-axis up/down
-}
-
-# -------------------- CLASS --------------------
 class TeleopInterface:
-    def __init__(self):
+    def __init__(self, robot_id="OBS8-01"):
+        # Initialize joystick
         pygame.init()
         pygame.joystick.init()
         self.joystick = None
         if pygame.joystick.get_count() > 0:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
-            print(f"[TeleopInterface] Joystick detected: {self.joystick.get_name()}")
+            print(f"[Teleop] Using joystick: {self.joystick.get_name()}")
         else:
-            print("[TeleopInterface] No joystick detected. Teleop disabled.")
+            print("[Teleop] No joystick detected, network control only")
+        
+        self.robot_id = robot_id
+        self.motion_planner = MotionPlanner()
+        self.running = False
 
-    def get_input(self):
+    def read_joystick(self):
         """
-        Poll joystick axes and buttons to generate joint delta commands
-        Returns dict: {'coxa': delta, 'femur': delta, 'tibia': delta}
+        Read joystick axes and buttons, return command dict
         """
-        delta_cmds = {'coxa': 0.0, 'femur': 0.0, 'tibia': 0.0}
-        if self.joystick is None:
-            return delta_cmds
-
-        pygame.event.pump()  # Process event queue
-
-        for axis_index, joint_name in AXIS_TO_JOINT.items():
-            value = self.joystick.get_axis(axis_index)
-            if abs(value) < JOYSTICK_DEADZONE:
-                value = 0.0
-            delta_cmds[joint_name] = value * JOINT_DELTA_SCALE
-
-        return delta_cmds
-
-    def shutdown(self):
-        """
-        Cleanup joystick
-        """
+        pygame.event.pump()
+        axes = {}
+        buttons = {}
         if self.joystick:
-            self.joystick.quit()
-        pygame.quit()
-        print("[TeleopInterface] Teleop interface shutdown complete.")
+            axes = {i: self.joystick.get_axis(i) for i in range(self.joystick.get_numaxes())}
+            buttons = {i: self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())}
+        return {"axes": axes, "buttons": buttons}
 
+    def network_command(self, cmd):
+        """
+        Accept network-based commands (dict) and convert to motion
+        Example cmd: {"forward": 0.5, "turn": -0.2}
+        """
+        # Convert to motion planner commands
+        self.motion_planner.set_velocity(cmd.get("forward",0), cmd.get("turn",0))
+
+    def teleop_loop(self):
+        self.running = True
+        try:
+            while self.running:
+                # Read joystick input
+                cmd = self.read_joystick()
+                if cmd["axes"]:
+                    # Map axes to robot velocity
+                    forward = -cmd["axes"].get(1, 0)  # Y axis inverted
+                    turn = cmd["axes"].get(0, 0)      # X axis
+                    self.motion_planner.set_velocity(forward, turn)
+
+                # Add network command reading here if needed
+                # Example: self.network_command(received_network_cmd)
+
+                time.sleep(0.02)  # 50 Hz
+        finally:
+            pygame.quit()
+            print("[Teleop] Stopped")
 
 # -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    teleop = TeleopInterface()
+    teleop = TeleopInterface(robot_id="OBS8-01")
     try:
-        while True:
-            commands = teleop.get_input()
-            print(f"[Teleop] Commands: {commands}")
-            pygame.time.wait(int(1000 / UPDATE_RATE_HZ))
+        teleop.teleop_loop()
     except KeyboardInterrupt:
-        teleop.shutdown()
+        print("[Teleop] Stopped by user")
