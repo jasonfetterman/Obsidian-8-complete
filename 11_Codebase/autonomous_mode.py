@@ -1,72 +1,102 @@
 # autonomous_mode.py
 # OBSIDIAN-8 V3 — REV D
-# High-level autonomous behavior and task management
+# Full autonomous control integrating vision, sensors, and swarm communication
 
 import time
-import numpy as np
-from motion_scheduler import schedule_motion
+from vision_interface import VisionInterface
+from object_detection import ObjectDetection
+from swarm_comms import SwarmComms
+import ctypes
+import threading
 
-# -------------------- CONFIG --------------------
-CONTROL_RATE_HZ = 50  # Hz for decision loop
-TASKS = ["explore", "dock", "sample_collection", "inspection"]
+# Load foot_sensor shared library compiled from foot_sensor.cpp
+foot_lib = ctypes.CDLL('./foot_sensor.so')
+foot_lib.read.restype = ctypes.POINTER(ctypes.c_bool * 8)
 
-# Thresholds for switching behaviors
-BATTERY_LOW_THRESHOLD = 24.0  # V
-OBSTACLE_DISTANCE_THRESHOLD = 0.3  # meters
-
-# -------------------- CLASS --------------------
 class AutonomousMode:
-    def __init__(self):
-        self.current_task = "explore"
-        self.robot_state = {
-            "velocity": np.array([0.0, 0.0, 0.0]),
-            "orientation": np.array([0.0, 0.0, 0.0]),
-            "obstacle_distance": 1.0,  # meters
-            "battery_voltage": 28.0,   # volts
-        }
+    def __init__(self, node_id="OB8-Node1"):
+        # Vision and object detection
+        self.vision = VisionInterface(use_oak=True)
+        self.detector = ObjectDetection(use_oak=True)
+        self.tracker = self.vision.tracker
 
-    def execute(self, motion_cmds):
-        """
-        Execute high-level autonomous task:
-        - Decide next task
-        - Update motion commands
-        """
-        self.update_robot_state()
-        self.select_task()
-        # Forward commands to motion scheduler or directly to actuators
-        # motion_cmds: list of joint commands from motion scheduler
-        self.send_to_actuators(motion_cmds)
+        # Swarm communications
+        self.swarm = SwarmComms(node_id=node_id)
 
-    def update_robot_state(self):
-        """
-        Update robot state using sensor fusion
-        """
-        # This should pull data from sensor fusion
-        # For now, simulate safe values
-        self.robot_state["battery_voltage"] = np.random.uniform(24.0, 28.0)
-        self.robot_state["obstacle_distance"] = np.random.uniform(0.2, 1.5)
+        # Foot sensor data
+        self.foot_state = [False]*8
 
-    def select_task(self):
-        """
-        Decide what task to perform based on battery and obstacles
-        """
-        battery = self.robot_state["battery_voltage"]
-        obstacle = self.robot_state["obstacle_distance"]
+        self.running = True
 
-        if battery < BATTERY_LOW_THRESHOLD:
-            self.current_task = "dock"
-        elif obstacle < OBSTACLE_DISTANCE_THRESHOLD:
-            self.current_task = "avoid_obstacle"
-        else:
-            self.current_task = "explore"
-
-        # Optional: integrate swarm tasks
-        # self.current_task = swarm.get_task_assignment()
-
-    def send_to_actuators(self, motion_cmds):
+    def read_feet(self):
         """
-        Send motion commands to actuators
+        Reads foot contact sensors via compiled C++ shared library
         """
-        # Placeholder: connect to servo driver or motion planner
-        # For production, call: servo_driver.send(motion_cmds)
-        print(f"[AutonomousMode] Task: {self.current_task}, sending joint commands")
+        raw_ptr = foot_lib.read()
+        self.foot_state = list(raw_ptr.contents)
+
+    def process_vision(self):
+        """
+        Runs detection and updates tracker
+        """
+        detections = self.detector.detect_objects()
+        # Extract only bounding boxes for tracker
+        rects = [(x1,y1,x2,y2) for (x1,y1,x2,y2,cls,conf) in detections]
+        tracked_objects = self.tracker.update(rects)
+        return tracked_objects
+
+    def swarm_heartbeat(self):
+        """
+        Periodically broadcast status to swarm
+        """
+        while self.running:
+            self.swarm.send({
+                "type": "heartbeat",
+                "node_id": self.swarm.node_id,
+                "timestamp": time.time(),
+                "foot_state": self.foot_state
+            })
+            time.sleep(1)
+
+    def run(self):
+        """
+        Main autonomous loop
+        """
+        # Start swarm heartbeat thread
+        heartbeat_thread = threading.Thread(target=self.swarm_heartbeat)
+        heartbeat_thread.start()
+
+        try:
+            while self.running:
+                # 1. Read foot sensors
+                self.read_feet()
+
+                # 2. Vision processing
+                tracked_objects = self.process_vision()
+                print("Tracked objects:", tracked_objects)
+                print("Foot states:", self.foot_state)
+
+                # 3. Swarm messages
+                messages = self.swarm.get_messages()
+                for msg in messages:
+                    print("Received swarm msg:", msg)
+
+                # 4. TODO: Motion planner integration
+                # Use tracked_objects + foot_state to generate gait commands
+
+                time.sleep(0.05)  # 20 Hz loop
+        finally:
+            self.shutdown()
+            heartbeat_thread.join()
+
+    def shutdown(self):
+        self.running = False
+        self.vision.shutdown()
+        self.detector.shutdown()
+        self.swarm.shutdown()
+
+
+# -------------------- TEST LOOP --------------------
+if __name__ == "__main__":
+    autonomous = AutonomousMode(node_id="OB8-Node1")
+    autonomous.run()
