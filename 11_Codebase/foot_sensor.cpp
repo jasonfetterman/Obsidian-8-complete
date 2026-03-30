@@ -1,71 +1,77 @@
+//
 // foot_sensor.cpp
 // OBSIDIAN-8 V3 — REV D
-// Reads foot contact sensors and provides debounced contact states
+// Reads 8 foot contact switches for gait and balance
+//
 
 #include <iostream>
 #include <array>
-#include <chrono>
 #include <thread>
-
-#define NUM_FEET 8
-#define DEBOUNCE_MS 20  // debounce time in milliseconds
+#include <chrono>
+#include <mutex>
+#include "gpio_interface.h"  // Replace with your GPIO library
 
 class FootSensor {
-private:
-    std::array<bool, NUM_FEET> last_state;
-    std::array<std::chrono::steady_clock::time_point, NUM_FEET> last_change;
-
 public:
     FootSensor() {
-        last_state.fill(false);
-        auto now = std::chrono::steady_clock::now();
-        last_change.fill(now);
-    }
-
-    /**
-     * Read raw digital input from sensors
-     * Replace this function with actual GPIO/I2C reads
-     */
-    std::array<bool, NUM_FEET> read_raw() {
-        std::array<bool, NUM_FEET> raw;
-        for(int i=0; i<NUM_FEET; i++) {
-            // Simulate sensor (replace with GPIO read)
-            raw[i] = false;
+        // Initialize GPIO pins for 8 foot sensors
+        // Example GPIO pins: 2-9
+        sensor_pins = {2, 3, 4, 5, 6, 7, 8, 9};
+        for (auto pin : sensor_pins) {
+            GPIO::setup(pin, GPIO::IN);
         }
-        return raw;
     }
 
-    /**
-     * Return debounced foot contact states
-     */
-    std::array<bool, NUM_FEET> read() {
-        auto raw = read_raw();
-        auto now = std::chrono::steady_clock::now();
-
-        for(int i=0; i<NUM_FEET; i++) {
-            if(raw[i] != last_state[i]) {
-                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_change[i]).count();
-                if(duration >= DEBOUNCE_MS) {
-                    last_state[i] = raw[i];
-                    last_change[i] = now;
-                }
-            }
+    // Reads all 8 sensors and returns array of bools
+    std::array<bool,8> read() {
+        std::lock_guard<std::mutex> lock(mtx);
+        for (size_t i = 0; i < 8; i++) {
+            sensor_state[i] = GPIO::read(sensor_pins[i]);
         }
-        return last_state;
+        return sensor_state;
     }
+
+    void update_loop() {
+        while (running) {
+            read();
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));  // 50 Hz
+        }
+    }
+
+    void start() {
+        running = true;
+        sensor_thread = std::thread(&FootSensor::update_loop, this);
+    }
+
+    void stop() {
+        running = false;
+        if (sensor_thread.joinable())
+            sensor_thread.join();
+    }
+
+private:
+    std::array<int,8> sensor_pins;
+    std::array<bool,8> sensor_state{false};
+    std::thread sensor_thread;
+    bool running = false;
+    std::mutex mtx;
 };
 
 // -------------------- TEST LOOP --------------------
-#ifdef TEST_FOOT_SENSOR
 int main() {
-    FootSensor fs;
-    while(true) {
-        auto states = fs.read();
-        std::cout << "Foot contacts: ";
-        for(auto s : states) std::cout << s << " ";
+    FootSensor foot;
+    foot.start();
+
+    while (true) {
+        auto state = foot.read();
+        std::cout << "[FootSensor] ";
+        for (bool s : state) {
+            std::cout << s << " ";
+        }
         std::cout << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+
+    foot.stop();
     return 0;
 }
-#endif
