@@ -1,0 +1,83 @@
++---------------------------------------------------------------+
+|                       HIGH-LEVEL COMPUTE                      |
+|                   Raspberry Pi 5 / NVIDIA Jetson NX           |
+|---------------------------------------------------------------|
+| - main_controller.py       (Pi)                               |
+| - motion_planner.py        (Pi)                               |
+| - path_planner.py          (Pi/Jetson)                        |
+| - sensor_fusion.py         (Pi)                               |
+| - vision_interface.py      (Jetson)                            |
+| - object_detection.py      (Jetson)                            |
+| - swarm_comms.py           (Pi)                               |
+| - autonomous_mode.py       (Pi)                               |
+| - teleop_interface.py      (Pi)                               |
++---------------------------------------------------------------+
+               |                             ^
+               | Sensor / command data      | Commands / telemetry
+               v                             |
++---------------------------------------------------------------+
+|                     CONTROL / SAFETY LAYER                     |
+|                     Duet 3 6HC + 3HC Boards                    |
+|---------------------------------------------------------------|
+| - Executes high-level motion commands                          |
+| - Manages servo banks and emergency stop                       |
+| - Interfaces with Teensy controllers                            |
+| - Monitors fuses, contactors, power rails                       |
++---------------------------------------------------------------+
+               |                             ^
+               | Low-level joint commands   | Status / feedback
+               v                             |
++---------------------------------------------------------------+
+|                     REAL-TIME MOTION LAYER                     |
+|                        Teensy 4.1 x2                             |
+|---------------------------------------------------------------|
+| - servo_driver.cpp (PWM control)                                |
+| - pid_controller.cpp (position / velocity loops)               |
+| - kinematics.h / gait_library.json                               |
+| - imu_reader.cpp (BNO085 IMU)                                   |
+| - foot_sensor.cpp / limit_switch.cpp                             |
+| - motion_scheduler.py                                           |
++---------------------------------------------------------------+
+               |                             ^
+               | PWM signals to servos      | Feedback sensors
+               v                             |
++---------------------------------------------------------------+
+|                      ACTUATORS / LEGS                            |
+| - AGFRC A86BHMW HV Servos (24)                                   |
+| - Bearings, shafts, clamp collars                                 |
+| - Coxa, Femur, Tibia joints                                      |
++---------------------------------------------------------------+
+
++---------------------------------------------------------------+
+|                   VISION / PERCEPTION LAYER                     |
+|   Luxonis OAK-D Pro (2)                                        |
+|   Intel RealSense D455 (2)                                      |
+|   Arducam OV9281 (2)                                           |
+|   M12 Wide Angle Lenses (2)                                     |
+|---------------------------------------------------------------|
+| - stereo_depth.py                                              |
+| - image_preprocessing.py                                       |
+| - object_tracking.py                                           |
++---------------------------------------------------------------+
+
++---------------------------------------------------------------+
+|                     POWER / SAFETY LAYER                       |
+| - LiFePO4 Battery 24V 30Ah                                     |
+| - DC-DC converters: RSD-500-24, LRS-350-12, DROK 5V           |
+| - Fuse blocks / ANL / MIDI fuses / contactors                  |
+| - power_monitor.cpp / thermal_monitor.cpp                      |
+| - emergency_stop.cpp                                           |
++---------------------------------------------------------------+
+
++---------------------------------------------------------------+
+|                   DOCKING & CHARGING LAYER                     |
+| - Anderson SB120 connector                                      |
+| - Dock controller / guide rails                                 |
+| - dock_manager.py / dock_comm.py / charge_control.py           |
++---------------------------------------------------------------+
+
++---------------------------------------------------------------+
+|                    NETWORK / SWARM LAYER                        |
+| - Ubiquiti UniFi Mesh Node / Antenna                             |
+| - mesh_setup.py / mesh_heartbeat.py / mesh_task_assign.py       |
++---------------------------------------------------------------+
