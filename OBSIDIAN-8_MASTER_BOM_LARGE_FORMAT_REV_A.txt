@@ -1,78 +1,138 @@
-🔧 OBSIDIAN-8 V3 — MASTER BOM (REV D)
-Part Name	Supplier / Manufacturer	Quantity	Unit Price	Total Price	Description / Notes
-AGFRC A86BHMW 400 kg·cm HV Servo	AGFRC	24	$120	$2,880	Primary leg actuation, CNC aluminum case, steel gears, 8.4 V, dual ball bearings, 25T spline
-AGFRC A86BHMW 400 kg·cm HV Servo (Spare)	AGFRC	2	$120	$240	Spare units
-Aluminum Servo Mount Brackets (CNC/Printed)	Custom Fabrication / 3D Print	48	$6.25	$300	Reinforced servo mounting brackets for all leg joints
-TPU 95A Foot Pads	Generic	8	included	included	Replaceable foot pads
-3030 Aluminum Extrusion	80/20	60 ft	$6.67	$400	Primary load ring for frame
-2020 Aluminum Extrusion	80/20	40 ft	$4.50	$180	Vertical & bracing
-M6 Bolts (Grade 10.9)	McMaster-Carr	300	$0.40	$120	Frame assembly
-M5 T-Nuts	McMaster-Carr	500	$0.12	$60	Extrusion assembly
-3030 / 2020 Corner Brackets	McMaster-Carr	120	$1.75	$210	Steel brackets for frame connections
-Aluminum Reinforcement Plates	SendCutSend / Xometry	20	$10	$200	Top plate, battery tray, servo backing plates
-6061 Aluminum Plates (1/4")	SendCutSend / Xometry	60	$20	$1,200	Mechanical linkages and structural plates
-Carbon-Fiber Nylon Filament (PA6-CF / PA12-CF)	Taulman / eSun	4 spools	$80	$320	Coxa, femur, tibia segments, reinforced servo mounts
-ABS Filament (eSun ABS+)	eSun	12 spools	$25	$300	Enclosures, covers, body panels
-Polycarbonate Sheets	McMaster-Carr	4	$20	$80	Camera / sensor protection
-6001-2RS Bearings (12 mm bore)	SKF / NSK	56	$7.20	$403	Main joint bearings for legs
-608-2RS Bearings	SKF / NSK	40	$2.50	$100	Redundant / expansion joints
-12 mm Hardened Steel Shafting	McMaster-Carr	8 m	$50/m	$400	Precision ground rods for all joints
-Clamp-style Shaft Collars (12 mm)	McMaster-Carr	24	$5	$120	Shaft retention hardware
-M8 Shoulder Bolts	McMaster-Carr	48	$6	$288	Joint fasteners
-Washers / Lock Nuts	McMaster-Carr	Bulk	$80	$80	Spacers & reinforcement
-Aluminum Spacers Kit	McMaster-Carr	100+	$50	$50	Adjustable spacing for linkages
-Duet 3 6HC Mainboard	Duet3D	1	$230	$230	Primary safety/motion supervisor
-Duet 3 3HC Expansion Board	Duet3D	2	$180	$360	Expansion for additional IO
-Teensy 4.1	PJRC	2	$35	$70	Real-time servo/motion control
-Teensy Ethernet Kit	PJRC	1	$20	$20	Networking / communication
-Pololu Maestro 24-Channel	Pololu	1	$90	$90	Auxiliary servo controller
-Raspberry Pi 5	Raspberry Pi Foundation	1	$90	$90	High-level compute
-NVIDIA Jetson Orin NX 16 GB	NVIDIA	1	$600	$600	Vision / AI compute
-256 GB NVMe SSD	Samsung 980	1	$80	$80	Storage for Jetson / Pi
-Isolated 5 V DC-DC Converter	DROK / MeanWell	1	$25	$25	Logic power for control boards
-LiFePO₄ 24 V 30 Ah Battery	Bioenno	1	$700	$700	Main energy core
-LiFePO₄ 24 V 15 A Charger	Bioenno	1	$120	$120	CC/CV charger for battery
-MeanWell RSD-500-24 DC Converter	MeanWell	2	$140	$280	24 V → 8 V servo power rails
-MeanWell LRS-350-12	MeanWell	1	$45	$45	12 V auxiliary power
-DROK 24 V → 5 V Buck Converter	DROK	3	$15	$45	5 V logic/sensor supply
-Copper Bus Bars (8 mm thick)	McMaster-Carr	2	$30	$60	Power distribution
-Terminal Blocks (DIN Rail)	McMaster-Carr	10	$8	$80	Modular wiring
-Blue Sea Systems Fuse Block	Blue Sea Systems	1	$55	$55	Fuse protection for servo banks
-Automotive Blade Fuses Kit	Generic	1	$25	$25	Spare fuses
-100 A Main Fuse	Generic	1	$20	$20	Primary protection
-150 A ANL Fuse + Holder	Generic	1	$20	$20	High-current protection
-80 A MIDI Fuses	Generic	2	$15	$30	DC-DC input protection
-150 A Contactors	Generic	2	$20	$40	Servo bank shutdown
-Luxonis OAK-D Pro	Luxonis	2	$300	$600	Depth + stereo vision cameras
-Intel RealSense D455	Intel	2	$300	$600	Depth mapping
-Arducam OV9281 Global Shutter	Arducam	2	$80	$160	High-speed monochrome cameras
-M12 Wide Angle Lenses (120°)	Generic	2	$25	$50	Lens upgrades for cameras
-BNO085 IMU	Bosch	2	$35	$70	Orientation / stability
-Limit Switches	Omron	24	$3	$72	Endstop detection for joints
-Foot Contact Switches	Honeywell	8	$10	$80	Gait / foot contact sensing
-Industrial USB 3.0 Hub	StarTech	2	$120	$240	Camera aggregation
-USB 3.0 Shielded Cables	StarTech	10	$15	$150	High-speed camera data wiring
-Ubiquiti UniFi Mesh Node	Ubiquiti	1	$180	$180	Swarm communications
-Ubiquiti Antenna	Ubiquiti	1	$90	$90	Optional range boost
-CAT6 Shielded Cable (50 ft)	Monoprice	1	$40	$40	Wired backbone networking
-Noctua 80 mm Fans	Noctua	4	$25	$100	Cooling for servos / electronics
-Noctua 40 mm Fans	Noctua	4	$15	$60	Electronics cooling
-Aluminum Heat Sinks	Generic	4	$30	$120	CPU / power module cooling
-Anderson SB120 Connector	Anderson Power	1	$40	$40	Docking / charging connector
-Charging Controller (LiFePO₄)	Generic	1	$120	$120	Docked charging controller
-Alignment Guide Rails	Custom Machined	1	$150	$150	Dock alignment guides
-Dock Base Plate (Steel / Aluminum)	Custom Fabrication	1	$90	$90	Structural dock plate
-Electrical Housing	Custom Fabrication	1	$100	$100	Docked wiring protection
-10 AWG Silicone Wire	Generic	50 ft	$90	$90	High-current servo / main power wiring
-12 AWG Silicone Wire	Generic	50 ft	$70	$70	Power distribution wiring
-18 AWG Wire	Generic	100 ft	$80	$80	Auxiliary / signal wiring
-22 AWG Multi-wire	Generic	200 ft	$60	$60	Logic wiring for sensors / boards
-XT60 Connectors	Generic	20	$1.50	$30	Quick-disconnects for servo power
-XT90 Connectors	Generic	10	$3.50	$35	Battery feed connectors
-JST-XH Kit	Generic	1	$25	$25	Sensor wiring harness
-Dupont Kit	Generic	1	$20	$20	Logic / board connections
-Ferrule Crimp Kit	Generic	1	$40	$40	Professional wire termination
-Braided Wire Loom	Generic	100 ft	$50	$50	Cable protection / organization
-Heat Shrink Kit	Generic	1	$25	$25	Electrical insulation / finishing
+============================================================
+🔧 OBSIDIAN-8 V3 — MASTER BOM (FULL SYSTEM)
+============================================================
 
-✅ Total Estimated Cost: ~$14,685
+------------------------------
+1️⃣ MAIN ROBOT — OBSIDIAN-8 V3
+------------------------------
+
+MECHANICAL / FRAME
+--------------------------------------------------------------------------------------------
+Part Name | Supplier | Qty | Unit Price | Total Price | Description / Notes
+3030 Aluminum Extrusion | 80/20 | 60 ft | $6.67 | $400 | Primary load ring
+2020 Aluminum Extrusion | 80/20 | 40 ft | $4.50 | $180 | Vertical and bracing
+M6 Bolts (Grade 10.9) | McMaster-Carr | 300 | $0.40 | $120 | Frame assembly
+M5 T-Nuts | McMaster-Carr | 500 | $0.12 | $60 | T-slot assembly
+3030 / 2020 Corner Brackets | McMaster-Carr | 120 | $1.75 | $210 | Frame reinforcement
+Aluminum Reinforcement Plates | SendCutSend/Xometry | 20 | $10 | $200 | Top plate, battery tray, servo backing
+6061 Aluminum Plates (1/4") | SendCutSend/Xometry | 60 | $20 | $1,200 | Mechanical linkages
+Carbon-Fiber Nylon Filament (PA6-CF/PA12-CF) | Taulman / eSun | 4 spools | $80 | $320 | Coxa, femur, tibia, servo mounts
+ABS Filament | eSun ABS+ | 12 spools | $25 | $300 | Enclosures, covers, body panels
+Polycarbonate Sheets | McMaster-Carr | 4 | $20 | $80 | Camera/sensor protection
+
+ACTUATION
+--------------------------------------------------------------------------------------------
+AGFRC A86BHMW 400 kg·cm HV Servo | AGFRC | 24 | $120 | $2,880 | Primary leg actuation, CNC case, steel gears, dual ball bearings, 25T spline
+AGFRC Servo Spare | AGFRC | 2 | $120 | $240 | Backup servos
+Aluminum Servo Mount Brackets | Custom/3D Print | 48 | $6.25 | $300 | Reinforced brackets
+TPU 95A Foot Pads | Generic | 8 | included | included | Replaceable foot pads
+6001-2RS Bearings (12mm bore) | SKF/NSK | 56 | $7.20 | $403 | Main leg joint bearings
+608-2RS Bearings | SKF/NSK | 40 | $2.50 | $100 | Redundant / expansion joints
+12 mm Hardened Steel Shafting | McMaster-Carr | 8 m | $50 | $400 | Precision ground rods
+Clamp-style Shaft Collars | McMaster-Carr | 24 | $5 | $120 | Shaft retention
+M8 Shoulder Bolts | McMaster-Carr | 48 | $6 | $288 | Joint fasteners
+Washers / Lock Nuts | McMaster-Carr | Bulk | $80 | $80 | Spacers & reinforcement
+Aluminum Spacers Kit | McMaster-Carr | 100+ | $50 | $50 | Adjustable linkage spacing
+
+CONTROL / COMPUTE
+--------------------------------------------------------------------------------------------
+Duet 3 6HC Mainboard | Duet3D | 1 | $230 | $230 | Safety & motion supervisor
+Duet 3 3HC Expansion Board | Duet3D | 2 | $180 | $360 | IO expansion
+Teensy 4.1 | PJRC | 2 | $35 | $70 | Real-time servo/motion control
+Teensy Ethernet Kit | PJRC | 1 | $20 | $20 | Network comms
+Pololu Maestro 24-Channel | Pololu | 1 | $90 | $90 | Auxiliary servo control
+Raspberry Pi 5 | Raspberry Pi Foundation | 1 | $90 | $90 | High-level compute
+NVIDIA Jetson Orin NX 16GB | NVIDIA | 1 | $600 | $600 | AI / vision compute
+256GB NVMe SSD | Samsung 980 | 1 | $80 | $80 | Storage for Jetson / Pi
+Isolated 5V DC-DC Converter | DROK / MeanWell | 1 | $25 | $25 | Logic power
+
+POWER / ELECTRICAL
+--------------------------------------------------------------------------------------------
+LiFePO4 24V 30Ah Battery | Bioenno | 1 | $700 | $700 | Main energy core
+LiFePO4 24V 15A Charger | Bioenno | 1 | $120 | $120 | CC/CV charging
+MeanWell RSD-500-24 DC Converter | MeanWell | 2 | $140 | $280 | Servo 24V→8V rails
+MeanWell LRS-350-12 | MeanWell | 1 | $45 | $45 | 12V auxiliary
+DROK 24V → 5V Buck Converter | DROK | 3 | $15 | $45 | 5V logic/sensors
+Copper Bus Bars (8mm thick) | McMaster-Carr | 2 | $30 | $60 | Power distribution
+Terminal Blocks (DIN Rail) | McMaster-Carr | 10 | $8 | $80 | Wiring distribution
+Blue Sea Systems Fuse Block | Blue Sea Systems | 1 | $55 | $55 | Fuse protection
+Automotive Blade Fuses Kit | Generic | 1 | $25 | $25 | Spare fuses
+100A Main Fuse | Generic | 1 | $20 | $20 | Primary protection
+150A ANL Fuse + Holder | Generic | 1 | $20 | $20 | High-current protection
+80A MIDI Fuses | Generic | 2 | $15 | $30 | DC-DC input protection
+150A Contactors | Generic | 2 | $20 | $40 | Servo bank shutdown
+
+CAMERAS / VISION
+--------------------------------------------------------------------------------------------
+Luxonis OAK-D Pro | Luxonis | 2 | $300 | $600 | Stereo depth + RGB
+Intel RealSense D455 | Intel | 2 | $300 | $600 | Depth mapping
+Arducam OV9281 Global Shutter | Arducam | 2 | $80 | $160 | High-speed monochrome
+M12 Wide Angle Lenses (120°) | Generic | 2 | $25 | $50 | Wide-angle lenses
+
+SENSORS / IMU
+--------------------------------------------------------------------------------------------
+BNO085 IMU | Bosch | 2 | $35 | $70 | Orientation / stability
+Limit Switches | Omron | 24 | $3 | $72 | Endstop detection
+Foot Contact Switches | Honeywell | 8 | $10 | $80 | Gait / foot contact sensing
+Thermistors (100k NTC) | Generic | 10 | $5 | $50 | Thermal monitoring
+Current Sensors (ACS758-100B) | Allegro / Generic | 2 | $25 | $50 | Servo bank monitoring
+
+DOCKING / CHARGING
+--------------------------------------------------------------------------------------------
+Anderson SB120 Connector | Anderson Power | 1 | $40 | $40 | Docking interface
+Charging Controller (LiFePO4) | Generic | 1 | $120 | $120 | Docked charging controller
+Alignment Guide Rails | Custom Machined | 1 | $150 | $150 | Dock alignment
+Dock Base Plate | Custom Fabrication | 1 | $90 | $90 | Structural dock plate
+Electrical Housing | Custom Fabrication | 1 | $100 | $100 | Dock wiring protection
+
+WIRING / CONNECTORS
+--------------------------------------------------------------------------------------------
+10 AWG Silicone Wire | Generic | 50 ft | $90 | $90 | Main power wiring
+12 AWG Silicone Wire | Generic | 50 ft | $70 | $70 | Servo wiring
+18 AWG Wire | Generic | 100 ft | $80 | $80 | Auxiliary wiring
+22 AWG Multi-wire | Generic | 200 ft | $60 | $60 | Logic wiring
+XT60 Connectors | Generic | 20 | $1.50 | $30 | Quick-disconnect
+XT90 Connectors | Generic | 10 | $3.50 | $35 | Battery feed
+JST-XH Kit | Generic | 1 | $25 | $25 | Sensor wiring
+Dupont Kit | Generic | 1 | $20 | $20 | Board connections
+Ferrule Crimp Kit | Generic | 1 | $40 | $40 | Professional terminations
+Braided Wire Loom | Generic | 100 ft | $50 | $50 | Cable protection
+Heat Shrink Kit | Generic | 1 | $25 | $25 | Insulation / finishing
+
+============================================================
+2️⃣ SWARM BOTS — MINIMAL SETUP (50 units)
+============================================================
+
+Part Name | Supplier | Qty | Unit Price | Total Price | Notes
+--------------------------------------------------------------------------------------------
+Arducam OV9281 Global Shutter | Arducam | 50 | $80 | $4,000 | Monochrome camera
+M12 Wide Angle Lens | Generic | 50 | $25 | $1,250 | Optional lens
+Edge Compute (Raspberry Pi 4 / Jetson Nano) | Raspberry Pi / NVIDIA | 50 | $90 | $4,500 | Local processing
+USB Cables / Mini Hubs | Generic | 50 | $15 | $750 | Camera transmission
+Power Connector / Wiring | Generic | 50 | $20 | $1,000 | Battery + camera
+LiFePO4 12–24 V Battery | Bioenno / Generic | 50 | $120 | $6,000 | Small onboard battery
+Frame / Minimal Chassis | Custom / 3D Printed | 50 | $150 | $7,500 | Lightweight robot chassis
+
+============================================================
+3️⃣ OFFICE / MONITORING STATION
+============================================================
+
+Primary Monitor 32" 4K | Dell U3223QE | 1 | $700 | $700 | OBSIDIAN‑8 main feed
+Secondary Monitors 27" | Dell U2723QE | 3 | $400 | $1,200 | Swarm / multi-screen
+Monitor Arms | Ergotron LX | 4 | $150 | $600 | Ergonomic mounting
+USB / HDMI Splitters | StarTech | 2 | $50 | $100 | Camera routing
+Video Capture Cards | Elgato Cam Link 4K | 6 | $130 | $780 | Stream camera feeds
+Keyboard & Mouse | Logitech MX | 1 set | $150 | $150 | Comfortable operation
+Hotkey Controller | Elgato Stream Deck | 1 | $200 | $200 | Quick bot/camera switching
+Desk | L-shaped Large | 1 | $400 | $400 | Multi-monitor space
+Chair | Ergonomic | 1 | $350 | $350 | Comfort
+Headphones | Logitech G Pro X | 1 | $130 | $130 | Audio alerts
+Surge Protectors | APC | 2 | $50 | $100 | Electronics protection
+Cable Management | Velcro / Trays | Multiple | $100 | $100 | Organized cabling
+Whiteboard / Notes | Generic | 1 | $50 | $50 | Planning / logging
+Backup Storage (RAID HDD) | 4TB x2 | 2 | $120 | $240 | Video recording
+Ubiquiti UniFi 48-Port PoE Switch | Ubiquiti | 1 | $800 | $800 | Network + PoE to bots/cameras
+CAT6 Shielded Cable | Monoprice | 500 ft | $0.80 | $400 | Network backbone
+Ubiquiti UniFi Mesh AP | Ubiquiti | 2 | $180 | $360 | Redundant wireless
+
+============================================================
