@@ -1,59 +1,77 @@
-# vision_interface.py
-# OBSIDIAN-8 V3 — REV D
-# Central interface for camera inputs, preprocessing, depth, and object tracking
+"""
+vision_interface.py
+OBSIDIAN-8 V3 — REV D
+Handles camera streams, preprocessing, and feeds to detection/tracking modules
+"""
 
 import cv2
-from stereo_depth import StereoDepth
+import threading
+import time
 from image_preprocessing import ImagePreprocessor
-from object_tracking import ObjectTracker
 
 class VisionInterface:
-    def __init__(self, use_oak=True, undistort_params=None):
-        self.stereo = StereoDepth(use_oak=use_oak)
-        self.preprocessor = ImagePreprocessor(target_width=640, target_height=480,
-                                              undistort_params=undistort_params)
-        self.tracker = ObjectTracker(max_disappeared=10)
+    def __init__(self, camera_sources=None, target_size=(640, 480)):
+        """
+        camera_sources: list of int (device indices) or str (video paths)
+        """
+        if camera_sources is None:
+            camera_sources = [0]  # Default to first webcam
 
-    def get_processed_frame(self):
-        """
-        Returns preprocessed frame ready for object detection/tracking
-        """
-        depth_frame = self.stereo.get_depth_frame()
-        # Use RGB/color frame for preprocessing if OAK, else color from RealSense
-        # For simplicity, using depth as placeholder; integrate color feed as needed
-        frame = cv2.normalize(depth_frame, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
-        processed = self.preprocessor.preprocess(cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR))
-        return processed
+        self.cameras = [cv2.VideoCapture(src) for src in camera_sources]
+        self.frames = [None] * len(self.cameras)
+        self.lock = threading.Lock()
+        self.running = False
+        self.preprocessor = ImagePreprocessor(target_size=target_size)
 
-    def get_depth_points(self):
-        """
-        Returns point cloud in camera coordinates
-        """
-        return self.stereo.get_point_cloud()
+    def capture_loop(self, cam_index):
+        cap = self.cameras[cam_index]
+        while self.running:
+            ret, frame = cap.read()
+            if ret:
+                processed = self.preprocessor.preprocess(frame)
+                with self.lock:
+                    self.frames[cam_index] = processed
+            time.sleep(0.01)  # ~100 Hz capture loop
 
-    def update_tracking(self, detections):
-        """
-        detections: list of bounding boxes [(startX, startY, endX, endY)]
-        Returns: dictionary {object_id: centroid}
-        """
-        return self.tracker.update(detections)
+    def start(self):
+        self.running = True
+        self.threads = []
+        for i in range(len(self.cameras)):
+            t = threading.Thread(target=self.capture_loop, args=(i,))
+            t.start()
+            self.threads.append(t)
 
-    def shutdown(self):
-        self.stereo.shutdown()
+    def stop(self):
+        self.running = False
+        for t in self.threads:
+            t.join()
+        for cap in self.cameras:
+            cap.release()
+
+    def get_frame(self, cam_index=0):
+        with self.lock:
+            return self.frames[cam_index]
+
+    def get_all_frames(self):
+        with self.lock:
+            return list(self.frames)
 
 # -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    vision = VisionInterface(use_oak=True)
+    vi = VisionInterface(camera_sources=[0,1], target_size=(640,480))
+    vi.start()
+
     try:
         while True:
-            frame = vision.get_processed_frame()
-            # Simulated detections: for testing, create dummy bounding boxes
-            detections = [(100,100,150,150), (300,200,350,250)]
-            tracked_objects = vision.update_tracking(detections)
-            print("Tracked Objects:", tracked_objects)
-            cv2.imshow("Processed Frame", frame)
+            frames = vi.get_all_frames()
+            for idx, frame in enumerate(frames):
+                if frame is not None:
+                    cv2.imshow(f"Camera {idx}", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+    except KeyboardInterrupt:
+        pass
     finally:
-        vision.shutdown()
+        vi.stop()
         cv2.destroyAllWindows()
+        print("[VisionInterface] Stopped")
