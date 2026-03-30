@@ -1,47 +1,74 @@
-# mesh_task_assign.py
-# OBSIDIAN-8 V3 — REV D
-# Dynamically assigns tasks to swarm nodes based on load and availability
+"""
+mesh_task_assign.py
+OBSIDIAN-8 V3 — REV D
+Assigns tasks to swarm bots dynamically based on state and priorities
+"""
 
-import random
-import socket
+import threading
 import time
+from swarm_comms import SwarmComms
 
-# -------------------- CONFIG --------------------
-SWARM_NODES = [
-    "192.168.50.101",
-    "192.168.50.102",
-    "192.168.50.103",
-]
+class MeshTaskAssign:
+    def __init__(self, swarm: SwarmComms, assign_interval=0.5):
+        """
+        swarm: instance of SwarmComms
+        assign_interval: seconds between task assignment cycles
+        """
+        self.swarm = swarm
+        self.assign_interval = assign_interval
+        self.running = False
+        self.thread = None
+        self.task_queue = []  # list of tasks
 
-MESH_PORT = 5000
-TASKS = [
-    "survey_area",
-    "sample_collection",
-    "inspection",
-    "battery_check",
-]
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self.task_loop)
+        self.thread.start()
+        print("[MeshTaskAssign] Task assignment started")
 
-# -------------------- FUNCTIONS --------------------
-def assign_task(node_ip: str, task: str):
-    """Send task assignment via UDP"""
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(1.0)
-        message = f"TASK:{task}".encode("utf-8")
-        sock.sendto(message, (node_ip, MESH_PORT))
-        sock.close()
-        print(f"[Task Assign] Assigned '{task}' to {node_ip}")
-    except Exception as e:
-        print(f"[Task Assign] Failed to assign '{task}' to {node_ip}: {e}")
+    def stop(self):
+        self.running = False
+        if self.thread:
+            self.thread.join()
+        print("[MeshTaskAssign] Task assignment stopped")
 
-def distribute_tasks():
-    """Assign tasks randomly for demo; can implement load-balancing logic"""
-    for node in SWARM_NODES:
-        task = random.choice(TASKS)
-        assign_task(node, task)
+    def add_task(self, task):
+        """Add a new task to the queue"""
+        self.task_queue.append(task)
 
-# -------------------- MAIN --------------------
+    def task_loop(self):
+        while self.running:
+            all_states = self.swarm.get_all_states()
+            if not all_states or not self.task_queue:
+                time.sleep(self.assign_interval)
+                continue
+
+            # Simple round-robin task assignment
+            bots = list(all_states.keys())
+            for i, task in enumerate(self.task_queue):
+                bot_id = bots[i % len(bots)]
+                command = {"bot_id": "OBSIDIAN_MASTER", "task": task}
+                self.swarm.send_command(bot_id, command)
+
+            # Clear tasks once assigned
+            self.task_queue.clear()
+            time.sleep(self.assign_interval)
+
+# -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    while True:
-        distribute_tasks()
-        time.sleep(10)  # Assign every 10 seconds
+    from swarm_comms import SwarmComms
+    swarm = SwarmComms(swarm_size=50)
+    swarm.start()
+    task_assigner = MeshTaskAssign(swarm)
+    task_assigner.start()
+
+    # Example tasks
+    task_assigner.add_task({"action": "explore", "area": [0,0,10,10]})
+    task_assigner.add_task({"action": "map_object", "object_id": 1})
+
+    try:
+        while True:
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        task_assigner.stop()
+        swarm.stop()
