@@ -1,39 +1,58 @@
-# mesh_heartbeat.py
-# OBSIDIAN-8 V3 — REV D
-# Periodically checks the health of swarm nodes
+"""
+mesh_heartbeat.py
+OBSIDIAN-8 V3 — REV D
+Maintains live heartbeat and connectivity with swarm bots
+"""
 
-import socket
+import threading
 import time
+from swarm_comms import SwarmComms
 
-# -------------------- CONFIG --------------------
-HEARTBEAT_INTERVAL = 5.0  # seconds
-MESH_PORT = 5000
-SWARM_NODES = [
-    "192.168.50.101",
-    "192.168.50.102",
-    "192.168.50.103",
-]
+class MeshHeartbeat:
+    def __init__(self, swarm: SwarmComms, heartbeat_interval=1.0):
+        """
+        swarm: instance of SwarmComms
+        heartbeat_interval: seconds between heartbeats
+        """
+        self.swarm = swarm
+        self.heartbeat_interval = heartbeat_interval
+        self.running = False
+        self.thread = None
 
-# -------------------- FUNCTIONS --------------------
-def send_heartbeat(node_ip: str):
-    """Send UDP heartbeat packet to node"""
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(1.0)
-        message = b"HEARTBEAT"
-        sock.sendto(message, (node_ip, MESH_PORT))
-        sock.close()
-        return True
-    except Exception as e:
-        print(f"[Heartbeat] Failed to send to {node_ip}: {e}")
-        return False
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self.heartbeat_loop)
+        self.thread.start()
+        print("[MeshHeartbeat] Heartbeat started")
 
-# -------------------- MAIN --------------------
+    def stop(self):
+        self.running = False
+        if self.thread:
+            self.thread.join()
+        print("[MeshHeartbeat] Heartbeat stopped")
+
+    def heartbeat_loop(self):
+        while self.running:
+            all_states = self.swarm.get_all_states()
+            for bot_id in all_states:
+                # Send ping
+                msg = {"bot_id": "OBSIDIAN_MASTER", "command": "heartbeat"}
+                self.swarm.send_command(bot_id, msg)
+            # Cleanup inactive bots
+            self.swarm.cleanup_inactive(timeout=5.0)
+            time.sleep(self.heartbeat_interval)
+
+# -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    while True:
-        for node in SWARM_NODES:
-            if send_heartbeat(node):
-                print(f"[Heartbeat] Node alive: {node}")
-            else:
-                print(f"[Heartbeat] Node offline: {node}")
-        time.sleep(HEARTBEAT_INTERVAL)
+    from swarm_comms import SwarmComms
+    swarm = SwarmComms(swarm_size=50)
+    swarm.start()
+    heartbeat = MeshHeartbeat(swarm)
+    heartbeat.start()
+
+    try:
+        while True:
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        heartbeat.stop()
+        swarm.stop()
