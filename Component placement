@@ -1,0 +1,84 @@
+🔧 OBSIDIAN‑8 V3 — COMPONENT PLACEMENT MAP
+1️⃣ Actuation System (Legs / Motion)
+Part	Quantity	Placement / Notes
+AGFRC A86BHMW 400 kg·cm HV Servo	24	3 per leg × 8 legs (Coxa, Femur, Tibia joints)
+AGFRC A86BHMW HV Servo (Spare)	2	Spare storage in electronics bay
+Aluminum Servo Mount Brackets	48	Mounting each servo in leg boxes / femur/tibia mounts
+TPU 95A Foot Pads	8	Bottom of tibia, replaceable feet
+6001-2RS Bearings	56	Each joint (Coxa, Femur, Tibia) supporting rotation
+608-2RS Bearings	40	Redundant / secondary joints if needed
+12 mm Hardened Steel Shafting	8 m	Shafts in all joints (Coxa, Femur, Tibia)
+Clamp-style Shaft Collars	24	Securing shaft ends at joints
+M8 Shoulder Bolts	48	Primary joint fasteners
+Washers / Lock Nuts	Bulk	Securing shoulder bolts and brackets
+Aluminum Spacers Kit	100+	Leg joint spacing / alignment
+2️⃣ Frame / Structural System
+Part	Quantity	Placement / Notes
+3030 Aluminum Extrusion	60 ft	Primary load ring, main chassis base
+2020 Aluminum Extrusion	40 ft	Vertical supports, bracing, cross-members
+M6 Bolts (Grade 10.9)	300	Extrusion assembly, frame joints
+M5 T-Nuts	500	Sliding mounting points for brackets and panels
+3030 / 2020 Corner Brackets	120	Frame corners, structural reinforcement
+Aluminum Reinforcement Plates	20	Servo backing, battery tray, top plate
+6061 Aluminum Plates (1/4")	60	Coxa, Femur, Tibia internal linkages, support plates
+Carbon-Fiber Nylon Filament (PA6-CF / PA12-CF)	4 spools	3D-printed coxa housings, femur/tibia segments, servo mounts
+ABS Filament	12 spools	Covers, enclosures, protective panels
+Polycarbonate Sheets	4	Camera / sensor protective shields
+3️⃣ Control & Electronics System
+Part	Quantity	Placement / Notes
+Duet 3 6HC Mainboard	1	Electronics bay, central motion / safety controller
+Duet 3 3HC Expansion Board	2	Mounted near main Duet board for IO expansion
+Teensy 4.1	2	Near leg servo banks for real-time motion control
+Teensy Ethernet Kit	1	For networked communication / swarm
+Pololu Maestro 24-Channel	1	Auxiliary servo / gripper or misc actuators
+Raspberry Pi 5	1	Electronics bay, high-level compute
+NVIDIA Jetson Orin NX 16 GB	1	Electronics bay, vision/AI processing
+256 GB NVMe SSD	1	Mounted on Jetson or Pi for storage
+Isolated 5 V DC-DC Converter	1	Logic power rail, near control boards
+Copper Bus Bars	2	Main power distribution in electronics bay
+Terminal Blocks (DIN Rail)	10	Modular connections for sensors, actuators, and power
+4️⃣ Power System
+Part	Quantity	Placement / Notes
+LiFePO₄ 24 V 30 Ah Battery	1	Center of chassis, low center of mass
+LiFePO₄ 24 V 15 A Charger	1	Docking station or onboard charging bay
+MeanWell RSD-500-24 DC Converter	2	Near battery, powers servo rails (24→8 V)
+MeanWell LRS-350-12	1	12 V auxiliary devices
+DROK 24 V → 5 V Buck Converter	3	Powers logic boards (Duet, Pi, Jetson)
+Blue Sea Fuse Block	1	Electronics bay, servo protection
+Automotive / ANL / MIDI Fuses	various	Distributed across power rails
+150 A Contactors	2	Servo bank isolation
+10 AWG / 12 AWG / 18 AWG / 22 AWG Wire	various	Routed through chassis with cable management
+XT60 / XT90 Connectors	30	Battery / servo quick connects
+Ferrules / Heat Shrink / Braided Loom	various	Wire protection and clean routing
+5️⃣ Vision & Sensors
+Part	Quantity	Placement / Notes
+Luxonis OAK-D Pro	2	Front-facing stereo cameras
+Intel RealSense D455	2	Top/rear cameras for navigation
+Arducam OV9281	2	High-speed monocular cameras
+M12 Wide Angle Lenses	2	Installed on Arducam / OAK-D for FOV
+BNO085 IMU	2	Central chassis / electronics bay
+Limit Switches	24	Leg joints endstops
+Foot Contact Switches	8	At each foot for gait feedback
+USB 3.0 Hub & Shielded Cables	2 / 10	Connect all cameras to Jetson / Pi
+6️⃣ Networking / Swarm
+Part	Quantity	Placement / Notes
+Ubiquiti UniFi Mesh Node	1	Mounted on top plate for swarm comms
+Ubiquiti Antenna	1	External mast / top of chassis
+CAT6 Shielded Cable (50 ft)	1	Internal / dock networking
+7️⃣ Cooling
+Part	Quantity	Placement / Notes
+Noctua 80 mm Fans	4	Electronics bay / servo heat vents
+Noctua 40 mm Fans	4	Smaller control boards / Jetson bay
+Aluminum Heat Sinks	4	On Pi, Jetson, power modules
+8️⃣ Docking / Charging
+Part	Quantity	Placement / Notes
+Anderson SB120 Connector	1	Docking port on rear chassis
+Charging Controller (LiFePO₄)	1	Dock electronics
+Alignment Guide Rails	1	On dock, funnel for robot alignment
+Dock Base Plate	1	Stationary dock structure
+Electrical Housing	1	Protects dock wiring / electronics
+9️⃣ Wiring / Modular Connections
+Part	Quantity	Placement / Notes
+JST-XH / Dupont / Ferrules	3 kits	For sensors / signal wiring
+Braided Wire Loom	100 ft	Protects all major wiring bundles
+Heat Shrink Kit	1	Insulation on power and signal connections
