@@ -1,84 +1,155 @@
-# main_controller.py
-# OBSIDIAN-8 V3 — REV D
-# Central controller with persistent map integration
+"""
+main_controller.py
+OBSIDIAN-8 V3 — REV D
+Main brain and orchestrator for autonomous operation, teleoperation, and swarm control
+"""
 
 import threading
 import time
+
+# Internal modules
 from autonomous_mode import AutonomousMode
 from teleop_interface import TeleopInterface
-from motion_planner import MotionPlanner
 from swarm_comms import SwarmComms
-from map_manager import MapManager
+from power_monitor import PowerMonitor
+from thermal_monitor import ThermalMonitor
+from emergency_stop import EmergencyStop
+from dock_manager import DockManager
+from charge_control import ChargeControl
 
 class MainController:
-    def __init__(self, node_id="OB8-Node1"):
-        # Initialize MapManager
-        self.map_manager = MapManager(map_dir="maps/world", grid_size=4000, resolution=0.05)
+    def __init__(self):
+        # ---------------- Core Modules ----------------
+        print("[MainController] Initializing core modules...")
+        self.autonomous = AutonomousMode(camera_sources=[0,1])
+        self.teleop = TeleopInterface(self.autonomous.motion_planner)
+        self.swarm = SwarmComms(swarm_size=50, listen_port=9000)
+        self.power = PowerMonitor()
+        self.thermal = ThermalMonitor()
+        self.estop = EmergencyStop()
+        self.dock = DockManager()
+        self.charger = ChargeControl()
 
-        # Mode: "autonomous" or "teleop"
-        self.mode = "autonomous"
+        # Operational flags
+        self.running = False
+        self.mode = "autonomous"  # "autonomous" or "teleop"
+        self.lock = threading.Lock()
 
-        # Subsystems
-        self.autonomous = AutonomousMode(node_id=node_id, map_manager=self.map_manager)
-        self.teleop = TeleopInterface()
-        self.motion_planner = MotionPlanner()
-        self.swarm = self.autonomous.swarm  # shared swarm instance
+        # Threads
+        self.monitor_thread = None
+        self.swarm_thread = None
 
+    # ---------------- Startup / Shutdown ----------------
+    def start(self):
+        print("[MainController] Starting main controller...")
         self.running = True
 
-    def mode_switch_loop(self):
-        """Monitor input to switch modes"""
-        while self.running:
-            new_mode = self.teleop.get_mode()
-            if new_mode != self.mode:
-                print(f"[MainController] Switching mode: {self.mode} -> {new_mode}")
-                self.mode = new_mode
-            time.sleep(0.1)
+        # Start monitoring loops
+        self.monitor_thread = threading.Thread(target=self.monitor_loop)
+        self.monitor_thread.start()
 
-    def control_loop(self):
-        """Main 50Hz control loop"""
-        while self.running:
-            if self.mode == "autonomous":
-                # Get perception and mapped objects
-                tracked_objects = self.autonomous.process_vision()
-                foot_state = self.autonomous.foot_state
+        # Start swarm communication
+        self.swarm.start()
 
-                # Compute leg commands with memory-aware path planning
-                commands = self.motion_planner.compute_gait(tracked_objects, foot_state)
+        # Start autonomous / teleop
+        if self.mode == "autonomous":
+            self.autonomous.start()
+        elif self.mode == "teleop":
+            self.teleop.start()
 
-                # TODO: Send commands to servo_driver.cpp
-
-            elif self.mode == "teleop":
-                commands = self.teleop.get_commands()
-                # TODO: Send commands to servo_driver.cpp
-
-            # Handle swarm messages
-            messages = self.swarm.get_messages()
-            for msg in messages:
-                print("[Swarm] Received:", msg)
-
-            time.sleep(0.02)  # 50 Hz
-
-    def run(self):
-        """Start main controller"""
-        mode_thread = threading.Thread(target=self.mode_switch_loop)
-        mode_thread.start()
-
-        try:
-            self.control_loop()
-        finally:
-            self.shutdown()
-            mode_thread.join()
-
-    def shutdown(self):
+    def stop(self):
+        print("[MainController] Stopping main controller...")
         self.running = False
-        self.autonomous.shutdown()
-        self.teleop.shutdown()
-        self.map_manager.shutdown()
+
+        self.autonomous.stop()
+        self.teleop.stop()
+        self.swarm.stop()
+
+        if self.monitor_thread:
+            self.monitor_thread.join()
         print("[MainController] Shutdown complete.")
 
+    # ---------------- Main Monitoring Loop ----------------
+    def monitor_loop(self):
+        """
+        Continuously checks:
+        - Power levels
+        - Thermal states
+        - Emergency stop
+        - Docking requests
+        """
+        while self.running:
+            # Emergency stop override
+            if self.estop.is_triggered():
+                print("[MainController] EMERGENCY STOP TRIGGERED! Halting all motion.")
+                self.autonomous.motion_planner.execute_trajectory([0]*24)
+                time.sleep(0.1)
+                continue
+
+            # Power check
+            voltage, current = self.power.read_voltage_current()
+            if voltage < 20.0:  # example low-voltage threshold
+                print(f"[MainController] LOW BATTERY: {voltage}V, initiating dock")
+                self.dock.autonomous_dock()
+                self.charger.start_charging()
+
+            # Thermal check
+            temps = self.thermal.read_temperatures()
+            if any(t > 70 for t in temps):
+                print(f"[MainController] OVERHEAT: {temps}, pausing motion")
+                self.autonomous.motion_planner.execute_trajectory([0]*24)
+
+            # Swarm management
+            self.manage_swarm()
+
+            time.sleep(0.1)  # 10 Hz loop
+
+    # ---------------- Swarm Management ----------------
+    def manage_swarm(self):
+        """
+        High-level swarm orchestration:
+        - Collect states
+        - Send coordinated commands
+        - Handle up to 50 bots
+        """
+        all_states = self.swarm.get_all_states()
+
+        for bot_id, bot_info in all_states.items():
+            # Example: maintain distance or formation
+            command = {"action": "hold_position"}
+            self.swarm.send_command(bot_id, command)
+
+    # ---------------- Mode Switching ----------------
+    def set_mode(self, mode):
+        """
+        mode: "autonomous" or "teleop"
+        """
+        with self.lock:
+            if mode == self.mode:
+                return
+            # Stop current mode
+            if self.mode == "autonomous":
+                self.autonomous.stop()
+            elif self.mode == "teleop":
+                self.teleop.stop()
+
+            # Start new mode
+            self.mode = mode
+            if self.mode == "autonomous":
+                self.autonomous.start()
+            elif self.mode == "teleop":
+                self.teleop.start()
+            print(f"[MainController] Switched to {self.mode} mode")
 
 # -------------------- TEST LOOP --------------------
 if __name__ == "__main__":
-    controller = MainController(node_id="OB8-Node1")
-    controller.run()
+    controller = MainController()
+    controller.start()
+    print("[MainController] Running. Ctrl+C to stop.")
+
+    try:
+        while True:
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        controller.stop()
+        print("[MainController] Exited")
