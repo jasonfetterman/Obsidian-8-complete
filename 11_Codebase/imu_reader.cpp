@@ -1,71 +1,76 @@
+//
 // imu_reader.cpp
 // OBSIDIAN-8 V3 — REV D
-// Reads BNO085 IMU data and provides orientation & angular velocity
+// Reads BNO085 IMU for orientation and motion sensing
+//
 
 #include <iostream>
-#include <cmath>
 #include <thread>
 #include <chrono>
-#include "bno085_driver.h" // Assume low-level I2C/SPI interface library
+#include "bno085.h"  // Include your IMU library / driver header
 
-struct IMUData {
-    double roll;   // degrees
-    double pitch;  // degrees
-    double yaw;    // degrees
-    double gx;     // deg/s
-    double gy;     // deg/s
-    double gz;     // deg/s
-};
-
-// -------------------- CLASS --------------------
 class IMUReader {
-private:
-    BNO085Driver imu;
-    IMUData last_data;
-
 public:
-    IMUReader() {
-        if(!imu.begin()) {
+    IMUReader(int i2c_bus = 1, int address = 0x4A) {
+        imu = new BNO085(i2c_bus, address);
+        if (!imu->begin()) {
             std::cerr << "[IMUReader] Failed to initialize BNO085" << std::endl;
-            throw std::runtime_error("IMU initialization failed");
         }
-        last_data = {0,0,0,0,0,0};
+        else {
+            std::cout << "[IMUReader] BNO085 initialized" << std::endl;
+        }
     }
 
-    IMUData read() {
-        double quat[4];
-        if(imu.getQuaternion(quat)) {
-            // Convert quaternion to Euler angles (roll, pitch, yaw)
-            double w = quat[0], x = quat[1], y = quat[2], z = quat[3];
-
-            last_data.roll  = atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y)) * 180.0/M_PI;
-            last_data.pitch = asin(2*(w*y - z*x)) * 180.0/M_PI;
-            last_data.yaw   = atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z)) * 180.0/M_PI;
-        }
-
-        double gyro[3];
-        if(imu.getGyro(gyro)) {
-            last_data.gx = gyro[0];
-            last_data.gy = gyro[1];
-            last_data.gz = gyro[2];
-        }
-
-        return last_data;
+    ~IMUReader() {
+        delete imu;
     }
+
+    void update() {
+        if (imu->dataAvailable()) {
+            imu->readSensor();  // reads accel, gyro, mag, quaternions
+
+            quaternion[0] = imu->getQuaternionW();
+            quaternion[1] = imu->getQuaternionX();
+            quaternion[2] = imu->getQuaternionY();
+            quaternion[3] = imu->getQuaternionZ();
+
+            accel[0] = imu->getAccelX();
+            accel[1] = imu->getAccelY();
+            accel[2] = imu->getAccelZ();
+
+            gyro[0] = imu->getGyroX();
+            gyro[1] = imu->getGyroY();
+            gyro[2] = imu->getGyroZ();
+        }
+    }
+
+    std::vector<double> getQuaternion() { return quaternion; }
+    std::vector<double> getAccel() { return accel; }
+    std::vector<double> getGyro() { return gyro; }
+
+private:
+    BNO085* imu;
+    std::vector<double> quaternion{0, 0, 0, 0};
+    std::vector<double> accel{0, 0, 0};
+    std::vector<double> gyro{0, 0, 0};
 };
 
 // -------------------- TEST LOOP --------------------
-#ifdef TEST_IMU
 int main() {
     IMUReader imu;
-    while(true) {
-        IMUData data = imu.read();
-        std::cout << "Roll: " << data.roll << " Pitch: " << data.pitch
-                  << " Yaw: " << data.yaw
-                  << " GX: " << data.gx << " GY: " << data.gy << " GZ: " << data.gz
+    while (true) {
+        imu.update();
+        auto q = imu.getQuaternion();
+        auto a = imu.getAccel();
+        auto g = imu.getGyro();
+
+        std::cout << "[IMU] Quaternion: "
+                  << q[0] << ", " << q[1] << ", " << q[2] << ", " << q[3]
+                  << " | Accel: " << a[0] << ", " << a[1] << ", " << a[2]
+                  << " | Gyro: " << g[0] << ", " << g[1] << ", " << g[2]
                   << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));  // 20 Hz
     }
     return 0;
 }
-#endif
