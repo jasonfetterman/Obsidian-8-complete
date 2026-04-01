@@ -1,6 +1,6 @@
 OBSIDIAN-8 V3
-LANDING INTERFACE GEOMETRY v1
-Based on: V3_LARGE_FORMAT_BASELINE
+LANDING INTERFACE GEOMETRY v3
+Based on: V3.3_HYBRID_FRAME
 Status: BASE CONTACT STRUCTURE DEFINITION
 Units: Millimeters
 
@@ -48,7 +48,7 @@ LANDING FOOT GEOMETRY
 Option A — Fixed Foot Pads
 Diameter: 80–120 mm
 Material: TPU, UHMW, or rubber composite
-Mount: Bolted to reinforced foot block
+Mount: Bolted to reinforced printed foot block
 
 Option B — Skid Ring (Continuous)
 Secondary circular skid
@@ -102,6 +102,8 @@ Minimum 3 mm from outer edge.
 
 Compression faces must align
 directly under aluminum post.
+
+Printed CF nylon reinforced for high-load points.
 
 ---------------------------------------
 GROUND CLEARANCE
