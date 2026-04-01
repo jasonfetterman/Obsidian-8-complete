@@ -1,6 +1,6 @@
 OBSIDIAN-8 V3
-PROPULSION MOUNT GEOMETRY v1
-Based on: V3_LARGE_FORMAT_BASELINE
+PROPULSION MOUNT GEOMETRY v3
+Based on: V3.3_HYBRID_FRAME
 Status: MOTOR STRUCTURAL INTERFACE DEFINITION
 Units: Millimeters
 
@@ -9,12 +9,13 @@ PURPOSE
 ---------------------------------------
 
 Define structural motor mounting geometry
-and thrust load transfer path.
+and thrust/torque load transfer path.
 
 Mount must:
-- Transfer thrust into aluminum structure
+- Transfer thrust directly into aluminum structure
 - Avoid loading printed parts in primary tension
-- Maintain symmetry
+- Maintain radial and angular symmetry
+- Support stair-mode and dynamic torque loads
 
 ---------------------------------------
 PROPULSION LAYOUT
@@ -27,7 +28,7 @@ Angular spacing:
 Aligned with vertical posts (45° increments)
 
 Radial position:
-Primary ring center radius (556.5 mm)
+Primary ring center radius: 556.5 mm
 
 Motor axis:
 Vertical (Z+)
@@ -39,64 +40,58 @@ THRUST LOAD ASSUMPTION
 Assumed maximum total thrust:
 ≥ 2 × all-up mass
 
-For 60 kg design mass:
-Total thrust ≈ 1200 N
-
-Per motor (8 motors):
-≈ 150 N nominal
-Design margin:
-300 N per motor
+Hybrid frame mass: 24.8–25 kg
+Total thrust ≈ 500 N (system nominal)
+Design margin per motor: 2×
+≈ 125–150 N nominal, 300 N peak per motor
 
 ---------------------------------------
 LOAD PATH
 ---------------------------------------
 
 Motor Mount
+→ Aluminum Motor Plate (5–8 mm)
 → 3030 Vertical Post
-→ Ring Node
+→ Primary Ring Node
 → Radial Bracing
 → Opposing structure
 
-Primary thrust must not:
-Pass through printed component alone.
+Printed components carry only shear stabilization.
+No axial compression or torque allowed through nylon parts.
 
 ---------------------------------------
 MOTOR MOUNT PLATE
 ---------------------------------------
 
-Mount Type:
-Aluminum plate (5–8 mm thick)
+Material:
+Aluminum 5–8 mm thick (structural grade)
 
-Recommended Diameter:
-Based on motor base pattern
-
-Mount must:
-Bolt directly to 3030 post
+Mount pattern:
+Bolt directly to vertical 3030 post
 or reinforced bracket
 
 Fasteners:
-M6 or M8 Grade 10.9 minimum
+M6 or M8, Grade 10.9 minimum
+Minimum 4 per motor, ≥ 30 mm spacing
 
 ---------------------------------------
-MOUNTING RULES
+TORQUE & THRUST RESISTANCE
 ---------------------------------------
 
-- Minimum 4 fasteners per motor
-- Bolt spacing ≥ 30 mm
-- No cantilever-only printed adapters
-- Aluminum-to-aluminum compression contact preferred
+Each motor produces:
 
----------------------------------------
-TORQUE RESISTANCE
----------------------------------------
-
-Each motor produces torsional reaction.
+- Vertical thrust
+- Radial/axial torque due to offset load
 
 Mount must resist:
-Motor torque + thrust vector offset.
 
-No visible twisting of vertical post
-under manual torque test.
+- 2× nominal thrust per motor
+- Reaction torque from stair-mode dynamics
+
+Verification:
+
+- Manual torque test: no visible flex of post
+- FEM simulation: peak torsion < 0.5° at post node
 
 ---------------------------------------
 CLEARANCE ZONES
@@ -104,47 +99,29 @@ CLEARANCE ZONES
 
 Maintain:
 
-Minimum 50 mm internal buffer
-from primary ring inward.
-
-No interference with:
-
-- Upper ring
-- Cross bracing
-- Core volume cylinder (300 mm)
+- ≥ 50 mm internal buffer from primary ring inward
+- No interference with:
+  - Upper ring
+  - Cross bracing
+  - Core cylinder (300 mm diameter)
+  - Landing interface foot blocks
 
 ---------------------------------------
-VIBRATION CONSIDERATION
+VIBRATION & THERMAL CONSIDERATIONS
 ---------------------------------------
 
-Motor mounts must be rigid.
-
-Do NOT use soft isolation
-between motor and structural mount.
-
-Vibration isolation occurs at electronics layer,
-not propulsion interface.
+- Mounts must be rigid
+- No soft isolation at motor-to-structure interface
+- Vibration isolation occurs at electronics layer only
+- Maintain 5–10 mm air gap between motor and CF nylon components to avoid heat transfer
 
 ---------------------------------------
-THERMAL CONSIDERATION
+ALIGNMENT TOLERANCES
 ---------------------------------------
 
-Motor heat must not:
-
-Transfer directly into printed parts.
-
-Maintain 5–10 mm air gap
-between motor and CF nylon components.
-
----------------------------------------
-ALIGNMENT TOLERANCE
----------------------------------------
-
-Motor vertical alignment:
-< 0.5° deviation
-
-Radial symmetry:
-±2 mm position tolerance
+- Vertical alignment < 0.5° deviation
+- Radial symmetry ±2 mm
+- Fasteners torque-verified post-install
 
 ---------------------------------------
 FAILURE CONDITIONS
@@ -152,10 +129,11 @@ FAILURE CONDITIONS
 
 Redesign required if:
 
-- Visible flex under thrust simulation
-- Post torsional twist exceeds spec
-- Printed components deform under load
-- Fasteners loosen after dynamic run
+- Vertical post flex visible under 2× thrust simulation
+- Post torsional twist exceeds 0.5° at motor mount
+- Printed components deform under dynamic load
+- Fasteners loosen after operational run
+- Motor plate offsets > 2 mm from designed radial location
 
 ---------------------------------------
 END OF FILE
