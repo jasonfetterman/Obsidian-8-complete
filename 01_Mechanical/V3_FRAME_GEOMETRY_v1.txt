@@ -1,6 +1,6 @@
 OBSIDIAN-8 V3
-FRAME GEOMETRY BASELINE
-Based on: V3_LARGE_FORMAT_BASELINE
+FRAME GEOMETRY BASELINE v3
+Based on: V3.3_HYBRID_FRAME
 Status: LOCKED GEOMETRY DEFINITION
 
 ---------------------------------------
@@ -18,7 +18,7 @@ PRIMARY_RING_CENTER_RADIUS = 556.5 mm
 PRIMARY_SEGMENT_LENGTH = 288.3 mm
 SEGMENT_MITER_ANGLE = 15 degrees per side
 
-FRAME_HEIGHT = 900 mm
+FRAME_HEIGHT = 1143 mm  # updated for hybrid frame
 
 MATERIAL_STRUCTURAL = 3030 Aluminum
 MATERIAL_BRACING = 2020 Aluminum
@@ -42,6 +42,7 @@ LOAD_PATH_RULES:
 - Compression paths terminate into aluminum members
 - Printed CF nylon components are interface/shear only
 - No primary load path relies solely on printed material in tension
+- Printed gussets supplement bracing where torsional load is minimal
 
 ---------------------------------------
 END OF FILE
