@@ -1,60 +1,55 @@
-# OBSIDIAN-8 MECHANICAL LAYOUT (V1)
+# OBSIDIAN-8 MECHANICAL LAYOUT (V3.3)
 
 ## Overview
 
 This document defines the physical mechanical layout of the OBSIDIAN‑8
-octopod platform. It establishes the core geometry used when assembling
-the robot in CAD.
+octopod platform (hybrid extrusion + 3D printed design). It establishes the
+core geometry and modular assembly references used when building the robot in CAD.
 
 Target Platform Size: 45 inch footprint (1143 mm)
 
-Target Mass: 27--30 kg
+Target Mass: 24--25 kg (hybrid design with printed limbs and modules)
 
-Primary Structure: 3030 aluminum extrusion ring chassis.
+Primary Structure: 3030 aluminum extrusion backbone with 2020 cross braces
 
 ------------------------------------------------------------------------
 
 # Chassis Geometry
 
-Outer Diameter: \~700 mm
+Outer Diameter: ~700 mm
 
-Coxa Mount Radius: \~350 mm from center
+Coxa Mount Radius: ~350 mm from chassis center
 
-Foot Radius (neutral stance): \~550 mm from center
+Foot Radius (neutral stance): ~550 mm from chassis center
 
-Leg Mount Positions: 8 equally spaced positions at 45° intervals.
+Leg Mount Positions: 8 equally spaced positions at 45° intervals:
 
-Example layout:
-
-Front Leg1 -- 0°
-
-Front‑Right Leg2 -- 45°
-
-Right Leg3 -- 90°
-
-Rear‑Right Leg4 -- 135°
-
-Rear Leg5 -- 180°
-
-Rear‑Left Leg6 -- 225°
-
-Left Leg7 -- 270°
-
+Front Leg1 -- 0°  
+Front‑Right Leg2 -- 45°  
+Right Leg3 -- 90°  
+Rear‑Right Leg4 -- 135°  
+Rear Leg5 -- 180°  
+Rear‑Left Leg6 -- 225°  
+Left Leg7 -- 270°  
 Front‑Left Leg8 -- 315°
+
+Notes: 3D printed leg brackets attach to 3030 backbone at these positions.
 
 ------------------------------------------------------------------------
 
 # Structural Frame
 
-Primary Load Ring: 3030 aluminum extrusion
+Primary Load Ring: 3030 aluminum extrusion backbone
 
 Cross Bracing: 2020 aluminum extrusion
 
-Top Plate: 3 mm aluminum sheet
+Top Plate: 3 mm aluminum sheet (mounts battery and compute modules)
 
-Battery Tray: 3 mm aluminum plate mounted centrally.
+Battery Tray: 3D printed or aluminum tray mounted centrally
 
-Purpose: Keeps center of gravity low.
+Purpose: Maintain low CG and structural rigidity while keeping modularity
+
+Notes: Printed gussets reinforce high-torque leg mounts
 
 ------------------------------------------------------------------------
 
@@ -62,14 +57,11 @@ Purpose: Keeps center of gravity low.
 
 Each leg uses:
 
-Coxa Servo: Mounted horizontally inside coxa housing.
+- **Coxa Servo:** Mounted horizontally in 3D printed coxa bracket  
+- **Femur Servo:** Mounted vertically in 3D printed femur beam  
+- **Tibia Servo:** Mounted inline with printed tibia segment  
 
-Femur Servo: Mounted vertically inside femur box beam.
-
-Tibia Servo: Mounted inline with tibia segment.
-
-Servo Access: Design service openings so horns can be accessed without
-full disassembly.
+Servo Access: Printed service openings allow horn access without full disassembly
 
 ------------------------------------------------------------------------
 
@@ -77,53 +69,62 @@ full disassembly.
 
 Major mass components:
 
-Battery Compute hardware Power electronics
+- Battery  
+- Compute hardware  
+- Power electronics  
 
-These should be mounted close to the center of the chassis.
+Placement:
 
-Target CG position: Within 50 mm of chassis center.
+- Central along X and Y axes  
+- Low as practical along Z axis (approx. 0.42 m from chassis base)  
 
-Low CG improves stability when walking.
+Target CG position: Within 50 mm of chassis center
+
+Low CG improves stability during walking and stair climbing
 
 ------------------------------------------------------------------------
 
 # Battery Placement
 
-Battery: 24V 30Ah LiFePO4
+Battery: 24V 30Ah LiFePO4  
 
-Recommended Location: Directly under the main chassis plate.
+Recommended Location: Directly under top chassis plate in central battery tray  
 
-Mounting: Shock‑isolated battery tray.
+Mounting: Shock-isolated, removable tray
 
 ------------------------------------------------------------------------
 
 # Head Mast Mount
 
-Location: Center of robot body.
+Location: Center of robot body  
 
-Height: 300--400 mm above chassis.
+Height: 300–400 mm above chassis  
 
 Mounting Method:
 
-Aluminum mast column Bolted to central frame plate.
+- 3D printed mast bracket or aluminum mast column  
+- Bolted to central 3030 frame plate  
 
-Vibration Isolation: Rubber bushings recommended.
+Vibration Isolation: Rubber bushings recommended
 
 ------------------------------------------------------------------------
 
 # Electronics Bay
 
-Location: Central interior chassis area.
+Location: Central interior chassis area
 
 Components:
 
-Jetson Orin NX Raspberry Pi 5 Teensy 4.1 Duet 3 6HC DC‑DC converters
+- Jetson Orin NX  
+- Raspberry Pi 5  
+- Teensy 4.1  
+- Duet 3 6HC  
+- DC‑DC converters  
 
 Recommended Mounting:
 
-Stacked electronics plates.
-
-Ensure airflow between layers.
+- Stacked electronics plates (3D printed or aluminum)  
+- Ensure airflow between layers
 
 ------------------------------------------------------------------------
 
@@ -131,15 +132,15 @@ Ensure airflow between layers.
 
 Active Cooling:
 
-2 × 80 mm Noctua fans
+- 2 × 80 mm fans (e.g., Noctua)  
 
 Airflow Path:
 
-Bottom intake Top exhaust vents
+- Bottom intake → Top exhaust vents  
 
 Purpose:
 
-Prevent heat buildup from: servos DC‑DC converters compute modules
+- Prevent heat buildup from servos, DC‑DC converters, and compute modules
 
 ------------------------------------------------------------------------
 
@@ -147,33 +148,45 @@ Prevent heat buildup from: servos DC‑DC converters compute modules
 
 Main Power Harness:
 
-Battery → DC‑DC converters → servo rails.
+- Battery → DC‑DC converters → servo rails  
 
 Recommended cable gauges:
 
-6 AWG main battery trunk 8 AWG converter feeds 10‑12 AWG servo leads
+- 6 AWG main battery trunk  
+- 8 AWG converter feeds  
+- 10–12 AWG servo leads  
 
 Leg Cable Routing:
 
-Route wires through coxa housing. Add strain relief at rotating joints.
-
-Recommended wire:
-
-High‑flex silicone robotics cable.
+- Wires routed through printed coxa housing  
+- Strain relief at rotating joints  
+- High-flex silicone robotics cable recommended
 
 ------------------------------------------------------------------------
 
 # CAD Assembly Notes
 
-Model order recommended:
+Recommended model order:
 
-1.  Chassis ring
-2.  Leg mount brackets
-3.  Coxa assemblies
-4.  Femur assemblies
-5.  Tibia assemblies
-6.  Battery tray
-7.  Electronics stack
-8.  Head mast
+1. 3030 chassis backbone ring  
+2. 2020 cross braces  
+3. 3D printed leg mount brackets  
+4. Coxa assemblies  
+5. Femur assemblies  
+6. Tibia assemblies  
+7. Battery tray (printed or aluminum)  
+8. Electronics stack  
+9. Head mast  
 
-This order prevents interference errors during assembly.
+Notes: Following this order minimizes interference errors during assembly.  
+Printed modules can be iterated or replaced without altering the main chassis.
+
+------------------------------------------------------------------------
+
+# Design Notes (V3.3)
+
+- Hybrid frame reduces overall mass while maintaining stiffness  
+- 3D printed modules modular and replaceable for rapid upgrades  
+- All high-load points reinforced with gussets and brackets  
+- Neutral stance and CG verified for tripod gait and stair climbing stability  
+- Supports FMEA, CM, and simulation testing
