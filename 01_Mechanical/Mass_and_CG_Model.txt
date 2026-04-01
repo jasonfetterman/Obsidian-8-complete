@@ -1,56 +1,80 @@
 OBSIDIAN-8 V3
 
 01_Mechanical/Mass_and_CG_Model.txt
-Revision: V3.2
+Revision: V3.3
 Status: Authoritative
 
 1. PURPOSE
 
-Define the mass properties and center of gravity (CG) model for OBSIDIAN-8 V3.
+Define the mass properties and center of gravity (CG) model for OBSIDIAN-8 V3.3 (hybrid extrusion + 3D printed design).  
 This ensures:
 
-Stability under operational motion
-Proper load distribution across limbs and actuators
-Accurate simulation for control and safety systems
-Traceability for CM, FMEA, and deployment profiles
+- Stability under operational motion
+- Proper load distribution across limbs and actuators
+- Accurate simulation for control and safety systems
+- Traceability for CM, FMEA, and deployment profiles
+
 2. TOTAL SYSTEM MASS
-Subsystem	Mass (kg)	Notes / Revision
-Main Chassis	12.5	Aluminum 7075 / V3
-Actuated Legs (2x)	8.0	Each leg MK1
-Torso Modules	6.5	Mission compute, battery, sensors
-Armor Covers	4.0	Polycarbonate + Kevlar
-Sensors & Payload	1.5	Cameras, LIDAR, mission modules
-Wiring & Harness	0.8	Embedded channels
-Total System Mass	33.3	Rounded
+
+Subsystem                   Mass (kg)       Notes / Revision
+Main Chassis (3030 + 2020) 8.5             Hybrid aluminum extrusion backbone
+Actuated Legs (6x printed)  6.0             3D printed limbs MK1/MK2, reinforced brackets
+Torso Modules (3D printed)  5.0             Battery, compute, sensors in printed housings
+Armor Covers (printed + polycarbonate) 3.0  Modular panels, snap-on mounts
+Sensors & Payload           1.5             Cameras, LIDAR, mission modules
+Wiring & Harness            0.8             Routed through extrusion channels
+Total System Mass           24.8            Rounded
+
+Notes:
+- Mass reduction achieved through hybrid design and lighter printed brackets
+- Lighter legs reduce torque on actuators and improve stair clearance
+
 3. CENTER OF GRAVITY (CG) MODEL
-Origin: Geometric center of main chassis reference frame.
+
+Origin: Geometric center of 3030 backbone reference frame
+
 CG Location (Nominal, XYZ):
 X: 0.0 m (longitudinal center)
 Y: 0.0 m (lateral center)
-Z: 0.45 m (height from chassis base)
+Z: 0.42 m (height from extrusion base)
+
 CG Sensitivity:
-Payload addition ±0.1 m
-Armor variation ±0.05 m
+Payload addition ±0.08 m
+Armor variation ±0.04 m
 Battery placement ±0.02 m
+Printed module variability ±0.03 m
+
 CG Considerations:
-Legs designed to support >120% of static weight
-Torso and payload mass concentrated near CG to minimize torque on actuators
-Armor and add-ons designed symmetrically to maintain lateral balance
+- Legs designed to support >120% of static weight
+- Torso and payload mass concentrated near CG to minimize torque on actuators
+- Armor and add-ons symmetrically placed to maintain lateral balance
+- Printed parts reduce mass high on the frame to lower vertical CG
+
 4. DYNAMIC MASS CONSIDERATIONS
+
 Actuation during motion changes effective CG:
-Forward/Back Leg Extension: ±0.05 m X-axis
-Lateral Swing: ±0.03 m Y-axis
-Limb Elevation: ±0.02 m Z-axis
+
+Forward/Back Leg Extension: ±0.04 m X-axis  
+Lateral Swing: ±0.025 m Y-axis  
+Limb Elevation: ±0.015 m Z-axis  
+
 Software control loops use this dynamic CG to:
-Adjust torque in real-time
-Maintain stability in reactive controller
-Feed FMEA risk models for motion limits
+
+- Adjust torque in real-time
+- Maintain stability in reactive controller
+- Feed FMEA risk models for motion limits
+
 5. MODULARITY AND CONFIGURATION
-Each subsystem mass tracked in Configuration Management Plan.
-Changes in battery, armor, or payload must update deployment_profile with new mass/CG data.
-Supports rapid recalculation for mission-specific loadouts.
+
+- Each subsystem mass tracked in Configuration Management Plan
+- Changes in battery, armor, or payload must update deployment_profile with new mass/CG data
+- Supports rapid recalculation for mission-specific loadouts
+- Modular 3D printed parts allow quick mass adjustment and replacement
+
 6. DESIGN INTENT
-Maintain predictable stability and actuation performance under all operational configurations.
-Ensure safe operation with both static and dynamic loads.
-Integrate with FMEA, CM, and System Control Authority to prevent tipping, overload, or actuator faults.
-Provide accurate data for simulation, mission planning, and control authority validation.
+
+- Maintain predictable stability and actuation performance under all operational configurations
+- Ensure safe operation with both static and dynamic loads
+- Integrate with FMEA, CM, and System Control Authority to prevent tipping, overload, or actuator faults
+- Provide accurate data for simulation, mission planning, and control authority validation
+- Reduce weight while keeping CG low for stair climbing and tripod gait stability
