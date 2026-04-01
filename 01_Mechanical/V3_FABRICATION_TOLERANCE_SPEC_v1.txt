@@ -1,6 +1,6 @@
 OBSIDIAN-8 V3
-FABRICATION TOLERANCE SPECIFICATION v1
-Based on: V3_LARGE_FORMAT_BASELINE
+FABRICATION TOLERANCE SPECIFICATION v3
+Based on: V3.3_HYBRID_FRAME
 Status: MANUFACTURING CONTROL STANDARD
 Units: Millimeters
 
@@ -11,7 +11,7 @@ PURPOSE
 Define dimensional tolerances for aluminum members,
 printed components, and assembly alignment.
 
-Prevent cumulative tolerance drift in 45-inch frame.
+Prevent cumulative tolerance drift in 45-inch (1143 mm) hybrid frame.
 
 ---------------------------------------
 ALUMINUM CUT TOLERANCES
@@ -24,7 +24,7 @@ Miter Cuts (15°):
 Angle tolerance ±0.5°
 Length tolerance ±0.5 mm
 
-Post Height (900 mm):
+Post Height (1143 mm):
 ±0.5 mm across all posts
 
 Segments must be matched sets.
@@ -64,7 +64,10 @@ Field trim recommended
 Final installed tolerance ±1 mm
 
 Cross braces:
-Cut after primary structure confirmed square.
+Cut after primary structure confirmed square
+
+Ensure braces tie securely to 3030 main ring
+Printed gussets may provide lateral support only
 
 ---------------------------------------
 PRINTED PART TOLERANCES
@@ -80,43 +83,49 @@ Insert seating depth:
 ±0.2 mm
 
 Critical mating surfaces:
-Test-fit required prior to final assembly.
+Test-fit required prior to final assembly
+
+Reinforce or shim printed brackets at high-torque locations
 
 ---------------------------------------
 FASTENER FITMENT
 ---------------------------------------
 
-No forced alignment using bolts.
+No forced alignment using bolts
 
 If hole misalignment > 0.5 mm:
-Disassemble and correct root geometry.
+Disassemble and correct root geometry
 
 ---------------------------------------
 CUMULATIVE ERROR CONTROL
 ---------------------------------------
 
 Do not:
-- Fully torque structure before confirming symmetry.
-- Install upper ring before verifying primary ring flatness.
-- Install cross bracing before vertical alignment confirmed.
+- Fully torque structure before confirming symmetry
+- Install upper ring before verifying primary ring flatness
+- Install cross bracing before vertical alignment confirmed
+- Mount printed core brackets before main ring rigidity verified
 
-Build must progress in validation stages.
+Build must progress in validation stages
 
 ---------------------------------------
 INSPECTION CHECKPOINTS
 ---------------------------------------
 
 Checkpoint 1:
-Primary ring diameter & flatness verified.
+Primary ring diameter & flatness verified
 
 Checkpoint 2:
-Vertical posts aligned and equal height.
+Vertical posts aligned and equal height
 
 Checkpoint 3:
-Upper ring concentric and level.
+Upper ring concentric and level
 
 Checkpoint 4:
-Full torque inspection complete.
+Radial braces & printed gussets installed and verified
+
+Checkpoint 5:
+Full torque inspection complete
 
 ---------------------------------------
 END OF FILE
