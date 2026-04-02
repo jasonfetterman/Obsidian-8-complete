@@ -1,0 +1,25 @@
+# OBSIDIAN-8 ACTUATOR INTERFACE SPEC (REV A)
+
+## Standard Mount Pattern
+- Default: 4-bolt mount
+- Bolt size: M4
+- Base pattern: 40 mm x 40 mm (adjust per actuator)
+
+## Shaft Interface
+- Type: D-shaft or spline (depends on actuator)
+- Use: metal horn or clamped hub
+- Must include secure mechanical connection (no press-fit only)
+
+## Required CAD Features
+Every actuator mount MUST include:
+- 4 mounting holes (fully defined)
+- Clearance pocket for actuator body
+- Wire exit path
+- Tool access for screws
+
+## Load Rules
+- Load must align with actuator axis
+- Avoid shear force on mounting screws
+
+## Safety Factor
+- Minimum: 2.0 on all actuator mounts
