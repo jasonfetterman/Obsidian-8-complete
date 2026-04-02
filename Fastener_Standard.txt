@@ -1,0 +1,32 @@
+# OBSIDIAN-8 FASTENER STANDARD (REV A)
+
+## Global Rules
+- Structural joints: M4 socket head cap screws
+- Secondary/light-duty: M3 socket head cap screws
+- High-load pivots: M5 bolts
+
+## Materials
+- Preferred: Alloy steel (12.9)
+- Optional: Stainless (A2-70) for non-structural parts
+
+## Heat-Set Inserts
+- Type: Brass heat-set inserts
+- M3 → electronics + covers
+- M4 → structural parts
+
+## Hole Sizes
+- M3 clearance: 3.2 mm
+- M4 clearance: 4.2 mm
+- M5 clearance: 5.2 mm
+
+## Thread Engagement
+- Minimum: 1.5× diameter
+  - M3 → 4.5 mm
+  - M4 → 6 mm
+
+## Wall Thickness Around Inserts
+- M3: 3 mm minimum
+- M4: 4.5 mm minimum
+
+## Locking
+- Use nylon lock nuts OR Loctite Blue
