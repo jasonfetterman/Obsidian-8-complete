@@ -1,0 +1,44 @@
+# OBSIDIAN-8 PRINT CONSTRAINTS (REV A)
+
+## Printer Limits
+- Max build volume: 220 x 220 x 250 mm
+
+## Materials
+- Prototype: PLA+
+- Final: PETG / ABS / Nylon
+
+## Wall Thickness
+- Minimum: 2.5 mm
+- Structural: 4–6 mm
+
+## Tolerances
+- Clearance fit: +0.2 mm
+- Tight fit: +0.1 mm
+
+## Orientation Rules
+- Layers must run perpendicular to load direction
+- Avoid layer separation at joints
+
+## Support Rules
+- Avoid supports in:
+  - Bolt holes
+  - Internal channels
+
+---
+
+# PART SPLITTING STRATEGY
+
+## General Rule
+- If part >180 mm → split into multiple pieces
+
+## Split Locations
+- Legs: 2–3 segments
+- Body: modular panels
+
+## Joint Method
+- Bolt-together flanges
+- Optional alignment pins
+
+## Strength Rules
+- Do NOT split at high-stress points
+- Reinforce seams with ribs
