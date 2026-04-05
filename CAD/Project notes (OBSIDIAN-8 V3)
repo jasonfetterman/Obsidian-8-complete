@@ -1,0 +1,140 @@
+COXA JOINT STANDARD (OBSIDIAN-8 V3)
+
+Rotation Axis: Vertical (Yaw)
+Load Type: Radial dominant + shock loads
+
+SHAFT:
+- Diameter: 8mm (minimum) → 10mm preferred
+- Material: Hardened steel (or precision rod)
+- Fit: Slip fit through bearings, clamped on output side
+
+BEARINGS:
+- Type: 608ZZ (8x22x7) OR 6000 series if upgrading
+- Quantity: 2 per leg (top + bottom)
+- Spacing: 20–35mm apart (CRITICAL for stability)
+
+HOUSING:
+- Fully captured bearing pockets
+- Press fit tolerance: -0.02mm
+- Reinforced outer walls (≥4mm thickness)
+
+SERVO INTERFACE:
+- Servo does NOT carry radial load
+- Output drives shaft via:
+    → Clamping hub OR
+    → Steel coupler
+
+LOAD PATH:
+LEG → SHAFT → BEARINGS → HOUSING → 2020 FRAME
+
+DO NOT:
+- Mount servo directly as structural support
+- Use single bearing
+- Print shaft
+
+
+OBSIDIAN-8 CAD CLEANUP — PASS 1
+
+GOAL:
+- Remove clutter
+- Standardize structure
+- Prepare for leg integration
+
+--------------------------------
+1. COMPONENT STRUCTURE
+--------------------------------
+
+CREATE TOP-LEVEL COMPONENTS:
+
+- 00_MASTER_ASSEMBLY
+- 01_THORAX
+- 02_ABDOMEN
+- 03_FRONT_BODY (if separate)
+- 10_LEG_FL
+- 11_LEG_FR
+- 12_LEG_ML
+- 13_LEG_MR
+- 14_LEG_RL
+- 15_LEG_RR
+- 90_HARDWARE
+- 99_REFERENCE
+
+--------------------------------
+2. MOVE PARTS INTO CORRECT GROUPS
+--------------------------------
+
+THORAX:
+- Shell
+- Internal ribs
+- Battery box
+- Mount plates
+
+LEGS:
+- EMPTY for now (you will build clean)
+
+HARDWARE:
+- Bearings
+- Screws
+- Shafts (placeholders)
+
+REFERENCE:
+- Sketches
+- Imported meshes
+- Images
+
+--------------------------------
+3. RENAME EVERYTHING
+--------------------------------
+
+FORMAT:
+[SECTION]_[PART]_[VERSION]
+
+EXAMPLES:
+THX_RIB_A_V1
+THX_BATT_BOX_V2
+COXA_HOUSING_V1
+
+NO:
+- "Body1"
+- "Part(3)"
+- "Sketch7"
+
+--------------------------------
+4. ORIGIN + ALIGNMENT CHECK
+--------------------------------
+
+- Thorax centered at origin
+- Z = up
+- X = forward
+- Y = left/right
+
+MAKE SURE:
+- 2020 extrusion is square to axes
+- Leg mount faces are planar + aligned
+
+--------------------------------
+5. DELETE / SUPPRESS TRASH
+--------------------------------
+
+REMOVE:
+- Old failed sketches
+- Duplicate bodies
+- Hidden junk geometry
+
+SUPPRESS:
+- Anything you're "maybe using later"
+
+--------------------------------
+6. PARAMETERS (IF YOUR CAD SUPPORTS IT)
+--------------------------------
+
+CREATE GLOBALS:
+
+LEG_SPACING = (set your distance)
+FRAME_WIDTH = (2020 spacing)
+WALL_THICKNESS = 5mm
+BEARING_OD = 22mm
+SHAFT_DIAMETER = 8mm
+
+--------------------------------
+END PASS 1
