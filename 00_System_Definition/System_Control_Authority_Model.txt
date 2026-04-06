@@ -1,82 +1,121 @@
 OBSIDIAN-8 V3
-
 System_Control_Authority_Model.txt
-Revision: V3.2
+Revision: V3.3
 Status: Authoritative
 
+------------------------------------------------------------
 1. PURPOSE
+------------------------------------------------------------
 
-Define control authority hierarchy, decision precedence, and enforcement mechanisms for OBSIDIAN-8 V3.
+Define control‑authority hierarchy, decision precedence, and
+enforcement mechanisms for OBSIDIAN‑8 V3.
 
-The model ensures:
+This model ensures:
+- Safety dominance at all times  
+- Deterministic and predictable control behavior  
+- Clear operator and supervisory authority  
+- Secure handling of remote and swarm commands  
+- Fail‑safe response to faults or attacks  
 
-Safety dominance at all times
-Predictable and deterministic control
-Clear operator and supervisory authority
-Secure handling of remote and swarm commands
-Fail-safe behavior under faults or attacks
-2. AUTHORITY HIERARCHY
+------------------------------------------------------------
+2. AUTHORITY HIERARCHY
+------------------------------------------------------------
 
-2.1 Hardware-Level Authority
+2.1 Hardware‑Level Authority  
+Kill‑Line circuits and watchdog timers override all software commands.  
+Safety interlocks are always active.  
+Hardware limits enforce maximum torque, voltage, and motion ranges.  
+Reference: /00_System_Definition/Safety_Architecture.txt  
 
-Kill-line circuits and watchdog timers override all software commands.
-Safety interlocks are always active.
-Hardware limits enforce maximum torque, voltage, and motion ranges.
+2.2 Reactive Controller  
+Local emergency response layer managing collision avoidance,
+stability correction, and motion inhibition.  
+Can preempt mission‑level or swarm commands when safety thresholds are exceeded.  
+Reports all preemptions to the Mission layer for audit.  
+Reference: /03_Control_Architecture/Reactive_Controller_Spec.txt  
 
-2.2 Reactive Controller
+2.3 Mission Compute Layer  
+Executes planned commands and trajectories.  
+Prioritized by authenticated operator session authority.  
+Can be overridden by Reactive or Hardware layers upon conflict detection.  
+Includes Energy and Thermal supervision modules for safe motion envelopes.  
 
-Local emergency response layer: collision avoidance, stability correction, motion inhibition.
-Can preempt mission-level or swarm commands if safety thresholds exceeded.
+2.4 Duet 3 Motion Executor / Bridge  
+Acts as a low‑level command executor receiving validated motion sequences only.  
+Duet outputs are disabled if Kill‑Line relay is open or watchdog heartbeat absent.  
+Reference: /02_Electrical/Duet3_Interface.txt and /11_Codebase/duet_bridge/  
 
-2.3 Mission Compute Layer
+2.5 Operator Authority  
+Local operator inputs take precedence over network‑based control.  
+All remote sessions require authentication with token validation and timeout.  
+Authority revocation triggers automatic Safe‑Stop.  
 
-Executes planned commands and trajectories.
-Prioritized by operator session authority.
-Can be overridden by reactive or hardware authority if conflicts arise.
+2.6 Swarm Authority  
+Peer commands are validated for identity and safety compliance.  
+Swarm inputs cannot override local Reactive or Hardware Kill function.  
+Consensus validation (≥ majority) required for coordinated multi‑unit actions.  
 
-2.4 Operator Authority
+2.7 Automated Failsafe Authority  
+System initiates Safe‑Stop when:  
+- Hardware fault detected  
+- Watchdog timer expired  
+- Communication timeout exceeded  
+- Unvalidated swarm command received  
+- Energy or thermal limit breach  
 
-Local operator inputs have precedence over network-based control.
-Authentication required for remote operators; token/session validation enforced.
-Authority revocation triggers safe-stop if compromised.
+Failsafe logic resides in both Reactive controller and watchdog.  
 
-2.5 Swarm Authority
+------------------------------------------------------------
+3. CONTROL DECISION FLOW
+------------------------------------------------------------
 
-Commands from peer units are verified against identity and safety constraints.
-Swarm inputs cannot override local safety or kill-line functions.
-Consensus or majority validation enforced if multi-unit coordination required.
+1. Input Received → (Local operator / Remote / Swarm / Mission plan)  
+2. Authenticate Source → Validate Authorization and session token.  
+3. Check Operational Constraints → Energy, terrain, thermal envelopes.  
+4. Reactive Safety Check → Collision and stability screening.  
+5. Hardware Kill / Watchdog Check → Abort on any fault or timeout.  
+6. Execution → Command sent to Duet Bridge if all clear.  
+7. Logging → Record every command and override for audit.  
 
-2.6 Automated Failsafe Authority
+All decision events are timestamped and linked to operator and session IDs.  
 
-System autonomously triggers safe-stop under:
-Hardware faults
-Watchdog timer expiry
-Communication loss beyond timeout threshold
-Unvalidated swarm command attempts
-3. CONTROL DECISION FLOW
-Input Received: Local operator, remote operator, swarm, mission plan.
-Verification: Authenticate source, validate command against operational constraints.
-Reactive Safety Check: Check for collisions, actuator limits, system stability.
-Hardware Kill/Watchdog Check: Overrides any command if safety compromised.
-Execution: Command sent to actuators if all authority checks pass.
-Logging: All commands, overrides, and authority preemptions logged for audit.
-4. CONFLICT RESOLUTION
-Hardware vs. Software: Hardware always wins.
-Reactive Controller vs. Mission Compute: Reactive preempts to preserve safety.
-Local vs. Remote Operator: Local operator has priority unless overridden by admin-approved network control.
-Swarm vs. Local Safety: Swarm cannot violate safety constraints; commands are rejected or limited.
-Failsafe: Any unresolvable conflict triggers safe-stop.
-5. AUTHORITY VALIDATION AND TESTING
-Penetration testing of remote operator credentials and swarm authentication.
-Simulation of safety override scenarios.
-Forced conflict scenarios between layers to ensure hierarchy enforcement.
-Logging and audit review to confirm proper command precedence.
-6. DESIGN INTENT
+------------------------------------------------------------
+4. CONFLICT RESOLUTION
+------------------------------------------------------------
 
-The System Control Authority Model ensures:
+| Conflict Pair | Resolution Rule |
+|:---------------|:----------------|
+| Hardware vs. Software | Hardware always dominates. |
+| Reactive vs. Mission | Reactive preempts to preserve safety. |
+| Local vs. Remote Operator | Local operator priority unless admin override approved. |
+| Swarm vs. Local Safety | Swarm command reduced or rejected on violation. |
+| Failsafe trigger | Immediate Safe‑Stop and power isolation. |
 
-Safety is never compromised by software, swarm, or remote commands.
-Decision-making is deterministic and auditable.
-Operator authority is clear, controlled, and revocable.
-Failures or malicious inputs trigger safe-stop, preserving hardware and mission integrity.
-Swarm coordination enhances mission capability without violating local authority or safety.
+No software layer can suppress a Reactive or Hardware stop signal.  
+
+------------------------------------------------------------
+5. AUTHORITY VALIDATION AND TESTING
+------------------------------------------------------------
+
+- Penetration testing of remote credentials and swarm authentication.  
+- Simulation of Reactive and Hardware override events.  
+- Conflict tests between Mission and Reactive controllers.  
+- Kill‑Line latency and authority response timing verification.  
+- Comprehensive log review to confirm expected precedence.  
+
+All results archived under /09_Testing/Authority_Validation/.  
+
+------------------------------------------------------------
+6. DESIGN INTENT
+------------------------------------------------------------
+
+The System Control Authority Model ensures:
+- Safety is never compromised by software or network commands.  
+- Decision‑making is deterministic and auditable.  
+- Operator authority remains explicit and revocable.  
+- Failures or malicious inputs result in predictable Safe‑Stop.  
+- Swarm coordination enhances mission performance without violating safety hierarchy.  
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
