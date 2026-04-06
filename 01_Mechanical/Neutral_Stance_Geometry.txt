@@ -1,68 +1,99 @@
-OBSIDIAN-8 V3
-
+OBSIDIAN‑8 V3
 01_Mechanical/Neutral_Stance_Geometry.txt
-Revision: V3.3
-Status: Authoritative
+Revision: V3.4
+Status: Authoritative
 
-1. PURPOSE
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
 
-Define the neutral stance geometry for OBSIDIAN-8 V3.3 (hybrid extrusion + 3D printed frame).  
-This stance is the baseline posture used for:
+Define the neutral stance geometry for OBSIDIAN‑8 V3.4
+(hybrid 3030/2020 extrusion frame with 3D‑printed limbs and modules).  
 
-- Calibration and sensor alignment
-- Actuator range verification
-- Center of gravity determination
-- Simulation and control authority testing
-- Deployment and maintenance reference
+This stance is the standardized baseline used for:
+- Calibration and sensor alignment  
+- Actuator range verification and torque profiling  
+- Center‑of‑gravity (Cg) determination  
+- Simulation, gait planning, and control‑authority testing  
+- Deployment and maintenance reference configuration  
 
-2. REFERENCE FRAME
+Reference documents: /01_Mechanical/Mass_and_CG_Model.txt and /03_Control_Architecture/Stability_Enforcer.txt  
 
-Origin: Center of 3030 backbone base plate (0,0,0)  
-Axes:  
-X: Forward  
-Y: Lateral (right positive)  
-Z: Upward  
-Units: Meters (m) and degrees (°)
+------------------------------------------------------------
+2. REFERENCE FRAME
+------------------------------------------------------------
 
-3. LIMB POSITIONS AND ANGLES
+Origin: center of 3030 backbone base plate (0, 0, 0)  
+Axes:  X = Forward Y = Lateral (right positive) Z = Upward  
+Units: Meters (m) and Degrees (°)  
 
-Limb / Joint                 Position XYZ (m)   Rotation (deg)   Notes
-Front Left Leg (FL) – Hip    0.35, 0.25, 0.42  0               Neutral hip orientation
-Front Left Leg – Knee         0.35, 0.25, 0.22  30              Slight bend for weight support
-Front Left Leg – Ankle        0.35, 0.25, 0.05  0               Foot flat on ground
-Front Right Leg (FR) – Hip    0.35, -0.25, 0.42 0               Symmetric to FL
-Front Right Leg – Knee        0.35, -0.25, 0.22 30
-Front Right Leg – Ankle       0.35, -0.25, 0.05 0
-Rear Left Leg (RL) – Hip      -0.35, 0.25, 0.42 0
-Rear Left Leg – Knee          -0.35, 0.25, 0.22 30
-Rear Left Leg – Ankle         -0.35, 0.25, 0.05 0
-Rear Right Leg (RR) – Hip     -0.35, -0.25, 0.42 0
-Rear Right Leg – Knee         -0.35, -0.25, 0.22 30
-Rear Right Leg – Ankle        -0.35, -0.25, 0.05 0
+All coordinates based on assembled frame V3 baseline geometry (/00_System_Definition/Geometry_Model.txt).  
 
-Notes: Knee bend angles chosen for static stability; foot flat on ground for CG alignment; Z coordinates lowered slightly from V3.2 to account for extrusion base and printed brackets.
+------------------------------------------------------------
+3. LIMB POSITIONS AND ANGLES (NEUTRAL POSE)
+------------------------------------------------------------
 
-4. TORSO AND PAYLOAD ALIGNMENT
+| Limb / Joint | Position XYZ (m) | Rotation (°) | Notes |
+|:--------------|:-----------------|:---------------:|:-----|
+| Front Left (FL) Hip |  0.35,  0.25,  0.42 | 0 | Neutral hip orientation |
+| Front Left (FL) Knee |  0.35,  0.25,  0.22 | 30 | Slight bend for load support |
+| Front Left (FL) Ankle |  0.35,  0.25,  0.05 | 0 | Foot flat on ground |
+| Front Right (FR) Hip |  0.35, −0.25,  0.42 | 0 | Symmetric to FL |
+| Front Right (FR) Knee |  0.35, −0.25,  0.22 | 30 | – |
+| Front Right (FR) Ankle |  0.35, −0.25,  0.05 | 0 | – |
+| Rear Left (RL) Hip | −0.35,  0.25,  0.42 | 0 | – |
+| Rear Left (RL) Knee | −0.35,  0.25,  0.22 | 30 | – |
+| Rear Left (RL) Ankle | −0.35,  0.25,  0.05 | 0 | – |
+| Rear Right (RR) Hip | −0.35, −0.25,  0.42 | 0 | – |
+| Rear Right (RR) Knee | −0.35, −0.25,  0.22 | 30 | – |
+| Rear Right (RR) Ankle | −0.35, −0.25,  0.05 | 0 | – |
 
-- Torso base plate level with horizontal plane (Z = 0.42 m)  
-- Mission compute and battery modules centered along X-axis (longitudinal) and Y = 0 (lateral)  
-- Sensor mounts oriented parallel to chassis top plane  
-- Armor panels installed in neutral stance for clearance verification
+Notes: Knee bends ensure static stability and balanced spring constant response.  
+Ankle Z coordinates adjusted −0.01 m from V3.2 to align with new printed foot mounts.
 
-5. CENTER OF GRAVITY ALIGNMENT
+------------------------------------------------------------
+4. TORSO AND PAYLOAD ALIGNMENT
+------------------------------------------------------------
 
-Neutral stance aligns CG directly above the midpoint of the base footprint:  
-CG X: 0.0 m  
-CG Y: 0.0 m  
-CG Z: 0.42 m  
+- Torso base plate aligned with horizontal (X–Y) plane at Z = 0.42 m.  
+- Mission compute and battery modules centered along X axis; Y = 0 (lateral neutral).  
+- Sensor mounts oriented parallel to chassis top plane.  
+- Armor panels installed in neutral pose to verify clearances and mount compression.  
 
-Ensures minimum tipping moment during static calibration and initial actuation.  
-Lighter 3D printed limbs slightly lower vertical CG while maintaining stable polygon.
+------------------------------------------------------------
+5. CENTER OF GRAVITY ALIGNMENT
+------------------------------------------------------------
 
-6. DESIGN INTENT
+Neutral stance aligns Cg directly above the base footprint midpoint.  
 
-- Provides baseline posture for calibration, simulation, and motion planning  
-- Ensures symmetry across all limbs for stability and accurate CG computation  
-- Supports integration with Mass_and_CG_Model, Actuation Systems, and Control Authority Model  
-- Reference for FMEA testing and neutral load verification  
-- Compatible with hybrid extrusion + printed frame for modular maintenance
+Nominal Cg:   X = 0.00 m Y = 0.00 m Z = 0.42 m  
+
+Cg Verification Procedure:  
+1. Suspend unit from hip mount and mark vertical through center.  
+2. Line must intersect with 100 mm diameter circle around origin.  
+3. Regain balance without servo assistance within ± 2 s settle time.  
+
+Lighter printed limbs decrease vertical Cg ≈ 0.01 m while maintaining polygon stability.  
+
+------------------------------------------------------------
+6. VALIDATION LINKAGES
+------------------------------------------------------------
+
+- Neutral geometry used as zero‑position for Tripod_Gait_Kinematics simulation.  
+- Forms baseline for Calibration Configuration (/09_Testing/Calibration_Sequence.txt).  
+- Cross‑referenced by Stair_Mode_Mechanics for stair entry/exit alignment.  
+- Employed during FMEA tests for neutral load verification (FM‑001 – FM‑005).  
+
+------------------------------------------------------------
+7. DESIGN INTENT
+------------------------------------------------------------
+
+- Provide symmetrical reference for control and calibration across limbs.  
+- Ensure predictable Cg and support polygon under zero‑motion state.  
+- Permit direct integration with Mass_and_CG_Model, Actuation Systems, and Control Authority Model.  
+- Guarantee repeatable neutral condition for deployment and maintenance alignment.  
+- Support hybrid extrusion + printed frame architecture for fast service and interchangeability.  
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
