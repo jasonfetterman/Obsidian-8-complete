@@ -1,0 +1,66 @@
+OBSIDIAN‑8 V3
+Duet3_Interface.txt
+Revision: V3.0
+Status: Draft – Electrical Baseline Addition
+
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
+Define electrical and communication interface between the
+Duet 3 Mainboard 6HC (32‑bit motion controller) and the
+OBSIDIAN‑8 V3 compute stack (Pi 5 / Jetson Orin / Maestro).
+
+------------------------------------------------------------
+2. COMMUNICATION PATHS
+------------------------------------------------------------
+Primary link: USB / UART bridge via Duet Bridge node (/11_Codebase/duet_bridge/)  
+Alternate link: CAN FD expansion for low‑level I/O debug feeds.  
+Protocol: G‑code over Duet RPC (JSON) with checksum validation.  
+
+------------------------------------------------------------
+3. POWER CONNECTIONS
+------------------------------------------------------------
+- VIN: 24 V line from power distribution servo rail.  
+- Logic Rail: 5 V supplied from isolated compute bus.  
+- Grounds bonded at single star point on distribution board.  
+
+------------------------------------------------------------
+4. SAFETY CHAIN INTEGRATION
+------------------------------------------------------------
+- E‑stop and Kill‑Line wired through shared relay coil.  
+- Duet ON/OFF signal slaved to watchdog authority.  
+- Power output to servos disabled if Kill‑Line open.  
+
+------------------------------------------------------------
+5. SOFTWARE INTERFACE
+------------------------------------------------------------
+- Controlled via duet_bridge ROS node (@ /11_Codebase/duet_bridge)  
+- Heartbeat rate 50 Hz (20 ms interval)  
+- Feedback topics: `/duet/status`, `/duet/temp`, `/duet/error`  
+- Command topics: `/duet/move`, `/duet/tool_enable`, `/duet/reset`  
+
+------------------------------------------------------------
+6. FAILURE MODES SUMMARY
+------------------------------------------------------------
+FM‑014 – Loss of USB/CAN link → Reactive halt → watchdog Kill‑Line.  
+FM‑015 – Overcurrent on Duet VIN → BMS cutoff → Power Isolation.  
+FM‑016 – Firmware fault → duet_bridge timeout shutdown.  
+See Failure_Modes_and_Effects_Analysis.txt for risk values.  
+
+------------------------------------------------------------
+7. VALIDATION TESTS
+------------------------------------------------------------
+- Interface latency test (≤ 10 ms typical).  
+- Heartbeat loss simulation.  
+- Kill‑Line propagation to Duet outputs.  
+- Concurrent command conflict test (Mission vs Reactive).  
+
+------------------------------------------------------------
+8. DESIGN INTENT
+------------------------------------------------------------
+The Duet system acts as a modular motion executor, commanded by the
+Reactive and Mission controllers but bound by safety hardware.
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
