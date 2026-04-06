@@ -1,80 +1,114 @@
 OBSIDIAN-8 V3
-
 01_Mechanical/Mass_and_CG_Model.txt
-Revision: V3.3
+Revision: V3.4
 Status: Authoritative
 
+------------------------------------------------------------
 1. PURPOSE
+------------------------------------------------------------
 
-Define the mass properties and center of gravity (CG) model for OBSIDIAN-8 V3.3 (hybrid extrusion + 3D printed design).  
-This ensures:
+Define the comprehensive mass and center‑of‑gravity (Cg)
+model for OBSIDIAN‑8 V3.4 (hybrid extrusion + 3D‑printed architecture).
 
-- Stability under operational motion
-- Proper load distribution across limbs and actuators
-- Accurate simulation for control and safety systems
-- Traceability for CM, FMEA, and deployment profiles
+This model ensures:
+- Stability during all operational gaits and terrain conditions  
+- Proper load distribution across limbs, actuators, and payloads  
+- Accurate input for control and safety simulation loops  
+- Traceability for Configuration Management (CM), FMEA, and deployment records  
+Reference: /00_System_Definition/Geometry_Model.txt and /01_Mechanical/Neutral_Stance_Geometry.txt  
 
-2. TOTAL SYSTEM MASS
+------------------------------------------------------------
+2. TOTAL SYSTEM MASS
+------------------------------------------------------------
 
-Subsystem                   Mass (kg)       Notes / Revision
-Main Chassis (3030 + 2020) 8.5             Hybrid aluminum extrusion backbone
-Actuated Legs (6x printed)  6.0             3D printed limbs MK1/MK2, reinforced brackets
-Torso Modules (3D printed)  5.0             Battery, compute, sensors in printed housings
-Armor Covers (printed + polycarbonate) 3.0  Modular panels, snap-on mounts
-Sensors & Payload           1.5             Cameras, LIDAR, mission modules
-Wiring & Harness            0.8             Routed through extrusion channels
-Total System Mass           24.8            Rounded
+| Subsystem | Mass (kg) | Notes / Revision |
+|:-----------|:-----------:|:----------------|
+| Main Chassis (3030 + 2020) | 8.5 | Hybrid aluminum extrusion backbone |
+| Actuated Legs (8 × printed) | 7.5 | 3D printed MK1/MK2 limbs + reinforced brackets |
+| Torso Modules (3D printed) | 5.0 | Battery, mission compute, sensor bays |
+| Armor Covers (printed + polycarbonate) | 3.0 | Snap‑on panel system |
+| Sensors & Payload | 1.5 | RGB/Depth cameras, LIDAR, RTK components |
+| Wiring & Harness | 0.8 | Internally routed through extrusions |
+| Total System Mass | 26.3 | Target tolerance ± 0.5 kg |
 
 Notes:
-- Mass reduction achieved through hybrid design and lighter printed brackets
-- Lighter legs reduce torque on actuators and improve stair clearance
+- Hybrid design achieves mass reduction without compromising strength.  
+- Reduced leg mass minimizes servo torque demands during stair gait.  
+- All values are baseline averages recorded after integration testing.  
 
-3. CENTER OF GRAVITY (CG) MODEL
+------------------------------------------------------------
+3. CENTER OF GRAVITY (CG) MODEL
+------------------------------------------------------------
 
-Origin: Geometric center of 3030 backbone reference frame
+Origin: Geometric center of 3030 backbone reference frame  
 
-CG Location (Nominal, XYZ):
-X: 0.0 m (longitudinal center)
-Y: 0.0 m (lateral center)
-Z: 0.42 m (height from extrusion base)
+Nominal Cg Location (XYZ m):  
+X = 0.00 Y = 0.00 Z = 0.42 (above extrusion base)  
 
-CG Sensitivity:
-Payload addition ±0.08 m
-Armor variation ±0.04 m
-Battery placement ±0.02 m
-Printed module variability ±0.03 m
+Cg Sensitivity (1 kg mass change):  
+- Payload addition → ΔZ ≈ ± 0.08 m  
+- Armor variation → ΔZ ≈ ± 0.04 m  
+- Battery placement shift → ΔZ ≈ ± 0.02 m  
+- Printed module variation → ΔZ ≈ ± 0.03 m  
 
-CG Considerations:
-- Legs designed to support >120% of static weight
-- Torso and payload mass concentrated near CG to minimize torque on actuators
-- Armor and add-ons symmetrically placed to maintain lateral balance
-- Printed parts reduce mass high on the frame to lower vertical CG
+Cg Considerations:
+- Limb assemblies support > 120 % of static load.  
+- Torso/payload mass kept around Cg column to reduce moment arm torque.  
+- Armor symmetry maintains lateral balance (Y axis neutral).  
+- Printed components reduce upper mass, lowering vertical Cg.  
+- Neutral stands align Cg directly above base footprint midpoint (Z = 0.42 m).  
 
-4. DYNAMIC MASS CONSIDERATIONS
+Reference: /01_Mechanical/Neutral_Stance_Geometry.txt  
 
-Actuation during motion changes effective CG:
+------------------------------------------------------------
+4. DYNAMIC MASS CONSIDERATIONS
+------------------------------------------------------------
 
-Forward/Back Leg Extension: ±0.04 m X-axis  
-Lateral Swing: ±0.025 m Y-axis  
-Limb Elevation: ±0.015 m Z-axis  
+Actuation changes effective Cg during motion:  
+- Forward/Rear Leg Extension → ΔX ± 0.04 m  
+- Lateral Swing → ΔY ± 0.025 m  
+- Limb Elevation → ΔZ ± 0.015 m  
 
-Software control loops use this dynamic CG to:
+Reactive Controller and Mission Compute use dynamic Cg data to:  
+- Adjust torque allocation in real time for balanced gait.  
+- Maintain stability margins within Reactive Safety envelope.  
+- Drive FMEA risk model inputs for motion threshold prediction.  
 
-- Adjust torque in real-time
-- Maintain stability in reactive controller
-- Feed FMEA risk models for motion limits
+Reference: /03_Control_Architecture/Reactive_Controller_Spec.txt  
 
-5. MODULARITY AND CONFIGURATION
+------------------------------------------------------------
+5. MODULARITY AND CONFIGURATION
+------------------------------------------------------------
 
-- Each subsystem mass tracked in Configuration Management Plan
-- Changes in battery, armor, or payload must update deployment_profile with new mass/CG data
-- Supports rapid recalculation for mission-specific loadouts
-- Modular 3D printed parts allow quick mass adjustment and replacement
+- Each subsystem mass recorded in Configuration Management Register.  
+- Changes in battery, armor, or payload require Deployment_Profile update with new mass/Cg values.  
+- Supports rapid mission‑specific re‑balancing via mass calculator tool.  
+- Modular printed parts allow field replaceable mass adjustments.  
+- Geometry offsets linked to Neutral_Stance_Geometry for load simulation accuracy.  
 
-6. DESIGN INTENT
+------------------------------------------------------------
+6. VALIDATION AND ALIGNMENT
+------------------------------------------------------------
 
-- Maintain predictable stability and actuation performance under all operational configurations
-- Ensure safe operation with both static and dynamic loads
-- Integrate with FMEA, CM, and System Control Authority to prevent tipping, overload, or actuator faults
-- Provide accurate data for simulation, mission planning, and control authority validation
-- Reduce weight while keeping CG low for stair climbing and tripod gait stability
+Cg and Mass Validation Steps:  
+1. Verify torso plate alignment at Z = 0.42 m base plane.  
+2. Check mission compute and battery modules centered (X = 0, Y = 0).  
+3. Install sensor mounts parallel to chassis top plane.  
+4. Mount armor panels in neutral stance to confirm clearance and mass symmetry.  
+5. Record Cg deviation ≤ ± 10 mm using suspension test procedure.  
+
+Dynamic verification performed during Tripod Gait Evaluation (/03_Control_Architecture/Gait_Control_Spec.txt).  
+
+------------------------------------------------------------
+7. DESIGN INTENT
+------------------------------------------------------------
+
+- Maintain predictable stability and actuation performance across all loadouts.  
+- Ensure safe operation under combined static and dynamic forces.  
+- Integrate with FMEA and CM to prevent tipping, overload, or servo faults.  
+- Provide accurate mass/Cg data for simulation and mission planning.  
+- Keep overall mass as low as practical with Cg below mid‑frame for stair and tripod stability.  
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
