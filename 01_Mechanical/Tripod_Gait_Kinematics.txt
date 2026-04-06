@@ -1,53 +1,115 @@
-OBSIDIAN-8 V3
+OBSIDIAN‑8 V3  
+01_Mechanical/Tripod_Gait_Kinematics.txt  
+Revision: V3.4  
+Status: Authoritative  
+Units: SI (m / s / °)
 
-01_Mechanical/Tripod_Gait_Kinematics.txt
-Revision: V3.2
-Status: Authoritative
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
 
-1. PURPOSE
+Define the kinematic behavior and control parameters for tripod gait locomotion of OBSIDIAN‑8 V3.4.
 
-Define the kinematic behavior and control parameters for tripod gait locomotion in OBSIDIAN-8 V3.
+This model ensures:
+- Stable and efficient flat‑terrain movement.  
+- Integration with Reactive Safety, Control Authority, and Neutral Stance Geometry.  
+- Predictable Cg tracking and actuator coordination for control simulation and mission execution.  
 
-Ensures stability and efficiency during flat terrain locomotion.
-Integrates with reactive safety, control authority, and neutral stance geometry.
-Provides a baseline for actuator motion planning and CG stability.
-2. GAIT DEFINITION
-Tripod gait: Alternating movement of two sets of three limbs to maintain at least 3 points of contact.
-Limb Sets:
-Set A: Front Left (FL), Rear Right (RR), Middle/optional limb if present
-Set B: Front Right (FR), Rear Left (RL), Middle/optional limb if present
-Cycle: Set A lifts → moves forward → set A sets down → Set B lifts → moves forward → set B sets down.
-3. STEP PARAMETERS
-Parameter	Nominal Value	Notes
-Step Length (X-axis)	0.25 m	Max safe without overextension
-Step Height (Z-axis)	0.05 m	Neutral terrain clearance
-Swing Duration	0.5 s	Time limb is in air
-Stance Duration	0.5 s	Time limb is in contact
-Duty Factor	0.5	Ratio stance/swing for stability
-Step parameters are adjustable per mission profile and payload weight.
-Dynamic CG tracking ensures balance throughout gait cycle.
-4. LIMB KINEMATICS
-Joint	Neutral Angle (°)	Swing Adjustment (°)	Notes
-Hip	0	±15	Forward/back swing
-Knee	30	±20	Lift for clearance
-Ankle	0	±10	Foot orientation
-Coordination between limb sets ensures continuous tripod support polygon.
-CG projection always remains within support polygon for dynamic stability.
-5. STABILITY CONSIDERATIONS
-Minimum of 3 points of ground contact at all times.
-CG adjusted dynamically along X and Y axes to prevent tipping.
-Torque limits enforced to protect actuators during forward motion.
-Sensor feedback (IMU, force sensors) used to detect slippage or imbalance.
-6. CONTROL INTEGRATION
-Tripod gait managed by Mission Compute Layer, preempted by Reactive Safety Layer if collisions or instability detected.
-Hardware kill-line and watchdog override all gait commands if emergency occurs.
-Swarm or remote commands cannot interrupt tripod gait mid-step unless safe-stop triggered.
-7. VALIDATION AND TESTING
-Flat terrain, inclined terrain, and variable payload tests.
-Metrics recorded: step length accuracy, CG deviation, torque utilization, actuator temperature.
-FMEA references: FM-003 (battery undervoltage), FM-004 (servo overheating), FM-008 (IMU drift).
-8. DESIGN INTENT
-Provides predictable, repeatable tripod gait for OBSIDIAN-8 V3.
-Ensures continuous stability and safety during locomotion.
-Supports integration with neutral stance, mass/CG model, stair-mode mechanics, and control authority.
-Enables simulation, calibration, and field deployment of stable gait patterns.
+References: /01_Mechanical/Neutral_Stance_Geometry.txt  /03_Control_Architecture/System_Control_Authority_Model.txt  
+
+------------------------------------------------------------
+2. GAIT DEFINITION
+------------------------------------------------------------
+
+**Tripod Gait** = alternating movement of two sets of three limbs while maintaining ≥ 3 points of ground contact.
+
+**Limb Sets:**  
+- Set A = Front Left (FL), Rear Right (RR), optional Middle (if configured)  
+- Set B = Front Right (FR), Rear Left (RL), optional Middle (if configured)  
+
+Cycle Sequence:  
+A‑lift → advance forward → A‑down → B‑lift → advance → B‑down → repeat.  
+
+Contact balance model ensures support polygon stability throughout Phase Shift 180°.  
+
+------------------------------------------------------------
+3. STEP PARAMETERS
+------------------------------------------------------------
+
+| Parameter | Nominal Value | Notes |
+|:--|:--:|:--|
+| Step Length (X‑axis) | 0.25 m | Safe range without over‑extension |
+| Step Height (Z‑axis) | 0.05 m | Neutral terrain clearance |
+| Swing Duration | 0.5 s | Time limb is elevated |
+| Stance Duration | 0.5 s | Time limb maintains contact |
+| Duty Factor | 0.50 | Stance / Swing ratio for tripod stability |
+
+Parameters adapt automatically to payload (+/‑ 2 kg) and terrain incline (< 7°).  
+Dynamic Cg controller adjusts setpoint continuously during transition phases.  
+
+------------------------------------------------------------
+4. LIMB KINEMATICS
+------------------------------------------------------------
+
+| Joint | Neutral Angle (°) | Swing Adjustment (°) | Notes |
+|:--|:--:|:--:|:--|
+| Hip | 0 | ±15 | Forward / back translation vector |
+| Knee | 30 | ±20 | Lift for terrain clearance |
+| Ankle | 0 | ±10 | Foot surface alignment |
+
+Synchronization between A/B limb sets maintains continuous tripod support polygon.  
+Reactive controller modulates joint angles to follow torque and sensor feedback.  
+
+------------------------------------------------------------
+5. STABILITY CONSIDERATIONS
+------------------------------------------------------------
+
+- ≥ 3 ground contact points maintained at all times.  
+- Cg shift actively compensated along X / Y axes to prevent tip‑over moments.  
+- Torque limits held ≤ 80 % of rated continuous output to protect actuators.  
+- IMU and ground‑force sensors detect slippage / imbalance within 50 ms window.  
+- Reactive Safety overrides motion if tilt > 10° or contact loss > 1 leg.  
+
+------------------------------------------------------------
+6. CONTROL INTEGRATION
+------------------------------------------------------------
+
+Tripod Gait Controller = Mission Compute Layer (primary) + Reactive Safety (preemptive).  
+
+Authority Chain:  
+1. Hardware Kill‑Line / Watchdog  
+2. Reactive Safety Layer (collision & stability priority)  
+3. Mission Gait Controller (trajectory planning)  
+4. Remote / Swarm commands (read‑only while mid‑stride)  
+
+Failsafe: hardware kill and watchdog can terminate sequence instantly.  
+Swarm/remote input cannot interrupt mid‑step unless Safe‑Stop authenticated.  
+
+------------------------------------------------------------
+7. VALIDATION AND TESTING
+------------------------------------------------------------
+
+**Simulation Tests**  
+- Flat & inclined terrain (±5°) with payload variation.  
+- Gait speed profile: 0.2 – 0.5 m/s.  
+- Performance metrics: step length accuracy, Cg deviation, torque usage, thermal response.  
+
+**Field Tests**  
+- Concrete, carpet, and packed dirt substrates.  
+- Incremental load cases from nominal to +20 %.  
+
+FMEA Cross‑References: FM‑003 (Battery Undervoltage), FM‑004 (Servo Overheat), FM‑008 (IMU Drift).  
+Results archived in /09_Testing/Tripod_Gait_Validation_Report.txt.  
+
+------------------------------------------------------------
+8. DESIGN INTENT
+------------------------------------------------------------
+
+- Provide predictable, repeatable tripod gait with hardware‑dominant safety.  
+- Maintain stable motion and torque‑balanced distribution for flat terrain.  
+- Integrate seamlessly with Neutral Stance, Mass/Cg Model, Stair‑Mode Mechanics, and Control Authority.  
+- Enable simulation, calibration, and field deployment of reliable gait patterns.  
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
