@@ -1,97 +1,118 @@
 OBSIDIAN-8 V3
-
 01_Mechanical/Frame_Architecture.txt
-Revision: V3.3
+Revision: V3.4
 Status: Authoritative
 
+------------------------------------------------------------
 1. PURPOSE
+------------------------------------------------------------
 
-Define the mechanical frame architecture of OBSIDIAN-8 V3 using a hybrid extrusion and 3D printed design. Includes structural layout, load paths, material selection, modular interfaces, and integration with actuators, sensors, and armor systems.
+Define the mechanical frame architecture of OBSIDIAN‑8 V3
+employing a hybrid aluminum‑extrusion and 3D‑printed modular design.
+Covers structural layout, load paths, material selection, interfaces,
+and integration with actuators, sensors, armor, and routing systems.
 
-This document ensures:
+This document ensures:
+- Predictable mechanical behavior under operational loads  
+- Compatibility with printed subsystems and armor modules  
+- Modularity for maintenance and upgrade iteration  
+- Traceable design decisions linked to Configuration Management records  
 
-Predictable mechanical behavior under operational loads
-Compatibility with 3D printed subsystems and armor
-Modularity for maintenance, upgrades, and design iteration
-Traceable design decisions linked to CM records
+------------------------------------------------------------
+2. FRAME STRUCTURE OVERVIEW
+------------------------------------------------------------
 
-2. FRAME STRUCTURE OVERVIEW
+Main Chassis:  
+- Backbone constructed from 3030 aluminum extrusions forming the central torso structure.  
+- Primary load path for battery, mission compute, and limb attachments.  
 
-Main Chassis: 
-- Backbone constructed from 3030 aluminum extrusions forming the central torso structure. 
-- Primary load-bearing paths for battery, mission compute, and limb attachments.
+Secondary Supports:  
+- 2020 extrusions form cross‑braces, sensor mounts, and payload bay frames.  
+- Provide rigidity while minimizing mass.  
 
-Secondary Supports:
-- 2020 extrusions for cross-braces, sensor mounts, and payload bay frames. 
-- Provides structural rigidity while minimizing weight.
+Leg Attachments:  
+- Modular 3D‑printed interface brackets connect limbs to 3030 backbone.  
+- Compatible with Leg_MK1_Obsidian and Leg_MK2_Obsidian assemblies.  
+- High‑stress points reinforced with gussets and CNC brackets.  
 
-Leg Attachments:
-- Modular 3D printed interface brackets attach limbs to 3030 backbone. 
-- Compatible with Leg_MK1_Obsidian and Leg_MK2_Obsidian designs.
-- Reinforced gussets and brackets used for high-stress points.
+Torso Modules:  
+- 3D‑printed housings for Mission Compute, Battery System, and Sensor arrays.  
+- Slide‑in or bolt‑on mounts for quick access and service.  
 
-Torso Modules:
-- 3D printed housings for Mission Compute, Battery System, and Sensors.
-- Designed to slide or bolt onto T-slot extrusions for easy access.
+Armor Mounting Points:  
+- Quick‑release printed brackets align with extrusion slots.  
+- Panels (Covers_armor) field‑replaceable without tools.  
 
-Armor Mounting Points:
-- 3D printed quick-release brackets attach to standardized extrusion slots.
-- Allows modular armor panels (Covers_armor) to be replaced or upgraded.
+Payload Bays:  
+- Custom add‑on compartments mount within extrusion framework.  
+- Reconfigurable per mission requirement.  
 
-Payload Bays:
-- 3D printed compartments fit within or attach to extrusion framework.
-- Modular and configurable based on mission requirements.
+Maintenance Access:  
+- Slide‑fit or bolted removal panels; no backbone disassembly required.  
 
-Maintenance Access:
-- Panels and modules designed for slide-fit or bolted removal.
-- No disassembly of backbone required for standard maintenance.
+------------------------------------------------------------
+3. MATERIAL SELECTION AND PROPERTIES
+------------------------------------------------------------
 
-3. MATERIAL SELECTION AND PROPERTIES
+| Component | Material / Method | Notes / Purpose |
+|:-----------|:------------------|:----------------|
+| Main Chassis | 3030 Aluminum Extrusions | High stiffness / modular load core |
+| Secondary Supports | 2020 Aluminum Extrusions | Low mass cross‑brace structure |
+| Limb Brackets | CF Nylon or PETG (printed) | Strength at actuator mounts / customizable |
+| Armor Panels | Printed + Polycarbonate Hybrid | Impact resilience and light weight |
+| Internal Panels | ABS/PETG Printed Sheets | Lightweight and removable |
+| Fasteners | M5/M6 Bolts + T‑slot Nuts | Standardized mount interface |
+| Gaskets/Pads | Rubber or TPU prints | Vibration damping at actuator joints |
 
-Component         Material / Method           Notes / Reasoning
-Main Chassis      3030 Aluminum Extrusions   High stiffness, lightweight, modular
-Secondary Supports 2020 Aluminum Extrusions  Cross-bracing, sensor mounts, low weight
-Limb Brackets      3D Printed PETG/Nylon    Strength at actuator mounts, customizable
-Armor Covers       3D Printed + Polycarbonate Infill or hybrid for impact resistance
-Internal Panels    3D Printed ABS or PETG   Lightweight, removable
-Fasteners          M5/M6 Bolts + T-slot Nuts Standardized modular attachment
+------------------------------------------------------------
+4. LOAD AND STRESS CONSIDERATIONS
+------------------------------------------------------------
 
-4. LOAD AND STRESS CONSIDERATIONS
+- Backbone extrusions support both dynamic motion and static loading.  
+- Global safety factor ≥ 2.0 for all extrusion members and 3D‑printed mounts.  
+- Critical joints (leg mounts, shoulders) reinforced with metal brackets.  
+- FEA validation required on main 3030 torso and actuator bracket geometry.  
+- Vibration damping via printed gaskets or rubber pads at high‑frequency mounts.  
+- Thermal expansion tolerance maintained ≤ 0.25 mm across 1 m span.  
 
-- Backbone extrusions designed for dynamic motion and static loads.
-- Safety factor ≥ 2.0 for all extrusion members and printed actuator mounts.
-- High-stress points (leg mounts, shoulder joints) reinforced with printed gussets and metal brackets.
-- Finite Element Analysis (FEA) recommended on main 3030 chassis and key printed components.
-- Vibration damping integrated via printed gaskets or rubber pads at actuator mounts.
+------------------------------------------------------------
+5. MODULARITY AND INTERFACES
+------------------------------------------------------------
 
-5. MODULARITY AND INTERFACES
+Actuator Interfaces:  
+- 3D‑printed mounting plates bolt to extrusion end‑plates.  
+- Slot geometry enables ± 3 mm alignment tuning.  
+- Torque limits defined per actuator type in Actuation_Systems specs.  
 
-Actuator Interfaces:
-- 3D printed mounting plates bolt to extrusion end plates.
-- Adjustable slots for fine alignment.
-- Torque limits documented per actuator type.
+Sensor Mounts:  
+- 2020 extrusion‑mounted sliders with locking tabs enable orientation adjustment and rapid replacement.  
 
-Sensor Mounts:
-- 2020 extrusion-mounted sliding brackets with locking tabs.
-- Allows orientation adjustment and rapid replacement.
+Armor Panels:  
+- Quick‑release brackets linked to Covers_armor dataset; swappable without tools.  
 
-Armor Panels:
-- Quick-release printed brackets align to extrusion slots.
-- Panels can be swapped without tools for field maintenance.
+Power and Data Channels:  
+- Internal extrusion cavities route wiring; printed guides clip along rails for secure retention.  
+- Supports CAN, 12 V, and 5 V low‑current bus lines to minimize external bundling.  
 
-Power & Data Channels:
-- Internal extrusion cavities route wiring harnesses.
-- Printed cable guides clip onto extrusions for secure routing.
+------------------------------------------------------------
+6. COMPATIBILITY WITH CM / DEPLOYMENT
+------------------------------------------------------------
 
-6. COMPATIBILITY WITH CM / DEPLOYMENT
+- Frame revision tracked in Configuration Management Plan (/00_System_Definition/Configuration_Management_Plan.txt).  
+- Each unit links to Deployment_Profile specifying hardware and printed part revisions.  
+- Structural or interface changes require approved Change Request (CR) under Class A or B as applicable.  
+- FEA and test records must be attached to CR on approved revision.  
 
-- Frame revision recorded in Configuration Management Plan.
-- Each unit linked to deployment_profile specifying hardware and printed part revisions.
-- Structural or interface changes require Change Request (CR) approval per CM guidelines.
+------------------------------------------------------------
+7. DESIGN INTENT
+------------------------------------------------------------
 
-7. DESIGN INTENT
+- Deliver high structural integrity with minimal mass through extrusion backbone.  
+- Maintain fully modular and upgradeable layout compatible with printed limbs, sensors, and armor.  
+- Ensure predictable response under dynamic load and articulation events.  
+- Guarantee traceability and auditability for every mechanical change.  
+- Support future integration of alternative materials (CF composite, light‑alloy) without geometry drift.  
 
-- Maintain high structural integrity with minimal weight using extrusion backbone.
-- Modular, upgradeable layout compatible with 3D printed limbs, sensors, and armor.
-- Predictable performance under dynamic loads and articulation.
-- Fully traceable and auditable design evolution.
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
