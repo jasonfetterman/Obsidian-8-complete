@@ -1,267 +1,153 @@
 OBSIDIAN-8 V3
 System_Requirements_Specification.txt
-Revision: V3.2
+Revision: V3.3
 Status: Authoritative
 
 ------------------------------------------------------------
 1. PURPOSE
 ------------------------------------------------------------
 
-Define formal, testable system-level requirements for OBSIDIAN-8 V3.
+Define formal, testable system‑level requirements for OBSIDIAN‑8 V3.  
+All design, code, and validation activities must trace to these requirements.
 
-All architectural documents, test protocols, and validation
-activities must trace back to these requirements.
-
-Each requirement is uniquely identified.
-
+Each requirement is uniquely identified and version‑controlled.
 
 ------------------------------------------------------------
-2. REQUIREMENT IDENTIFICATION FORMAT
+2. REQUIREMENT IDENTIFICATION FORMAT
 ------------------------------------------------------------
 
-Format:
+Format: REQ‑[CATEGORY]‑[NUMBER]
 
-REQ-[CATEGORY]-[NUMBER]
-
-Categories:
-
-MECH  – Mechanical
-ELEC  – Electrical
-CTRL  – Control
-SAFE  – Safety
-NAV   – Navigation
-ENER  – Energy
-SW    – Software
-COMM  – Communication
-OPS   – Operational
-LIFE  – Lifecycle
-
+Categories:  
+MECH – Mechanical ELEC – Electrical CTRL – Control SAFE – Safety  
+NAV – Navigation ENER – Energy SW – Software COMM – Communication  
+OPS – Operational LIFE – Lifecycle  
 
 ------------------------------------------------------------
-3. MECHANICAL REQUIREMENTS
+3. MECHANICAL REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-MECH-001  
-System shall maintain structural integrity under defined deployment load.
-
-REQ-MECH-002  
-System shall withstand torsional loading within stability envelope.
-
-REQ-MECH-003  
-Center of gravity shall remain within defined stability polygon during stance.
-
-REQ-MECH-004  
-Frame shall tolerate vibration profile defined in Testing domain.
-
-REQ-MECH-005  
-All load-bearing fasteners shall be torque-specified and documented.
-
+REQ‑MECH‑001  System shall maintain structural integrity under defined deployment load.  
+REQ‑MECH‑002  System shall withstand torsional loading within stability envelope.  
+REQ‑MECH‑003  Center of gravity shall remain within defined stability polygon during stance.  
+REQ‑MECH‑004  Frame shall tolerate vibration profile defined in Testing domain.  
+REQ‑MECH‑005  All load‑bearing fasteners shall be torque‑specified and documented.  
 
 ------------------------------------------------------------
-4. ELECTRICAL REQUIREMENTS
+4. ELECTRICAL REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-ELEC-001  
-System shall segment servo and compute power rails.
-
-REQ-ELEC-002  
-Battery Management System shall enforce overcurrent protection.
-
-REQ-ELEC-003  
-Battery Management System shall enforce undervoltage protection.
-
-REQ-ELEC-004  
-Kill-line shall disable servo rail within defined latency threshold.
-
-REQ-ELEC-005  
-System shall prevent reverse polarity connection.
-
+REQ‑ELEC‑001  System shall segment servo, compute, and accessory power rails.  
+REQ‑ELEC‑002  BMS shall enforce over‑current protection.  
+REQ‑ELEC‑003  BMS shall enforce under‑voltage protection.  
+REQ‑ELEC‑004  Kill‑Line shall disable servo rail within latency ≤ 250 ms.  
+REQ‑ELEC‑005  System shall prevent reverse polarity connection.  
+REQ‑ELEC‑006  Duet 3 Mainboard shutdown shall engage automatic servo disable on Kill‑Line open.  
 
 ------------------------------------------------------------
-5. CONTROL REQUIREMENTS
+5. CONTROL REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-CTRL-001  
-System shall implement layered control authority model.
-
-REQ-CTRL-002  
-Reactive layer shall override mission commands when safety violated.
-
-REQ-CTRL-003  
-Heartbeat timeout shall result in deterministic fallback state.
-
-REQ-CTRL-004  
-System shall log authority transitions.
-
-REQ-CTRL-005  
-No motion shall occur without validated reactive authority.
-
+REQ‑CTRL‑001  System shall implement layered control authority model.  
+REQ‑CTRL‑002  Reactive layer shall override Mission commands when safety violated.  
+REQ‑CTRL‑003  Heartbeat timeout shall result in deterministic Safe‑Stop state.  
+REQ‑CTRL‑004  System shall log authority layer transitions and timeouts.  
+REQ‑CTRL‑005  No motion shall occur without validated Reactive authority.  
+REQ‑CTRL‑006  Duet Bridge interface shall verify periodic heartbeat at ≥ 50 Hz rate.  
 
 ------------------------------------------------------------
-6. SAFETY REQUIREMENTS
+6. SAFETY REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-SAFE-001  
-Hardware emergency stop shall directly disable servo rail.
-
-REQ-SAFE-002  
-Watchdog shall independently monitor reactive and mission heartbeats.
-
-REQ-SAFE-003  
-System shall default to STOP upon authority ambiguity.
-
-REQ-SAFE-004  
-Software shall not override hardware kill-line.
-
-REQ-SAFE-005  
-System shall prevent operation below defined energy critical threshold.
-
+REQ‑SAFE‑001  Hardware Emergency Stop (E‑Stop) shall directly interrupt servo rail.  
+REQ‑SAFE‑002  Watchdog shall independently monitor Reactive and Mission heartbeats.  
+REQ‑SAFE‑003  System shall default to STOP upon authority ambiguity.  
+REQ‑SAFE‑004  Software shall not override Kill‑Line or BMS cutoff.  
+REQ‑SAFE‑005  Operation shall cease below defined critical energy threshold.  
+REQ‑SAFE‑006  Duet 3 outputs shall follow Kill‑Line state without delay > 100 ms.  
 
 ------------------------------------------------------------
-7. NAVIGATION REQUIREMENTS
+7. NAVIGATION REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-NAV-001  
-System shall classify terrain before traversal.
-
-REQ-NAV-002  
-System shall refuse traversal of hazardous terrain class.
-
-REQ-NAV-003  
-Navigation shall incorporate energy-aware constraints.
-
-REQ-NAV-004  
-System shall perform controlled docking within tolerance.
-
-REQ-NAV-005  
-System shall maintain slope traversal limits defined in Deployment Profile.
-
+REQ‑NAV‑001  System shall classify terrain before traversal.  
+REQ‑NAV‑002  System shall refuse traversal of hazardous terrain classes.  
+REQ‑NAV‑003  Navigation planner shall incorporate energy‑aware constraints.  
+REQ‑NAV‑004  System shall perform controlled docking within ±15 mm tolerance.  
+REQ‑NAV‑005  System shall maintain slope traversal ≤ specified in Deployment Profile.  
 
 ------------------------------------------------------------
-8. ENERGY REQUIREMENTS
+8. ENERGY REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-ENER-001  
-System shall estimate state-of-charge using coulomb counting.
-
-REQ-ENER-002  
-System shall initiate mission termination at defined SOC threshold.
-
-REQ-ENER-003  
-System shall avoid BMS hard cutoff during active motion.
-
-REQ-ENER-004  
-System shall log battery temperature excursions.
-
-REQ-ENER-005  
-Charging shall not occur during active mission state.
-
+REQ‑ENER‑001  System shall estimate state‑of‑charge using coulomb count + voltage correlation.  
+REQ‑ENER‑002  System shall initiate mission termination at defined SOC threshold (15 %).  
+REQ‑ENER‑003  System shall avoid BMS hard cutoff during motion.  
+REQ‑ENER‑004  System shall log battery temperature and current excursions.  
+REQ‑ENER‑005  Charging shall not occur during active mission state.  
 
 ------------------------------------------------------------
-9. SOFTWARE REQUIREMENTS
+9. SOFTWARE REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-SW-001  
-All motion commands shall include sequence identifier.
-
-REQ-SW-002  
-All safety-critical messages shall include timestamp.
-
-REQ-SW-003  
-System shall reject stale or malformed motion commands.
-
-REQ-SW-004  
-Message definitions shall be version-controlled.
-
-REQ-SW-005  
-System shall log critical faults persistently.
-
+REQ‑SW‑001  All motion commands shall include unique sequence identifier.  
+REQ‑SW‑002  All safety‑critical messages must include timestamp and checksum.  
+REQ‑SW‑003  System shall reject stale or malformed motion commands.  
+REQ‑SW‑004  Message definitions and APIs shall be version‑controlled.  
+REQ‑SW‑005  System shall log critical faults persistently and non‑volatilely.  
+REQ‑SW‑006  Duet Bridge node shall publish status and error topics at ≥ 10 Hz.  
 
 ------------------------------------------------------------
-10. COMMUNICATION REQUIREMENTS
+10. COMMUNICATION REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-COMM-001  
-Remote control channel shall be encrypted.
-
-REQ-COMM-002  
-Unauthorized command attempts shall be rejected and logged.
-
-REQ-COMM-003  
-Loss of remote link shall trigger defined fallback behavior.
-
-REQ-COMM-004  
-System shall display current authority layer externally.
-
-REQ-COMM-005  
-Swarm commands shall not override local safety authority.
-
+REQ‑COMM‑001  Remote control channel shall be encrypted (TLS 1.3 minimum).  
+REQ‑COMM‑002  Unauthorized command attempts shall be rejected and logged.  
+REQ‑COMM‑003  Loss of remote link shall trigger Reactive Safe‑Stop.  
+REQ‑COMM‑004  System shall display current authority layer externally.  
+REQ‑COMM‑005  Swarm commands shall never override local safety authority.  
+REQ‑COMM‑006  All Duet Bridge communications shall use checksum‑verified packets.  
 
 ------------------------------------------------------------
-11. OPERATIONAL REQUIREMENTS
+11. OPERATIONAL REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-OPS-001  
-System shall operate within defined environmental envelope.
-
-REQ-OPS-002  
-System shall require pre-deployment checklist validation.
-
-REQ-OPS-003  
-System shall log mission duration and fault events.
-
-REQ-OPS-004  
-System shall require manual reset after emergency stop.
-
-REQ-OPS-005  
-Maintenance intervals shall be defined and enforced.
-
+REQ‑OPS‑001  System shall operate within defined environmental envelope (−10 °C – 40 °C).  
+REQ‑OPS‑002  Pre‑deployment checklist validation required before arm.  
+REQ‑OPS‑003  System shall log mission duration and fault events per cycle.  
+REQ‑OPS‑004  Manual Reset required after any E‑Stop event.  
+REQ‑OPS‑005  Preventive maintenance intervals shall be documented and enforced.  
 
 ------------------------------------------------------------
-12. LIFECYCLE REQUIREMENTS
+12. LIFECYCLE REQUIREMENTS
 ------------------------------------------------------------
 
-REQ-LIFE-001  
-All production units shall be serialized.
-
-REQ-LIFE-002  
-Engineering changes shall require documented impact analysis.
-
-REQ-LIFE-003  
-Calibration results shall be stored per unit.
-
-REQ-LIFE-004  
-Decommissioned units shall be marked in fleet registry.
-
-REQ-LIFE-005  
-System documentation shall be version-controlled.
-
+REQ‑LIFE‑001  All production units shall be serialized.  
+REQ‑LIFE‑002  Engineering changes require documented impact analysis and approval.  
+REQ‑LIFE‑003  Calibration records shall be stored per unit.  
+REQ‑LIFE‑004  Decommissioned units shall be flagged in fleet registry.  
+REQ‑LIFE‑005  All system documentation shall be revision‑controlled.   
 
 ------------------------------------------------------------
-13. VERIFICATION TRACEABILITY
+13. VERIFICATION TRACEABILITY
 ------------------------------------------------------------
 
-Each requirement must map to:
+Each requirement maps to:  
+- Design Document (ID / Path)  
+- Test Protocol (ID / Procedure)  
+- Validation Result (record / date)  
 
-- Design document
-- Test protocol
-- Validation result
-
-No requirement shall remain unverified prior to Phase 2 exit.
-
-
-------------------------------------------------------------
-14. DESIGN INTENT
-------------------------------------------------------------
-
-This specification establishes measurable, testable,
-and enforceable system-level requirements.
-
-Architecture, code, testing, and lifecycle processes
-must remain traceable to these requirements.
-
-Safety and deterministic behavior are mandatory.
+No requirement may remain unverified prior to Phase 2 exit.  
+Entries maintained in /09_Testing/Verification_Traceability_Matrix.txt.  
 
 ------------------------------------------------------------
-END OF FILE
+14. DESIGN INTENT
+------------------------------------------------------------
+
+This specification establishes measurable and testable system‑level requirements.  
+All architecture, code, testing, and lifecycle documentation must maintain traceability.  
+Safety and deterministic behavior remain non‑negotiable core principles.  
+
+------------------------------------------------------------
+END OF FILE
 ------------------------------------------------------------
