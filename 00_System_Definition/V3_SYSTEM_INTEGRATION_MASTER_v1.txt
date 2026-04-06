@@ -1,163 +1,162 @@
 OBSIDIAN-8 V3
-SYSTEM INTEGRATION MASTER DOCUMENT v1
-Based on: V3_LARGE_FORMAT_BASELINE
-Status: FULL PLATFORM INTEGRATION CONTROL
-Units: Metric
+System_Integration_Master_Document.txt
+Revision: V3.3
+Status: Full Platform Integration Control
+Units: Metric
 
----------------------------------------
-PURPOSE
----------------------------------------
+------------------------------------------------------------
+1. PURPOSE
+------------------------------------------------------------
 
-Define integration rules across:
+Define integration rules and validation criteria across all critical domains:
 
-- Structure
-- Propulsion
-- Core systems
-- Electronics
-- Power
-- Wiring
-- Thermal
-- Landing interface
+- Structure  
+- Propulsion / Actuation  
+- Core Systems  
+- Electronics  
+- Power Distribution  
+- Wiring and Harnessing  
+- Thermal Management  
+- Landing Interface  
 
-Prevent subsystem conflicts
-and maintain architecture integrity.
+Purpose: prevent subsystem conflicts and preserve architecture integrity.  
+Reference: /00_System_Definition/V3_Master_System_Definition.txt  
 
----------------------------------------
-ARCHITECTURE LOCK
----------------------------------------
+------------------------------------------------------------
+2. ARCHITECTURE LOCK
+------------------------------------------------------------
 
-The following are FIXED:
+The following geometry and structure dimensions are FIXED for OBSIDIAN‑8 V3:
 
-- 45-inch (1143 mm) footprint
-- 12-segment 3030 primary ring
-- 8 vertical 3030 posts
-- 2020 secondary bracing system
-- 300 mm central clearance cylinder
-- CF nylon printed interface parts
-- No primary load path through printed parts
+- 45‑inch (1143 mm) footprint  
+- 12‑segment 3030 primary ring  
+- 8 vertical 3030 posts  
+- 2020 secondary bracing system  
+- 300 mm central clearance cylinder  
+- Carbon‑fiber nylon printed interface parts  
+- No primary load path through printed components  
 
-No modification without documented revision.
+Any modification requires documented revision and updated load validation.  
+Reference: /01_Mechanical/Frame_Architecture.txt  
 
----------------------------------------
-INTEGRATION HIERARCHY
----------------------------------------
+------------------------------------------------------------
+3. INTEGRATION HIERARCHY
+------------------------------------------------------------
 
-Load Order Priority:
+Load Order / Priority:
 
-1. Aluminum structural members
-2. Fasteners (Grade 10.9)
-3. Secondary aluminum bracing
-4. Printed interface parts (shear only)
-5. Electronics
-6. Wiring
-7. Thermal control components
+1. Aluminum structural members  
+2. Fasteners (Grade 10.9 minimum)  
+3. Secondary aluminum bracing  
+4. Printed interface parts (for shear transfer only)  
+5. Electronics assemblies  
+6. Wiring and harness routes  
+7. Thermal control components  
 
-Lower-priority systems must not compromise higher-priority structure.
+Lower‑priority systems must not compromise higher‑priority structural elements.  
 
----------------------------------------
-CLEARANCE MANAGEMENT
----------------------------------------
+------------------------------------------------------------
+4. CLEARANCE MANAGEMENT
+------------------------------------------------------------
 
-Reserved volumes:
+Reserved volumes:
 
-- Central 300 mm cylinder
-- 50 mm inward buffer from primary ring
-- Upper airflow path
+- Central 300 mm diameter cylinder (core services)  
+- 50 mm inward buffer from primary ring (ID protection zone)  
+- Upper airflow path (plenum)  
 
-No subsystem may intrude into reserved zones
-without documented approval.
+No subsystem infringement in reserved zones without approved Change Request.  
+Reference: /01_Mechanical/Clearance_Map.step  
 
----------------------------------------
-MASS DISTRIBUTION CONTROL
----------------------------------------
+------------------------------------------------------------
+5. MASS DISTRIBUTION CONTROL
+------------------------------------------------------------
 
-Target AUM: 40–55 kg
-Structural max: 60 kg
+Target All‑Up Mass (AUM): 40 – 55 kg  
+Structural Maximum: ≤ 60 kg  
 
-CG must remain:
+Center of Gravity (Cg):  
+- Horizontal offset ≤ 50 mm from geometric center.  
+- Vertical position = 35 – 55 % of frame height.  
 
-Within 50 mm of geometric center (horizontal)
-Between 35–55% of frame height (vertical)
+Subsystem placement must comply with /00_System_Definition/Mass_and_Center_of_Gravity_Model.txt.  
 
-Subsystem placement must respect CG model.
+------------------------------------------------------------
+6. INTERFACE CONTROL RULES
+------------------------------------------------------------
 
----------------------------------------
-INTERFACE CONTROL RULES
----------------------------------------
+Propulsion Mounts → direct aluminum contact (no printed spacers in load path).  
+Electronics Deck → mount to secondary structure only.  
+Battery System → must reside within lower core region below mid‑height.  
+Wiring → follow route definitions in /02_Electrical/Wiring_Harness_Specification.txt.  
+Thermal Management → no sealed heat traps; provide active airflow or passive sink paths.  
+Duet 3 and Maestro Boards → mount isolated from vibration zones, cooled via shared heatsink duct.  
 
-Propulsion mounts:
-Direct aluminum contact only.
+------------------------------------------------------------
+7. REVISION CONTROL
+------------------------------------------------------------
 
-Electronics deck:
-Mounted to secondary structure only.
+Any geometry change requires:  
+1. Updated geometry file (.step / .stl)  
+2. Updated cut list (if affected)  
+3. Updated mass assumptions (if component weight changes)  
+4. Version increment and Change Request approval  
 
-Battery:
-Lower core region.
+No silent geometry or interface drift permitted.  
+All source CAD and manifests stored under /12_STL_Production/00_Master_List/.  
 
-Wiring:
-Follow routing spec strictly.
+------------------------------------------------------------
+8. VALIDATION FLOW
+------------------------------------------------------------
 
-Thermal:
-No sealed heat traps.
+Required sequence before integration closure:
 
----------------------------------------
-REVISION CONTROL
----------------------------------------
+1. Structural assembly verification  
+2. Torsional rigidity test  
+3. Landing load test  
+4. Wiring and continuity validation  
+5. Thermal performance run  
+6. Cg measurement and validation (check Section 5)  
+7. Dynamic vibration observation  
 
-Any geometry change requires:
+Each stage must pass before advancing to the next test phase.  
+All results logged in /09_Testing/Integration_Validation_Report.txt.  
 
-1. Updated geometry file.
-2. Updated cut list (if affected).
-3. Updated load assumption (if mass changes).
-4. Version increment.
+------------------------------------------------------------
+9. FAILURE ESCALATION RULES
+------------------------------------------------------------
 
-No silent geometry drift allowed.
+If subsystem conflicts are identified, resolve by priority:
 
----------------------------------------
-VALIDATION FLOW
----------------------------------------
+1. Structural integrity  
+2. Load path accuracy  
+3. Cg stability  
+4. Thermal safety  
+5. Electrical isolation and integrity  
+6. Serviceability and accessibility  
 
-1. Structural assembly verification
-2. Torsion test
-3. Landing load test
-4. Wiring integrity check
-5. Thermal run test
-6. CG validation
-7. Dynamic vibration observation
+Aesthetic or cosmetic considerations have lowest priority.  
 
-Each stage must pass
-before proceeding to next.
+------------------------------------------------------------
+10. END‑STATE DEFINITION
+------------------------------------------------------------
 
----------------------------------------
-FAILURE ESCALATION
----------------------------------------
+System considered fully integrated when:  
+- All geometry files locked and baseline tag applied.  
+- Assembly matches design specifications.  
+- Structural and load tests passed.  
+- Thermal limits respected.  
+- Cg validated and logged.  
+- No visible structural drift or deviation.  
 
-If subsystem conflicts occur:
+------------------------------------------------------------
+11. DESIGN INTENT
+------------------------------------------------------------
 
-Priority resolution order:
+This document forms the master reference for end‑to‑end integration of OBSIDIAN‑8 V3.  
+Following its rules maintains architecture consistency and ensures mechanical, electrical, and thermal domains interlock safely.  
+Any exceptions must be approved through the Configuration Management Plan and logged as a formal change record.  
 
-1. Structural integrity
-2. Load path correctness
-3. CG stability
-4. Thermal safety
-5. Electrical integrity
-6. Serviceability
-
-Aesthetic considerations are lowest priority.
-
----------------------------------------
-END STATE DEFINITION
----------------------------------------
-
-System considered integrated when:
-
-- All geometry files locked
-- Assembly completed to spec
-- Load tests passed
-- Thermal limits respected
-- CG validated
-- No visible structural drift
-
----------------------------------------
-END OF FILE
----------------------------------------
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
