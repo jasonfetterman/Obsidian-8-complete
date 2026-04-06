@@ -1,6 +1,6 @@
 OBSIDIAN-8 V3
 Cybersecurity_Threat_Model.txt
-Revision: V3.2
+Revision: V3.3
 Status: Authoritative
 
 ------------------------------------------------------------
@@ -9,10 +9,9 @@ Status: Authoritative
 
 Define cybersecurity threat landscape, attack surfaces,
 mitigation strategies, and validation requirements
-for OBSIDIAN-8 V3.
+for OBSIDIAN‑8 V3.
 
 Security architecture must preserve:
-
 - Safety dominance
 - Authority hierarchy
 - Deterministic control behavior
@@ -23,186 +22,157 @@ Security architecture must preserve:
 2. THREAT CATEGORIES
 ------------------------------------------------------------
 
-T1 – Remote Command Injection  
-T2 – Credential Compromise  
-T3 – Network Eavesdropping  
-T4 – Firmware Tampering  
-T5 – Denial of Service (DoS)  
-T6 – Swarm Spoofing  
-T7 – Data Exfiltration  
-T8 – Physical Access Exploit  
+T1 – Remote Command Injection  
+T2 – Credential Compromise  
+T3 – Network Eavesdropping  
+T4 – Firmware Tampering  
+T5 – Denial of Service (DoS)  
+T6 – Swarm Spoofing  
+T7 – Data Exfiltration  
+T8 – Physical Access Exploit  
 
 ------------------------------------------------------------
 3. ATTACK SURFACES
 ------------------------------------------------------------
 
-3.1 Remote Communication Channel  
-3.2 ROS2 Topic Interface  
-3.3 Wireless Network Stack  
-3.4 SSH / Maintenance Access  
-3.5 Firmware Update Path  
-3.6 Swarm Coordination Channel  
-3.7 Local Storage (Logs + Configs)  
+3.1 Remote Communication Channel  
+3.2 ROS 2 Topic Interface  
+3.3 Wireless Network Stack  
+3.4 SSH / Maintenance Access  
+3.5 Firmware Update Path  
+3.6 Swarm Coordination Channel  
+3.7 Local Storage (Logs + Configs)  
 
 ------------------------------------------------------------
 4. THREAT ANALYSIS
 ------------------------------------------------------------
 
-T1 – Remote Command Injection  
-Risk: Unauthorized motion command  
-Mitigation:
-- Encrypted communication (TLS or equivalent)
-- Authenticated operator IDs
-- Command validation through reactive layer
-- Authority transparency enforcement
-Verification:
-- Unauthorized access simulation
-- Command injection penetration test
+T1 – Remote Command Injection  
+Risk: Unauthorized motion command  
+Mitigation:  
+- Encrypted communication (TLS 1.3 or approved crypto alternative)  
+- Authenticated operator IDs  
+- Command validation through reactive layer  
+- Authority transparency enforcement  
+Verification: Unauthorized access simulation; command injection penetration test  
 
 ------------------------------------------------------------
 
-T2 – Credential Compromise  
-Risk: Persistent unauthorized access  
-Mitigation:
-- Strong credential requirements
-- Token expiration
-- Revocation capability
-- Credential hashing and secure storage
-Verification:
-- Credential rotation audit
-- Authentication bypass attempt test
+T2 – Credential Compromise  
+Risk: Persistent unauthorized access  
+Mitigation:  
+- Strong credential requirements  
+- Token expiration and revocation capability  
+- Credential hashing and secure storage  
+Verification: Credential rotation audit; authentication bypass attempt test  
 
 ------------------------------------------------------------
 
-T3 – Network Eavesdropping  
-Risk: Interception of mission data  
-Mitigation:
-- Encrypted communication
-- Secure key exchange
-- Certificate validation
-Verification:
-- Packet inspection test
+T3 – Network Eavesdropping  
+Risk: Interception of mission data  
+Mitigation: Encrypted communication; secure key exchange; certificate validation  
+Verification: Packet inspection test  
 
 ------------------------------------------------------------
 
-T4 – Firmware Tampering  
-Risk: Malicious code execution  
-Mitigation:
-- Signed firmware updates
-- Secure boot enforcement
-- Version validation
-Verification:
-- Firmware integrity validation test
+T4 – Firmware Tampering  
+Risk: Malicious code execution  
+Mitigation: Signed firmware updates; secure boot enforcement; version validation  
+Verification: Firmware integrity validation test; secure‑boot signature verification with RO public key  
 
 ------------------------------------------------------------
 
-T5 – Denial of Service  
-Risk: Communication disruption  
-Mitigation:
-- Defined link-loss fallback
-- Rate limiting
-- Resource monitoring
-Verification:
-- DoS simulation test
+T5 – Denial of Service  
+Risk: Communication disruption  
+Mitigation: Defined link‑loss fallback; rate limiting; resource monitoring  
+Verification: DoS simulation test  
 
 ------------------------------------------------------------
 
-T6 – Swarm Spoofing  
-Risk: Fake unit injecting swarm commands  
-Mitigation:
-- Unique device identity
-- Mutual authentication between units
-- Local safety dominance
-Verification:
-- Swarm authentication simulation
+T6 – Swarm Spoofing  
+Risk: Fake unit injecting swarm commands  
+Mitigation: Unique device identity; mutual authentication between units (ROS 2 DDS Security plugin X.509)  
+Verification: Swarm authentication simulation  
 
 ------------------------------------------------------------
 
-T7 – Data Exfiltration  
-Risk: Exposure of logs or mission data  
-Mitigation:
-- Access-controlled log storage
-- Encryption at rest (if required)
-- Maintenance authentication
-Verification:
-- Access control audit
+T7 – Data Exfiltration  
+Risk: Exposure of logs or mission data  
+Mitigation: Access‑controlled log storage; encryption at rest; maintenance authentication  
+Verification: Access control audit  
 
 ------------------------------------------------------------
 
-T8 – Physical Access Exploit  
-Risk: Direct hardware tampering  
-Mitigation:
-- Secured access panels
-- Tamper detection (optional)
-- Disable debug ports in production
-Verification:
-- Physical inspection
+T8 – Physical Access Exploit  
+Risk: Direct hardware tampering  
+Mitigation: Secured access panels; tamper detection; debug ports disabled in production  
+Verification: Physical inspection  
 
 ------------------------------------------------------------
 5. SECURITY REQUIREMENTS
 ------------------------------------------------------------
 
-SEC-001  
-All remote control channels must be encrypted.
+| Threat ID | Related Security Requirement |
+|:-----------|:-----------------------------|
+| T1 | SEC‑001, SEC‑002, SEC‑003 |
+| T2 | SEC‑002, SEC‑003 |
+| T3 | SEC‑001 |
+| T4 | SEC‑004 |
+| T5 | SEC‑006, SEC‑007 |
+| T6 | SEC‑005 |
+| T7 | SEC‑003 |
+| T8 | SEC‑008 |
 
-SEC-002  
-All operator sessions must require authentication.
-
-SEC-003  
-System must log all remote access attempts.
-
-SEC-004  
-Firmware must be version-controlled and validated.
-
-SEC-005  
-Unauthorized swarm commands must be rejected.
-
-SEC-006  
-System must remain safe under DoS conditions.
-
-SEC-007  
-Kill-line must not depend on network connectivity.
-
-------------------------------------------------------------
-6. SAFETY PRIORITY RULE
-------------------------------------------------------------
-
-Cybersecurity shall never:
-
-- Override hardware kill authority
-- Interfere with reactive safety dominance
-- Suppress watchdog function
-
-Security controls must preserve safety hierarchy.
+SEC‑001  Remote control channels must be encrypted.  
+SEC‑002  All operator sessions require authentication.  
+SEC‑003  System logs all remote access attempts.  
+SEC‑004  Firmware must be version‑controlled and validated.  
+SEC‑005  Unauthorized swarm commands must be rejected.  
+SEC‑006  System must remain safe under DoS conditions.  
+SEC‑007  Kill‑line must not depend on network connectivity.  
+SEC‑008  Physical debug and maintenance ports must be disabled or protected in production units.  
 
 ------------------------------------------------------------
-7. VALIDATION REQUIREMENTS
+6. SAFETY PRIORITY RULE
 ------------------------------------------------------------
 
-Security validation must include:
+Cybersecurity shall never:  
+- Override hardware kill authority  
+- Interfere with reactive safety dominance  
+- Suppress watchdog function  
 
-- Penetration testing
-- Authentication failure simulation
-- Encrypted channel verification
-- Firmware integrity audit
-- Swarm identity validation
-- Link flooding simulation
-
-------------------------------------------------------------
-8. DESIGN INTENT
-------------------------------------------------------------
-
-The cybersecurity model ensures:
-
-- Protection of remote interfaces
-- Integrity of control authority
-- Confidentiality of operational data
-- Prevention of unauthorized motion
-- Preservation of safety-first architecture
-
-Security is subordinate to safety,
-but mandatory for operational deployment.
+Security controls must preserve safety hierarchy.  
+Reference: /03_Control_Architecture/Authority_Model.txt  
 
 ------------------------------------------------------------
-END OF FILE
+7. VALIDATION REQUIREMENTS
+------------------------------------------------------------
+
+Security validation includes:  
+- Penetration testing  
+- Authentication failure simulation  
+- Encrypted channel verification  
+- Firmware integrity audit  
+- Swarm identity validation  
+- Link flooding simulation  
+
+Validation artifacts stored under:  
+/09_Testing/Security_Validation/  
+Each test links to firmware tag and software manifest.  
+
+------------------------------------------------------------
+8. DESIGN INTENT
+------------------------------------------------------------
+
+Cybersecurity model ensures:  
+- Protection of remote interfaces  
+- Integrity of control authority  
+- Confidentiality of operational data  
+- Prevention of unauthorized motion  
+- Preservation of safety‑first architecture  
+
+Security is subordinate to safety but mandatory for deployment.
+
+------------------------------------------------------------
+END OF FILE
 ------------------------------------------------------------
