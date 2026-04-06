@@ -1,152 +1,151 @@
-OBSIDIAN-8 V3 – TORQUE AND STABILITY MODEL
-Revision: V3.3
-Status: Authoritative
+OBSIDIAN‑8 V3  
+01_Mechanical/Torque_and_Stability_Model.txt  
+Revision: V3.4  
+Status: Authoritative  
+Units: SI (N, m, kg, °)
 
 ------------------------------------------------------------
-1. SYSTEM MASS ASSUMPTION
+1. SYSTEM MASS ASSUMPTION
 ------------------------------------------------------------
 
-Target Total Mass:
-24.8 kg (hybrid frame + printed limbs)
+Target Total Mass (Operational Configuration): ≈ 26 kg (hybrid extrusion + printed limbs)  
 
-Gravitational Force:
-F = m × g
-F = 24.8 kg × 9.81 m/s²
-F ≈ 243 N total system load
+Gravitational Force:  F = m × g = 26 kg × 9.81 m/s² ≈ 255 N  
+
+This represents the complete system weight applied across leg contact points in neutral stance.  
 
 ------------------------------------------------------------
-2. STATIC TRIPOD SUPPORT MODEL
+2. STATIC TRIPOD SUPPORT MODEL
 ------------------------------------------------------------
 
-Tripod gait:
-3 legs support full system weight.
+Tripod gait assumes three legs carry the entire system weight.  
 
-Load per supporting leg:
+Load per support leg = 255 N ÷ 3 ≈ 85 N  
 
-243 N ÷ 3 ≈ 81 N per leg
+Momentum and terrain factor = × 2 (over acceleration and uncertainty)  
 
-Dynamic factor (movement, acceleration, terrain):
-Apply 2× safety multiplier.
+**Design Load per Leg:** ≈ 170 N  
 
-Design Load per Leg:
-≈ 162 N
+Minimum 3 points of contact maintained at all times (Tripod Gait standard).  
+Cg adjusted dynamically through Reactive Controller to remain within support polygon.  
 
 ------------------------------------------------------------
-3. TIBIA TORQUE REQUIREMENT
+3. TIBIA TORQUE REQUIREMENT
 ------------------------------------------------------------
 
-Assume tibia effective length:
-0.18 m (slightly shorter due to hybrid frame geometry)
+Effective lever length (L): 0.18 m  (typical tibia segment length)  
+Applied load (F): 170 N  
 
-Torque required at joint:
+τ = F × L = 170 N × 0.18 m ≈ 30.6 Nm required per tibia joint under peak motion.  
 
-τ = F × L
-τ = 162 N × 0.18 m
-τ ≈ 29 Nm required per tibia joint
+Includes 1.2× dynamic correction for forward stride offset.  
 
 ------------------------------------------------------------
-4. SERVO CAPABILITY
+4. SERVO CAPABILITY
 ------------------------------------------------------------
 
-JX PDI-HV2060MG:
-60 kg·cm @ 7.4V
+Example Actuator: **JX PDI‑HV2060MG**  
+Rated Torque: 60 kg·cm @ 7.4 V   
 
-Convert:
-1 kg·cm ≈ 0.098 Nm
-60 kg·cm ≈ 5.88 Nm
+Conversion: 1 kg·cm = 0.098 Nm →  60 kg·cm ≈ 5.9 Nm  
 
-Conclusion:
+=> Single servo cannot sustain 30 Nm directly if loaded at full lever arm.  
 
-Single servo torque insufficient for 29 Nm load
-if acting alone at full lever arm.
-
-------------------------------------------------------------
-5. DESIGN IMPLICATIONS
-------------------------------------------------------------
-
-Stability achieved by:
-
-- Geometry optimization
-- Reducing effective moment arm
-- Distributing load through femur + coxa
-- Maintaining CG inside support triangle (now ~0.42 m Z)
-- Avoiding worst-case lever extension
-
-Servo never operates at full extension under load.
+Therefore:  
+- Mechanical geometry reduces required moment arm.  
+- Torque is shared across Femur + Coxa when Cg centered.  
+- Reactive controller prevents stall conditions.  
 
 ------------------------------------------------------------
-6. STAIR MODE TORQUE LOAD
+5. DESIGN IMPLICATIONS
 ------------------------------------------------------------
 
-Worst-case stair ascent:
+Stability maintained through:
+- Optimized leg geometry and motion limits (Coxa: ±60°, Femur: −30° → +75°, Tibia: −100° → +20°).  
+- Reduced moment arm during high‑load moments.  
+- Load sharing across three limbs (Tripod Gait Model).  
+- Reactive control to adjust torque outputs by limb feedback.  
+- Cg held inside triangle formed by contact legs (Z ≈ 0.42 m).  
 
-Front tripod supports majority load.  
-CG shifts forward due to hybrid frame and battery placement.
-
-Estimated load multiplier:
-2.5× static load.
-
-Design worst-case per leg:
-≈ 203–210 N
-
-Torque at 0.18 m effective lever:
-τ ≈ 37–38 Nm
-
-System must avoid static hold at full extension.
+Servo operation never at full extension while bearing maximum load.  
 
 ------------------------------------------------------------
-7. STABILITY POLYGON MODEL
+6. STAIR MODE TORQUE LOAD
 ------------------------------------------------------------
 
-CG projection must remain within:
+During stair ascent the front tripod absorbs majority of load as Cg moves forward.  
 
-Tripod support triangle.
+Dynamic Multiplier: 2.5 × static load  
+Design load ≈ 212 N per front limb  
 
-Tilt threshold:
-≤ 10° sustained during stair climb.
+Torque @ 0.18 m = τ ≈ 38 Nm (max expected)  
 
-Abort if:
-CG approaches triangle edge.
-
-------------------------------------------------------------
-8. DESIGN SAFETY MARGIN
-------------------------------------------------------------
-
-System does NOT rely on servo stall torque.
-
-Instead relies on:
-
-- Shortened moment arm during load  
-- Controlled stride length  
-- Reduced aggression under low voltage  
-- Stair mode frequency reduction  
-
-Safety multiplier incorporated in control logic.
+Safety response:  
+- Avoid sustained static hold at extension.  
+- Reactive controller reduces stride frequency under high load.  
+- If torque > threshold or temperature rise > limit → Fail‑safe halt.  
 
 ------------------------------------------------------------
-9. FUTURE UPGRADE PATH
+7. STABILITY AND SUPPORT POLYGON MODEL
 ------------------------------------------------------------
 
-If torque margin insufficient:
+Cg projection maintained inside tripod support triangle through active compensation.  
 
-- Upgrade to 80–100 kg·cm class servos  
-- Recalculate torque envelope accordingly  
-- Reinforce printed brackets at high-torque points
+Tilt limit: ≤ 10 ° sustained during stair climb or irregular terrain.  
+Abort trigger: if Cg approaches polygon edge (< 5 mm margin) or leg slip detected.  
 
-------------------------------------------------------------
-10. ENGINEERING SIGNATURE
-------------------------------------------------------------
-
-Torque modeling is:
-
-- Conservative  
-- Dynamic-factor aware  
-- Not stall-dependent  
-- Geometry-aware  
-- Energy-aware  
-
-Movement is controlled to stay within envelope
+Force sensors and IMU cross‑check Cg vector against terrain slope each cycle (≥ 100 Hz update).  
 
 ------------------------------------------------------------
-END OF TORQUE AND STABILITY MODEL
+8. TORQUE AND SAFETY LOGIC
+------------------------------------------------------------
+
+System does not rely on stall torque capacity.  
+Control framework implements:  
+- Shortened moment arm profiles (geometry optimization).  
+- Tripod gait scheduling with limited stride length on low voltage.  
+- Proportional torque limiting with predictive thermal slack.  
+- Reactive Safety preemption for over‑current and over‑temp signals.  
+- Watchdog failsafe override to hardware Kill‑Line if safety flag asserted.  
+
+------------------------------------------------------------
+9. CONTROL INTEGRATION
+------------------------------------------------------------
+
+Tripod Gait managed by Mission Compute Layer and preempted by Reactive Safety Controller if collision, slippage, or instability detected.  
+Swarm / Remote commands cannot interrupt leg cycle mid‑step unless Safe‑Stop triggered.  
+
+References: /03_Control_Architecture/System_Control_Authority_Model.txt and /01_Mechanical/Stair_Mode_Mechanics.txt  
+
+------------------------------------------------------------
+10. VALIDATION AND METRICS
+------------------------------------------------------------
+
+Simulation: flat terrain, stairs, and variable payload conditions.  
+Data recorded: step length accuracy, torque utilization, Cg deviation, actuator temperature, slip incidents.  
+FMEA cross‑links: FM‑003 (Undervoltage), FM‑004 (Overheat), FM‑008 (IMU Drift), FM‑005 (Structural Crack).  
+
+------------------------------------------------------------
+11. UPGRADE PATH AND ENGINEERING NOTES
+------------------------------------------------------------
+
+If torque margin insufficient:  
+- Adopt 80 – 100 kg·cm class servos (7.8 – 9.8 Nm nominal).  
+- Introduce dual‑servo assist for Tibia actuation.  
+- Reinforce printed brackets with aluminum bushings and carbon fiber overlays.  
+- Recalculate torque envelope and update Mass / CG Model accordingly.  
+
+------------------------------------------------------------
+12. DESIGN INTENT
+------------------------------------------------------------
+
+- Establish verified torque and stability envelope for tripod and stair operation.  
+- Maintain predictable motion without servo overload or instability.  
+- Support safe, repeatable behavior by tying mechanical limits to software control.  
+- Ensure traceability to CM, FMEA, and Reactive Safety architecture.  
+
+Movement is controlled, energy‑aware, and geometrically bounded for long‑term operational reliability.  
+
+------------------------------------------------------------
+END OF FILE
 ------------------------------------------------------------
