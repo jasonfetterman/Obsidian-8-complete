@@ -1,69 +1,166 @@
 OBSIDIAN-8 V3
-
 V3_Master_System_Definition.txt
-Revision: V3.2
+Revision: V3.3
 Status: Authoritative
 
-TABLE OF CONTENTS
-Configuration Management Plan
-Cybersecurity Threat Model
-Deployment Profile
-Failure Modes and Effects Analysis (FMEA)
-Design Philosophy
-System Control Authority Model
-1. CONFIGURATION MANAGEMENT PLAN
+------------------------------------------------------------
+TABLE OF CONTENTS
+------------------------------------------------------------
 
-Reference: Configuration_Management_Plan.txt
+1. Configuration Management Plan  
+2. Cybersecurity Threat Model  
+3. Deployment Profile  
+4. Failure Modes and Effects Analysis (FMEA)  
+5. Design Philosophy  
+6. System Control Authority Model  
+7. Operational Envelope  
+8. Safety Architecture  
+9. System Requirements Specification  
+10. System Block Diagram  
+11. Duet 3 / Maestro Integration Overview  
 
-Defines baselines (System, Hardware, Software, Production)
-Versioning: V[Major].[Minor].[Revision]
-Change Control: CR process, Class A/B/C classification, approval hierarchy
-Configuration Records: serials, hardware/software versions, calibration, deployment profile
-Software and Document Control, Audits, Field Change Management, End-of-Life procedures
-Design Intent: predictable evolution, safety preservation, traceable engineering changes
-2. CYBERSECURITY THREAT MODEL
+------------------------------------------------------------
+1. CONFIGURATION MANAGEMENT PLAN
+------------------------------------------------------------
 
-Reference: Cybersecurity_Threat_Model.txt
+Reference: /00_System_Definition/Configuration_Management_Plan.txt  
 
-Threat Categories T1–T8 (Remote Command Injection, Credential Compromise, etc.)
-Attack Surfaces: Remote channels, ROS2 topics, wireless stack, SSH, firmware path, swarm, local storage
-Mitigations and Verification Methods for each threat
-Security Requirements SEC-001 to SEC-007
-Safety Priority Rule: security never overrides hardware kill or reactive dominance
-Validation Requirements: penetration testing, authentication simulation, firmware audits, swarm validation
-3. DEPLOYMENT PROFILE
+Defines baselines (System, Hardware, Software, Production).  
+Versioning format: V[Major].[Minor].[Revision].  
+Change Control via CR process (Class A/B/C) and approval hierarchy.  
 
-Reference: Deployment_Profile.txt
+Configuration Records include: serial number, hardware/software versions, calibration ID, deployment profile.  
+Covers Software and Document Control, Audits, Field Change Management, and End‑of‑Life procedures.  
 
-Unit Identification: Serial, model, deployment date, operator, mission type
-Hardware Configuration: actuators, battery, BMS, sensors, optional add-ons
-Software Configuration: ROS2 packages, firmware, launch configs, security patches
-Calibration & Testing: pre-deployment tests, safety override status
-Network & Communication: primary network, encryption, swarm channels
-Security & Authorization: credential profiles, access control, firmware verification
-Deployment Status: readiness, restrictions, authorized sign-off
-4. FAILURE MODES AND EFFECTS ANALYSIS (FMEA)
+Design Intent: predictable system evolution, safety integrity, and traceable engineering changes.  
 
-Reference: Failure_Modes_and_Effects_Analysis.txt
+------------------------------------------------------------
+2. CYBERSECURITY THREAT MODEL
+------------------------------------------------------------
 
-Failure ID FM-001 to FM-012 across subsystems: Reactive Controller, Mission Compute, Battery, Actuators, Frame, Watchdog, Communication, Sensors, Power Distribution, Docking, Authority, Energy Model
-Includes Failure Mode, Cause, Effect, Severity, Occurrence, Detection, RPN, Mitigation
-RPN interpretation: ≥25 → review, 15–24 → acceptable with monitoring, <15 → controlled
-Review Policy: before Phase 2 exit, after Class A changes, after critical incidents, annual
-Design Intent: structured evaluation, prioritized mitigation, proactive discipline
-5. DESIGN PHILOSOPHY
+Reference: /00_System_Definition/Cybersecurity_Threat_Model.txt  
 
-Reference: Design_Philosophy.txt
+Threat Categories T1–T8 (Remote Command Injection → Physical Exploit).  
+Attack Surfaces: remote channels, ROS 2 topics, wireless stack, SSH, firmware path, swarm link, local storage.  
 
-Guiding principles: Safety-first, modularity, deterministic control, integrated security, reliability, traceability, human-centered interaction
-Engineering mindset: anticipate failure, validate continuously, maintain discipline, iterate responsibly, respect operational context
-Design Intent: predictable evolution, preserved authority and safety hierarchy, contained failures, traceable software/hardware/network interactions, security subordinate to safety
-6. SYSTEM CONTROL AUTHORITY MODEL
+Mitigations and Verification: per threat with mapped SEC‑001 → SEC‑008 requirements.  
+Safety Priority Rule: security never overrides hardware kill or reactive authority.  
+Validation Requirements: penetration testing, authentication failure simulation, firmware integrity, swarm auth validation.  
 
-Reference: System_Control_Authority_Model.txt
+------------------------------------------------------------
+3. DEPLOYMENT PROFILE
+------------------------------------------------------------
 
-Authority Hierarchy: Hardware-level > Reactive Controller > Mission Compute > Local Operator > Swarm > Automated Failsafe
-Control Decision Flow: input → verification → reactive check → hardware kill → execution → logging
-Conflict Resolution: Hardware > Software, Reactive > Mission, Local > Remote, Swarm ≤ Local Safety
-Authority Validation and Testing: penetration testing, forced conflict simulations, logging/audit review
-Design Intent: safety preserved, deterministic, auditable, operator authority clear, swarm enhances mission without violating safety
+Reference: /00_System_Definition/Deployment_Profile.txt  
+
+Defines unit identification (serial, model, date, mission type).  
+Documents hardware configuration (actuators, battery, BMS, sensors, add‑ons).  
+Software stack — ROS 2 packages, firmware, launch configs, security patch level.  
+
+Covers calibration version, pre‑deployment validation, safety override status.  
+Network and Communication: primary links, encryption, swarm authentication keys.  
+Security and Authorization: credential roles, firmware signature, field mod permissions.  
+Deployment Status: readiness, restrictions, authorized sign‑off.  
+
+------------------------------------------------------------
+4. FAILURE MODES AND EFFECTS ANALYSIS (FMEA)
+------------------------------------------------------------
+
+Reference: /00_System_Definition/Failure_Modes_and_Effects_Analysis.txt  
+
+Failure IDs: FM‑001 → FM‑017 cover Reactive Controller, Mission Compute, Battery, Actuators, Frame, Watchdog, Comm, Sensors, Power Dist., Docking, Authority, Energy, Maestro, and Duet subsystems.  
+
+Each entry = Mode + Cause + Effect + Severity + Occurrence + Detection + RPN + Mitigation.  
+RPN Interpretation: ≥25 → engineering review; 15‑24 → monitor; <15 → controlled.  
+Review Policy: Phase 2 exit, Class A change, critical incident, annual production audit.  
+Design Intent: structured evaluation, prioritized risk reduction, proactive design discipline.  
+
+------------------------------------------------------------
+5. DESIGN PHILOSOPHY
+------------------------------------------------------------
+
+Reference: /00_System_Definition/Design_Philosophy.txt  
+
+Guiding Principles: Safety First; Modularity & Extensibility; Deterministic Control; Integrated Security; Reliability & Redundancy; Traceability & Auditability; Human‑Centered Interaction.  
+Engineering Mindset: anticipate failure, validate continuously, maintain discipline, iterate responsibly, respect operational context.  
+Design Intent: predictable evolution and maintainability with safety and authority hierarchy preserved.  
+
+------------------------------------------------------------
+6. SYSTEM CONTROL AUTHORITY MODEL
+------------------------------------------------------------
+
+Reference: /03_Control_Architecture/System_Control_Authority_Model.txt  
+
+Hierarchy: Hardware > Reactive > Mission > Operator > Swarm > Failsafe.  
+Decision Flow: Input → Verification → Reactive Check → Hardware Kill Test → Execution → Logging.  
+
+Conflict Resolution:  
+- Hardware wins over software  
+- Reactive preempts mission  
+- Local operator priority over remote  
+- Swarm cannot violate safety  
+
+Testing: penetration, conflict simulation, kill‑line latency, audit log review.  
+Design Intent: safety and determinism in all control decisions.  
+
+------------------------------------------------------------
+7. OPERATIONAL ENVELOPE
+------------------------------------------------------------
+
+Reference: /00_System_Definition/Operational_Envelope.txt  
+
+Defines physical bounds, terrain types, environmental limits (−10 °C – 40 °C), and mission energy model.  
+Safety Rules: safety > energy > mission; remote control cannot override protective layers.  
+
+------------------------------------------------------------
+8. SAFETY ARCHITECTURE
+------------------------------------------------------------
+
+Reference: /00_System_Definition/Safety_Architecture.txt  
+
+Layers 0‑4 (Hardware Kill → Reactive → Mission → Remote → Maintenance).  
+Covers hardware cuts, BMS protections, reactive limits, watchdog supervision, fault containment, and validation tests.  
+Design Intent: hardware‑dominant cutoff and deterministic failure behavior.  
+
+------------------------------------------------------------
+9. SYSTEM REQUIREMENTS SPECIFICATION
+------------------------------------------------------------
+
+Reference: /00_System_Definition/System_Requirements_Specification.txt  
+
+Formal REQ IDs across Mechanical, Electrical, Control, Safety, Navigation, Energy,
+Software, Communication, Operational, Lifecycle domains.  
+Links to Verification Traceability Matrix for design and test coverage.  
+
+------------------------------------------------------------
+10. SYSTEM BLOCK DIAGRAM
+------------------------------------------------------------
+
+Reference: /00_System_Definition/System_Block_Diagram.txt  
+
+Shows hardware and data paths including Duet 3 motion controller and Maestro board.  
+Defines authority flow (Layer 4 → 0), heartbeat relationships, and failure containment boundaries.  
+
+------------------------------------------------------------
+11. DUET 3 / MAESTRO INTEGRATION OVERVIEW
+------------------------------------------------------------
+
+References: /02_Electrical/Duet3_Interface.txt /02_Electrical/Maestro_Controller_Interface.txt  
+
+Describes dual motion control architecture; Duet 3 handles high‑precision servo outputs,  
+Maestro manages auxiliary channels and legacy servo networks.  
+
+Both interfaces obey Kill‑Line and Watchdog authority.  
+Integration validated via Fault‑Induced Timeout Test in /09_Testing/Hardware_Validation/.  
+
+------------------------------------------------------------
+DESIGN INTENT
+------------------------------------------------------------
+
+The Master System Definition unifies all baseline documents of OBSIDIAN‑8 V3.  
+It serves as the root for configuration control, traceability, and safety compliance.  
+Any revision to this file requires cross‑reference updates to associated documents.  
+
+------------------------------------------------------------
+END OF FILE
+------------------------------------------------------------
