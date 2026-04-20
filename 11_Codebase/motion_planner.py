@@ -1,54 +1,109 @@
-"""
-motion_planner.py
-OBSIDIAN-8 V3 — REV D
-Converts high-level velocity and trajectory commands into leg-level motions
-"""
+import time
+import math
 
-import numpy as np
-from kinematics import LegKinematics
-from servo_driver import ServoDriver
 
 class MotionPlanner:
-    def __init__(self, num_legs=8):
-        self.num_legs = num_legs
-        self.leg_kin = [LegKinematics(leg_id=i) for i in range(num_legs)]
-        self.servo_driver = ServoDriver()
-        self.current_velocity = {"forward": 0.0, "turn": 0.0}
+    def __init__(self):
+        # Current state
+        self.current_vx = 0.0
+        self.current_vy = 0.0
+        self.current_w = 0.0  # angular velocity
 
-    def set_velocity(self, forward, turn):
-        """
-        Sets desired robot velocity
-        forward: float [-1,1] forward/backward
-        turn: float [-1,1] left/right
-        """
-        self.current_velocity["forward"] = np.clip(forward, -1.0, 1.0)
-        self.current_velocity["turn"] = np.clip(turn, -1.0, 1.0)
-        self.plan_motion()
+        self.last_time = time.time()
 
-    def plan_motion(self):
-        """
-        Convert current velocity into leg target positions
-        """
-        # Example gait calculation: simplified tripod gait for octopod
-        for i, leg in enumerate(self.leg_kin):
-            # Compute leg swing/stance based on forward and turn velocity
-            # Forward motion scales X-axis, turn scales Y-axis
-            swing_offset = self.current_velocity["forward"] * 50.0  # mm
-            turn_offset = self.current_velocity["turn"] * (-1 if i%2==0 else 1) * 30.0  # mm
-            target_xyz = leg.default_position + np.array([swing_offset, turn_offset, 0.0])
-            
-            # Inverse kinematics to joint angles
-            joint_angles = leg.inverse_kinematics(target_xyz)
-            
-            # Send angles to servo driver
-            self.servo_driver.set_leg_angles(leg.leg_id, joint_angles)
+        # Constraints (TUNE THESE TO YOUR HARDWARE)
+        self.max_vel = 1.5          # m/s
+        self.max_accel = 1.0        # m/s^2
+        self.max_angular = 2.0      # rad/s
 
-# -------------------- TEST LOOP --------------------
-if __name__ == "__main__":
-    planner = MotionPlanner()
-    try:
-        while True:
-            # Example: move forward at 50% speed, slight left turn
-            planner.set_velocity(0.5, -0.2)
-    except KeyboardInterrupt:
-        print("[MotionPlanner] Stopped")
+        self.emergency = False
+
+    # =========================
+    # PLANNING
+    # =========================
+    def plan(self, path):
+        """
+        path = list of waypoints or dict
+        returns motion command dict
+        """
+        if not path:
+            return {"vx": 0, "vy": 0, "w": 0}
+
+        target = path[0]
+
+        dx = target["x"]
+        dy = target["y"]
+
+        distance = math.hypot(dx, dy)
+
+        if distance < 0.05:
+            return {"vx": 0, "vy": 0, "w": 0}
+
+        vx = dx / distance * self.max_vel
+        vy = dy / distance * self.max_vel
+
+        return {"vx": vx, "vy": vy, "w": 0}
+
+    # =========================
+    # EXECUTION
+    # =========================
+    def execute(self, cmd):
+        if self.emergency:
+            self.halt_all()
+            return
+
+        now = time.time()
+        dt = now - self.last_time
+        self.last_time = now
+
+        if dt <= 0:
+            return
+
+        target_vx = self._clamp(cmd.get("vx", 0), self.max_vel)
+        target_vy = self._clamp(cmd.get("vy", 0), self.max_vel)
+        target_w = self._clamp(cmd.get("w", 0), self.max_angular)
+
+        # Apply acceleration limits
+        self.current_vx = self._ramp(self.current_vx, target_vx, dt)
+        self.current_vy = self._ramp(self.current_vy, target_vy, dt)
+        self.current_w = self._ramp(self.current_w, target_w, dt)
+
+        # Send to hardware layer (stub)
+        self._send_to_motors(self.current_vx, self.current_vy, self.current_w)
+
+    # =========================
+    # SAFETY
+    # =========================
+    def halt_all(self):
+        self.current_vx = 0
+        self.current_vy = 0
+        self.current_w = 0
+        self._send_to_motors(0, 0, 0)
+
+    def trigger_emergency(self):
+        self.emergency = True
+        self.halt_all()
+
+    def clear_emergency(self):
+        self.emergency = False
+
+    # =========================
+    # INTERNAL HELPERS
+    # =========================
+    def _ramp(self, current, target, dt):
+        delta = target - current
+        max_delta = self.max_accel * dt
+
+        if abs(delta) > max_delta:
+            delta = math.copysign(max_delta, delta)
+
+        return current + delta
+
+    def _clamp(self, value, limit):
+        return max(min(value, limit), -limit)
+
+    def _send_to_motors(self, vx, vy, w):
+        """
+        Replace this with real motor interface
+        """
+        print(f"[MOTION] vx={vx:.2f} vy={vy:.2f} w={w:.2f}")
