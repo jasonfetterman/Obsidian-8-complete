@@ -1,83 +1,116 @@
-"""
-sensor_fusion.py
-OBSIDIAN-8 V3 — REV D
-Fuses IMU, foot sensors, stereo depth, and object tracking for a unified robot state
-"""
+import time
+import math
 
-import numpy as np
-from imu_reader import IMUReader
-from foot_sensor import FootSensor
-from stereo_depth import StereoDepth
-from object_tracking import ObjectTracker
 
 class SensorFusion:
     def __init__(self):
-        self.imu = IMUReader()
-        self.foot_sensors = FootSensor()
-        self.stereo = StereoDepth()
-        self.tracker = ObjectTracker()
+        # State vector
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0  # heading (rad)
 
-        self.robot_state = {
-            "position": np.zeros(3),  # x, y, z
-            "orientation": np.array([1,0,0,0]),  # quaternion
-            "foot_contact": [False]*8,
-            "tracked_objects": [],
-            "depth_map": None
+        self.vx = 0.0
+        self.vy = 0.0
+
+        self.last_time = time.time()
+
+        # Sensor inputs (latest)
+        self.imu_data = None
+        self.gps_data = None
+        self.encoder_data = None
+
+        # Tuning
+        self.alpha_pos = 0.6
+        self.alpha_vel = 0.5
+        self.alpha_heading = 0.7
+
+    # =========================
+    # SENSOR INPUT METHODS
+    # =========================
+    def update_imu(self, imu):
+        """
+        imu = {
+            'ax': float,
+            'ay': float,
+            'gyro_z': float
         }
-
-    def update(self, frame, detections=None):
         """
-        frame: current RGB frame from camera
-        detections: optional pre-detected objects
+        self.imu_data = imu
+
+    def update_gps(self, gps):
         """
-        # Update IMU
-        self.imu.update()
-        self.robot_state["orientation"] = self.imu.getQuaternion()
-        self.robot_state["acceleration"] = self.imu.getAccel()
-        self.robot_state["gyro"] = self.imu.getGyro()
+        gps = {
+            'x': float,
+            'y': float
+        }
+        """
+        self.gps_data = gps
 
-        # Update foot sensors
-        self.robot_state["foot_contact"] = self.foot_sensors.read()
+    def update_encoders(self, enc):
+        """
+        enc = {
+            'vx': float,
+            'vy': float
+        }
+        """
+        self.encoder_data = enc
 
-        # Update depth
-        depth_oak = self.stereo.get_oakd_depth()
-        depth_rs = self.stereo.get_realsense_depth()
-        self.robot_state["depth_map"] = depth_oak if depth_oak is not None else depth_rs
+    # =========================
+    # MAIN UPDATE LOOP
+    # =========================
+    def update(self):
+        now = time.time()
+        dt = now - self.last_time
+        self.last_time = now
 
-        # Update object tracking
-        if detections is not None:
-            tracked = self.tracker.update(detections)
-            self.robot_state["tracked_objects"] = [
-                {"id": obj.id, "bbox": obj.bbox, "history": list(obj.history)} for obj in tracked
-            ]
+        if dt <= 0:
+            return
 
-        return self.robot_state
+        # ---- IMU INTEGRATION ----
+        if self.imu_data:
+            ax = self.imu_data.get('ax', 0)
+            ay = self.imu_data.get('ay', 0)
+            gyro = self.imu_data.get('gyro_z', 0)
 
-# -------------------- TEST LOOP --------------------
-if __name__ == "__main__":
-    from image_preprocessing import ImagePreprocessor
-    from object_detection import ObjectDetector
-    import cv2
+            # integrate velocity
+            self.vx += ax * dt
+            self.vy += ay * dt
 
-    cap = cv2.VideoCapture(0)
-    preprocessor = ImagePreprocessor()
-    detector = ObjectDetector(model_path="yolov8n.pt", device="cuda")
-    fusion = SensorFusion()
+            # integrate heading
+            self.theta += gyro * dt
 
-    try:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            processed = preprocessor.preprocess(frame)
-            detections = detector.detect(processed)
-            state = fusion.update(frame, detections)
+        # ---- ENCODER FUSION ----
+        if self.encoder_data:
+            evx = self.encoder_data.get('vx', 0)
+            evy = self.encoder_data.get('vy', 0)
 
-            # Print robot orientation and foot contact for debugging
-            print(f"Orientation: {state['orientation']}, Foot Contact: {state['foot_contact']}")
-            print(f"Tracked Objects: {[obj['id'] for obj in state['tracked_objects']]}")
+            self.vx = self.alpha_vel * evx + (1 - self.alpha_vel) * self.vx
+            self.vy = self.alpha_vel * evy + (1 - self.alpha_vel) * self.vy
 
-    except KeyboardInterrupt:
-        cap.release()
-        cv2.destroyAllWindows()
-        print("[SensorFusion] Stopped")
+        # ---- POSITION PREDICTION ----
+        self.x += self.vx * dt
+        self.y += self.vy * dt
+
+        # ---- GPS CORRECTION ----
+        if self.gps_data:
+            gx = self.gps_data.get('x', self.x)
+            gy = self.gps_data.get('y', self.y)
+
+            self.x = self.alpha_pos * gx + (1 - self.alpha_pos) * self.x
+            self.y = self.alpha_pos * gy + (1 - self.alpha_pos) * self.y
+
+        # Normalize heading
+        self.theta = math.atan2(math.sin(self.theta), math.cos(self.theta))
+
+    # =========================
+    # OUTPUT STATE
+    # =========================
+    def get_state(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "theta": self.theta,
+            "vx": self.vx,
+            "vy": self.vy,
+            "timestamp": time.time()
+        }
