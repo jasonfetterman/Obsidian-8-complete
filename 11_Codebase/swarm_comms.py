@@ -1,107 +1,98 @@
-"""
-swarm_comms.py
-OBSIDIAN-8 V3 — REV D
-Manages communication with up to 50 swarm robots
-Handles command distribution, state collection, and shared perception
-"""
-
 import socket
-import threading
 import json
+import threading
 import time
 
+
 class SwarmComms:
-    def __init__(self, swarm_size=50, listen_ip="0.0.0.0", listen_port=9000):
-        self.swarm_size = swarm_size
-        self.listen_ip = listen_ip
+    def __init__(self, listen_port=5005, broadcast_port=5006):
         self.listen_port = listen_port
-        self.bots = {}  # bot_id -> last state
-        self.lock = threading.Lock()
-        self.running = False
+        self.broadcast_port = broadcast_port
 
-        # UDP socket for lightweight state updates and commands
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind((self.listen_ip, self.listen_port))
-        self.sock.settimeout(0.1)  # Non-blocking
-
-        print(f"[SwarmComms] Listening on {self.listen_ip}:{self.listen_port}")
-
-    def start(self):
         self.running = True
-        self.recv_thread = threading.Thread(target=self.receive_loop)
-        self.recv_thread.start()
 
-    def stop(self):
-        self.running = False
-        self.recv_thread.join()
-        self.sock.close()
-        print("[SwarmComms] Stopped")
+        # Latest command
+        self.latest_command = {"vx": 0, "vy": 0, "w": 0}
 
-    # ---------------- Receiving ----------------
-    def receive_loop(self):
+        # Node ID (simple for now)
+        self.node_id = f"node_{int(time.time())}"
+
+        # Socket setup
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind(("", self.listen_port))
+        self.sock.setblocking(False)
+
+        # Start listener thread
+        self.thread = threading.Thread(target=self._listen_loop, daemon=True)
+        self.thread.start()
+
+    # =========================
+    # LISTEN LOOP
+    # =========================
+    def _listen_loop(self):
         while self.running:
             try:
                 data, addr = self.sock.recvfrom(4096)
-                message = json.loads(data.decode("utf-8"))
-                bot_id = message.get("bot_id")
-                state = message.get("state")
-                with self.lock:
-                    if bot_id is not None:
-                        self.bots[bot_id] = {"state": state, "last_seen": time.time(), "addr": addr}
-            except socket.timeout:
-                continue
+                message = json.loads(data.decode())
+
+                if self._validate(message):
+                    self._handle_message(message)
+
+            except BlockingIOError:
+                time.sleep(0.01)
             except Exception as e:
-                print(f"[SwarmComms] Receive error: {e}")
+                print(f"[COMMS ERROR] {e}")
 
-    # ---------------- Sending ----------------
-    def send_command(self, bot_id, command_dict):
-        """
-        command_dict: arbitrary dict with commands (e.g., motion, tasks)
-        """
-        with self.lock:
-            bot_info = self.bots.get(bot_id)
-            if bot_info:
-                addr = bot_info["addr"]
-                msg = json.dumps(command_dict).encode("utf-8")
-                self.sock.sendto(msg, addr)
+    # =========================
+    # MESSAGE HANDLING
+    # =========================
+    def _handle_message(self, msg):
+        msg_type = msg.get("type")
 
-    def broadcast_command(self, command_dict):
-        """Send same command to all known swarm bots"""
-        with self.lock:
-            for bot_id, bot_info in self.bots.items():
-                msg = json.dumps(command_dict).encode("utf-8")
-                self.sock.sendto(msg, bot_info["addr"])
+        if msg_type == "COMMAND":
+            self.latest_command = msg.get("data", self.latest_command)
 
-    # ---------------- Utilities ----------------
-    def get_bot_state(self, bot_id):
-        with self.lock:
-            return self.bots.get(bot_id)
+        elif msg_type == "HEARTBEAT":
+            pass  # future use
 
-    def get_all_states(self):
-        with self.lock:
-            return self.bots.copy()
+        elif msg_type == "TELEMETRY":
+            pass  # future swarm sharing
 
-    def cleanup_inactive(self, timeout=5.0):
-        """Remove bots not seen for a certain period"""
-        with self.lock:
-            now = time.time()
-            inactive = [bot_id for bot_id, info in self.bots.items() if now - info["last_seen"] > timeout]
-            for bot_id in inactive:
-                print(f"[SwarmComms] Removing inactive bot: {bot_id}")
-                del self.bots[bot_id]
+    def _validate(self, msg):
+        return isinstance(msg, dict) and "type" in msg
 
-# -------------------- TEST LOOP --------------------
-if __name__ == "__main__":
-    swarm = SwarmComms(swarm_size=50, listen_port=9000)
-    swarm.start()
-    print("[SwarmComms] Running. Ctrl+C to stop.")
+    # =========================
+    # PUBLIC INTERFACE
+    # =========================
+    def get_teleop_commands(self):
+        return self.latest_command
 
-    try:
-        while True:
-            all_states = swarm.get_all_states()
-            if all_states:
-                print(f"[SwarmComms] Active bots: {list(all_states.keys())}")
-            time.sleep(1.0)
-            swarm.cleanup_inactive(timeout=10.0)
-    except KeyboardInterrupt:
-        swarm.stop()
+    def send_telemetry(self, state):
+        msg = {
+            "type": "TELEMETRY",
+            "node": self.node_id,
+            "data": state
+        }
+        self._broadcast(msg)
+
+    def send_heartbeat(self):
+        msg = {
+            "type": "HEARTBEAT",
+            "node": self.node_id,
+            "timestamp": time.time()
+        }
+        self._broadcast(msg)
+
+    # =========================
+    # NETWORK
+    # =========================
+    def _broadcast(self, message):
+        try:
+            data = json.dumps(message).encode()
+            self.sock.sendto(data, ("<broadcast>", self.broadcast_port))
+        except Exception as e:
+            print(f"[SEND ERROR] {e}")
+
+    def shutdown(self):
+        self.running = False
+        self.sock.close()
