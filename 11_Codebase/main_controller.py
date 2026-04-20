@@ -1,155 +1,134 @@
-"""
-main_controller.py
-OBSIDIAN-8 V3 — REV D
-Main brain and orchestrator for autonomous operation, teleoperation, and swarm control
-"""
-
-import threading
 import time
+import threading
 
-# Internal modules
-from autonomous_mode import AutonomousMode
-from teleop_interface import TeleopInterface
+from motion_planner import MotionPlanner
+from sensor_fusion import SensorFusion
+from path_planner import PathPlanner
 from swarm_comms import SwarmComms
 from power_monitor import PowerMonitor
-from thermal_monitor import ThermalMonitor
-from emergency_stop import EmergencyStop
-from dock_manager import DockManager
-from charge_control import ChargeControl
+from mesh_heartbeat import MeshHeartbeat
 
-class MainController:
+from pi_watchdog.heartbeat_monitor import HeartbeatMonitor
+
+# ===== SYSTEM MODES =====
+MODE_IDLE = "IDLE"
+MODE_TELEOP = "TELEOP"
+MODE_AUTONOMOUS = "AUTONOMOUS"
+MODE_EMERGENCY = "EMERGENCY_STOP"
+
+
+class ObsidianController:
     def __init__(self):
-        # ---------------- Core Modules ----------------
-        print("[MainController] Initializing core modules...")
-        self.autonomous = AutonomousMode(camera_sources=[0,1])
-        self.teleop = TeleopInterface(self.autonomous.motion_planner)
-        self.swarm = SwarmComms(swarm_size=50, listen_port=9000)
+        print("[INIT] Starting OBSIDIAN-8 Controller")
+
+        # Core systems
+        self.sensor_fusion = SensorFusion()
+        self.motion_planner = MotionPlanner()
+        self.path_planner = PathPlanner()
+
+        # Comms
+        self.swarm = SwarmComms()
+        self.mesh = MeshHeartbeat()
+
+        # Health
         self.power = PowerMonitor()
-        self.thermal = ThermalMonitor()
-        self.estop = EmergencyStop()
-        self.dock = DockManager()
-        self.charger = ChargeControl()
+        self.watchdog = HeartbeatMonitor()
 
-        # Operational flags
-        self.running = False
-        self.mode = "autonomous"  # "autonomous" or "teleop"
-        self.lock = threading.Lock()
-
-        # Threads
-        self.monitor_thread = None
-        self.swarm_thread = None
-
-    # ---------------- Startup / Shutdown ----------------
-    def start(self):
-        print("[MainController] Starting main controller...")
+        # State
+        self.mode = MODE_IDLE
         self.running = True
 
-        # Start monitoring loops
-        self.monitor_thread = threading.Thread(target=self.monitor_loop)
-        self.monitor_thread.start()
+        # Thread control
+        self.lock = threading.Lock()
 
-        # Start swarm communication
-        self.swarm.start()
-
-        # Start autonomous / teleop
-        if self.mode == "autonomous":
-            self.autonomous.start()
-        elif self.mode == "teleop":
-            self.teleop.start()
-
-    def stop(self):
-        print("[MainController] Stopping main controller...")
-        self.running = False
-
-        self.autonomous.stop()
-        self.teleop.stop()
-        self.swarm.stop()
-
-        if self.monitor_thread:
-            self.monitor_thread.join()
-        print("[MainController] Shutdown complete.")
-
-    # ---------------- Main Monitoring Loop ----------------
-    def monitor_loop(self):
-        """
-        Continuously checks:
-        - Power levels
-        - Thermal states
-        - Emergency stop
-        - Docking requests
-        """
-        while self.running:
-            # Emergency stop override
-            if self.estop.is_triggered():
-                print("[MainController] EMERGENCY STOP TRIGGERED! Halting all motion.")
-                self.autonomous.motion_planner.execute_trajectory([0]*24)
-                time.sleep(0.1)
-                continue
-
-            # Power check
-            voltage, current = self.power.read_voltage_current()
-            if voltage < 20.0:  # example low-voltage threshold
-                print(f"[MainController] LOW BATTERY: {voltage}V, initiating dock")
-                self.dock.autonomous_dock()
-                self.charger.start_charging()
-
-            # Thermal check
-            temps = self.thermal.read_temperatures()
-            if any(t > 70 for t in temps):
-                print(f"[MainController] OVERHEAT: {temps}, pausing motion")
-                self.autonomous.motion_planner.execute_trajectory([0]*24)
-
-            # Swarm management
-            self.manage_swarm()
-
-            time.sleep(0.1)  # 10 Hz loop
-
-    # ---------------- Swarm Management ----------------
-    def manage_swarm(self):
-        """
-        High-level swarm orchestration:
-        - Collect states
-        - Send coordinated commands
-        - Handle up to 50 bots
-        """
-        all_states = self.swarm.get_all_states()
-
-        for bot_id, bot_info in all_states.items():
-            # Example: maintain distance or formation
-            command = {"action": "hold_position"}
-            self.swarm.send_command(bot_id, command)
-
-    # ---------------- Mode Switching ----------------
-    def set_mode(self, mode):
-        """
-        mode: "autonomous" or "teleop"
-        """
+    # =========================
+    # MODE CONTROL
+    # =========================
+    def set_mode(self, new_mode):
         with self.lock:
-            if mode == self.mode:
-                return
-            # Stop current mode
-            if self.mode == "autonomous":
-                self.autonomous.stop()
-            elif self.mode == "teleop":
-                self.teleop.stop()
+            print(f"[MODE] Switching to {new_mode}")
+            self.mode = new_mode
 
-            # Start new mode
-            self.mode = mode
-            if self.mode == "autonomous":
-                self.autonomous.start()
-            elif self.mode == "teleop":
-                self.teleop.start()
-            print(f"[MainController] Switched to {self.mode} mode")
+    # =========================
+    # MAIN LOOP
+    # =========================
+    def run(self):
+        print("[SYSTEM] Entering main loop")
 
-# -------------------- TEST LOOP --------------------
+        while self.running:
+            try:
+                self.watchdog.kick()
+
+                # Health check first
+                if not self.power.is_power_safe():
+                    print("[FAILSAFE] Power unsafe!")
+                    self.set_mode(MODE_EMERGENCY)
+
+                if self.watchdog.is_system_unhealthy():
+                    print("[FAILSAFE] Watchdog triggered!")
+                    self.set_mode(MODE_EMERGENCY)
+
+                # Mode execution
+                if self.mode == MODE_IDLE:
+                    self.idle_loop()
+
+                elif self.mode == MODE_TELEOP:
+                    self.teleop_loop()
+
+                elif self.mode == MODE_AUTONOMOUS:
+                    self.autonomous_loop()
+
+                elif self.mode == MODE_EMERGENCY:
+                    self.emergency_stop()
+
+                time.sleep(0.02)
+
+            except Exception as e:
+                print(f"[CRITICAL ERROR] {e}")
+                self.set_mode(MODE_EMERGENCY)
+
+    # =========================
+    # MODE LOOPS
+    # =========================
+    def idle_loop(self):
+        # Minimal activity
+        self.sensor_fusion.update()
+
+    def teleop_loop(self):
+        self.sensor_fusion.update()
+        commands = self.swarm.get_teleop_commands()
+        self.motion_planner.execute(commands)
+
+    def autonomous_loop(self):
+        self.sensor_fusion.update()
+
+        world_state = self.sensor_fusion.get_state()
+        path = self.path_planner.compute_path(world_state)
+        motion_cmds = self.motion_planner.plan(path)
+
+        self.motion_planner.execute(motion_cmds)
+
+    def emergency_stop(self):
+        print("[EMERGENCY] STOPPING ALL SYSTEMS")
+        self.motion_planner.halt_all()
+        time.sleep(0.1)
+
+    # =========================
+    # SHUTDOWN
+    # =========================
+    def shutdown(self):
+        print("[SYSTEM] Shutdown initiated")
+        self.running = False
+        self.motion_planner.halt_all()
+
+
+# =========================
+# ENTRY POINT
+# =========================
 if __name__ == "__main__":
-    controller = MainController()
-    controller.start()
-    print("[MainController] Running. Ctrl+C to stop.")
+    controller = ObsidianController()
 
     try:
-        while True:
-            time.sleep(1.0)
+        controller.run()
     except KeyboardInterrupt:
-        controller.stop()
-        print("[MainController] Exited")
+        controller.shutdown()
