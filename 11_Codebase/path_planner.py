@@ -1,66 +1,111 @@
-"""
-path_planner.py
-OBSIDIAN-8 V3 — REV D
-Generates safe trajectories and footstep plans based on sensor input
-"""
+import heapq
+import math
 
-import numpy as np
-from motion_planner import MotionPlanner
 
 class PathPlanner:
-    def __init__(self, num_legs=8):
-        self.motion_planner = MotionPlanner(num_legs=num_legs)
-        self.safe_distance = 100.0  # mm, minimum clearance from obstacles
+    def __init__(self):
+        # Grid settings
+        self.grid_size = 50
+        self.resolution = 0.2  # meters per cell
 
-    def plan_step(self, current_pos, obstacles):
+        # Occupancy grid (0 = free, 1 = obstacle)
+        self.grid = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
+
+        # Goal (set externally)
+        self.goal = {"x": 5.0, "y": 5.0}
+
+    # =========================
+    # PUBLIC INTERFACE
+    # =========================
+    def set_goal(self, x, y):
+        self.goal = {"x": x, "y": y}
+
+    def update_obstacles(self, obstacle_points):
         """
-        Plan next step for robot body given obstacles
-        current_pos: np.array([x, y, z])
-        obstacles: list of dict {"pos": [x,y,z], "radius": r}
-        Returns: velocity command dict {"forward": , "turn": }
+        obstacle_points = [(x, y), ...]
         """
-        forward_cmd = 0.0
-        turn_cmd = 0.0
+        # Reset grid
+        self.grid = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
 
-        # Simple avoidance logic
-        for obs in obstacles:
-            obs_pos = np.array(obs["pos"])
-            distance = np.linalg.norm(obs_pos - current_pos)
-            if distance < self.safe_distance:
-                # Obstacle too close, adjust velocity
-                forward_cmd = -0.5  # back up
-                if obs_pos[1] > current_pos[1]:
-                    turn_cmd = -0.3  # turn left
-                else:
-                    turn_cmd = 0.3   # turn right
-                break
-        else:
-            forward_cmd = 0.5  # normal forward
-            turn_cmd = 0.0
+        for ox, oy in obstacle_points:
+            gx, gy = self._world_to_grid(ox, oy)
+            if self._in_bounds(gx, gy):
+                self.grid[gx][gy] = 1
 
-        return {"forward": forward_cmd, "turn": turn_cmd}
+    def compute_path(self, state):
+        start = self._world_to_grid(state["x"], state["y"])
+        goal = self._world_to_grid(self.goal["x"], self.goal["y"])
 
-    def execute_plan(self, current_pos, obstacles):
-        """
-        High-level execution loop
-        """
-        cmd = self.plan_step(current_pos, obstacles)
-        self.motion_planner.set_velocity(cmd["forward"], cmd["turn"])
-        return cmd
+        path = self._a_star(start, goal)
 
-# -------------------- TEST LOOP --------------------
-if __name__ == "__main__":
-    planner = PathPlanner()
-    current_pos = np.array([0.0, 0.0, 0.0])
+        if not path:
+            return []
 
-    # Example obstacles
-    obstacles = [{"pos": [150, 0, 0], "radius": 50}]
+        # Convert back to world coords
+        return [self._grid_to_world(p[0], p[1]) for p in path]
 
-    try:
-        while True:
-            cmd = planner.execute_plan(current_pos, obstacles)
-            print(f"[PathPlanner] Velocity command: {cmd}")
-            # Simulate movement
-            current_pos[0] += cmd["forward"] * 10  # mm per loop
-    except KeyboardInterrupt:
-        print("[PathPlanner] Stopped")
+    # =========================
+    # A* IMPLEMENTATION
+    # =========================
+    def _a_star(self, start, goal):
+        open_set = []
+        heapq.heappush(open_set, (0, start))
+
+        came_from = {}
+        g_score = {start: 0}
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+
+            if current == goal:
+                return self._reconstruct_path(came_from, current)
+
+            for neighbor in self._neighbors(current):
+                tentative_g = g_score[current] + 1
+
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    g_score[neighbor] = tentative_g
+                    f = tentative_g + self._heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f, neighbor))
+                    came_from[neighbor] = current
+
+        return []
+
+    def _neighbors(self, node):
+        x, y = node
+        dirs = [(1,0), (-1,0), (0,1), (0,-1)]
+
+        results = []
+        for dx, dy in dirs:
+            nx, ny = x + dx, y + dy
+            if self._in_bounds(nx, ny) and self.grid[nx][ny] == 0:
+                results.append((nx, ny))
+        return results
+
+    def _heuristic(self, a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def _reconstruct_path(self, came_from, current):
+        path = [current]
+        while current in came_from:
+            current = came_from[current]
+            path.append(current)
+        path.reverse()
+        return path
+
+    # =========================
+    # UTILITIES
+    # =========================
+    def _world_to_grid(self, x, y):
+        gx = int(x / self.resolution)
+        gy = int(y / self.resolution)
+        return gx, gy
+
+    def _grid_to_world(self, gx, gy):
+        return {
+            "x": gx * self.resolution,
+            "y": gy * self.resolution
+        }
+
+    def _in_bounds(self, x, y):
+        return 0 <= x < self.grid_size and 0 <= y < self.grid_size
