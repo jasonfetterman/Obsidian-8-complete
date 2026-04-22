@@ -1,109 +1,104 @@
+# motion_planner.py — REV B (High-Torque Safe Motion Planning)
+
 import time
 import math
 
+# ---------------- CONFIG ----------------
 
-class MotionPlanner:
+SERVO_COUNT = 8
+
+# Limits
+ANGLE_MIN = 0
+ANGLE_MAX = 180
+
+# Motion constraints
+MAX_SPEED_DEG_PER_SEC = 90      # global cap
+MAX_ACCEL_DEG_PER_SEC2 = 180    # acceleration limit
+
+# Update rate
+UPDATE_HZ = 50
+DT = 1.0 / UPDATE_HZ
+
+# ---------------- STATE ----------------
+
+class ServoState:
     def __init__(self):
-        # Current state
-        self.current_vx = 0.0
-        self.current_vy = 0.0
-        self.current_w = 0.0  # angular velocity
+        self.current = 90.0
+        self.target = 90.0
+        self.velocity = 0.0
 
-        self.last_time = time.time()
+servos = [ServoState() for _ in range(SERVO_COUNT)]
 
-        # Constraints (TUNE THESE TO YOUR HARDWARE)
-        self.max_vel = 1.5          # m/s
-        self.max_accel = 1.0        # m/s^2
-        self.max_angular = 2.0      # rad/s
+# ---------------- CORE FUNCTIONS ----------------
 
-        self.emergency = False
+def clamp(value, min_val, max_val):
+    return max(min_val, min(max_val, value))
 
-    # =========================
-    # PLANNING
-    # =========================
-    def plan(self, path):
-        """
-        path = list of waypoints or dict
-        returns motion command dict
-        """
-        if not path:
-            return {"vx": 0, "vy": 0, "w": 0}
+def set_target(servo_id, angle):
+    if 0 <= servo_id < SERVO_COUNT:
+        servos[servo_id].target = clamp(angle, ANGLE_MIN, ANGLE_MAX)
 
-        target = path[0]
+def update_servo(servo: ServoState):
+    error = servo.target - servo.current
 
-        dx = target["x"]
-        dy = target["y"]
+    # Desired velocity based on error
+    desired_velocity = clamp(error * 2.0, -MAX_SPEED_DEG_PER_SEC, MAX_SPEED_DEG_PER_SEC)
 
-        distance = math.hypot(dx, dy)
+    # Acceleration limiting
+    accel = desired_velocity - servo.velocity
+    accel = clamp(accel, -MAX_ACCEL_DEG_PER_SEC2 * DT, MAX_ACCEL_DEG_PER_SEC2 * DT)
 
-        if distance < 0.05:
-            return {"vx": 0, "vy": 0, "w": 0}
+    servo.velocity += accel
 
-        vx = dx / distance * self.max_vel
-        vy = dy / distance * self.max_vel
+    # Apply velocity
+    servo.current += servo.velocity * DT
 
-        return {"vx": vx, "vy": vy, "w": 0}
+    # Snap to target if close
+    if abs(error) < 0.5:
+        servo.current = servo.target
+        servo.velocity = 0.0
 
-    # =========================
-    # EXECUTION
-    # =========================
-    def execute(self, cmd):
-        if self.emergency:
-            self.halt_all()
-            return
+# ---------------- GROUP MOTION ----------------
 
-        now = time.time()
-        dt = now - self.last_time
-        self.last_time = now
+def set_pose(pose):
+    """
+    pose: list of angles for all servos
+    """
+    for i in range(min(len(pose), SERVO_COUNT)):
+        set_target(i, pose[i])
 
-        if dt <= 0:
-            return
+# ---------------- MAIN LOOP ----------------
 
-        target_vx = self._clamp(cmd.get("vx", 0), self.max_vel)
-        target_vy = self._clamp(cmd.get("vy", 0), self.max_vel)
-        target_w = self._clamp(cmd.get("w", 0), self.max_angular)
+def run_motion_loop(send_callback):
+    """
+    send_callback(servo_id, angle)
+    """
+    while True:
+        start = time.time()
 
-        # Apply acceleration limits
-        self.current_vx = self._ramp(self.current_vx, target_vx, dt)
-        self.current_vy = self._ramp(self.current_vy, target_vy, dt)
-        self.current_w = self._ramp(self.current_w, target_w, dt)
+        for i, servo in enumerate(servos):
+            update_servo(servo)
+            send_callback(i, servo.current)
 
-        # Send to hardware layer (stub)
-        self._send_to_motors(self.current_vx, self.current_vy, self.current_w)
+        elapsed = time.time() - start
+        sleep_time = max(0, DT - elapsed)
+        time.sleep(sleep_time)
 
-    # =========================
-    # SAFETY
-    # =========================
-    def halt_all(self):
-        self.current_vx = 0
-        self.current_vy = 0
-        self.current_w = 0
-        self._send_to_motors(0, 0, 0)
+# ---------------- SAFETY ----------------
 
-    def trigger_emergency(self):
-        self.emergency = True
-        self.halt_all()
+def emergency_stop():
+    for servo in servos:
+        servo.target = servo.current
+        servo.velocity = 0.0
 
-    def clear_emergency(self):
-        self.emergency = False
+# ---------------- EXAMPLE CALLBACK ----------------
 
-    # =========================
-    # INTERNAL HELPERS
-    # =========================
-    def _ramp(self, current, target, dt):
-        delta = target - current
-        max_delta = self.max_accel * dt
+def debug_send(servo_id, angle):
+    print(f"Servo {servo_id}: {angle:.2f}")
 
-        if abs(delta) > max_delta:
-            delta = math.copysign(max_delta, delta)
+# ---------------- ENTRY (OPTIONAL TEST) ----------------
 
-        return current + delta
-
-    def _clamp(self, value, limit):
-        return max(min(value, limit), -limit)
-
-    def _send_to_motors(self, vx, vy, w):
-        """
-        Replace this with real motor interface
-        """
-        print(f"[MOTION] vx={vx:.2f} vy={vy:.2f} w={w:.2f}")
+if __name__ == "__main__":
+    # Example: move all servos to 120 degrees
+    set_pose([120] * SERVO_COUNT)
+    run_motion_loop(debug_send)
