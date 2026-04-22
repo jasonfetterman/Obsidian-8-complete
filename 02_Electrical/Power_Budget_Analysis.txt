@@ -1,219 +1,213 @@
-OBSIDIAN-8 V3
-Power_Budget_Analysis.txt
-Revision: V3.2
-Status: Authoritative
+Power Budget Analysis — REV C (16-Servo Octopod, High-Torque System)
 
-------------------------------------------------------------
-1. PURPOSE
-------------------------------------------------------------
+OVERVIEW
+This document defines the electrical power requirements for OBSIDIAN-8 configured with 16 high-torque servos (150KG-class), onboard compute, and supporting electronics.
 
-Define quantitative power consumption model for OBSIDIAN-8 V3.
+--------------------------------------------------
 
-This document establishes:
+SYSTEM VOLTAGES
 
-- Peak current draw
-- Average current draw
-- Energy capacity modeling
-- Mission duration estimates
-- Safety energy margins
+Servo Power Rail:
+- Nominal: 7.4V (2S LiPo)
+- Range: 6.4V – 8.4V
 
-All energy-aware navigation logic must align with this model.
+Logic Power Rail:
+- 5V regulated (buck converter from main battery)
 
-------------------------------------------------------------
-2. BATTERY CONFIGURATION ASSUMPTION
-------------------------------------------------------------
+--------------------------------------------------
 
-Example Baseline Configuration:
+SERVO POWER CHARACTERISTICS
 
-Chemistry: LiFePO4  
-Nominal Voltage: 25.6 V (8S)  
-Capacity: 20 Ah  
-Total Energy:  
+Servo Class:
+- 150KG·cm high-torque digital servos
 
-Energy (Wh) = Voltage × Capacity  
-Energy = 25.6 V × 20 Ah = 512 Wh  
+Per-Servo Estimates (based on typical spec for this class):
+- Idle: 0.2 A
+- Moving (no load): 1.5 A
+- Moderate load: 4–6 A
+- Peak stall: 8–10 A
 
-Usable energy (80% safety window):  
+Design Basis (used for calculations):
+- Average active current per servo: 5 A
+- Peak transient per servo: 8 A
 
-512 Wh × 0.80 = 409.6 Wh usable
+--------------------------------------------------
 
-------------------------------------------------------------
-3. SUBSYSTEM POWER DRAW
-------------------------------------------------------------
+SYSTEM CURRENT CALCULATION
 
-3.1 Servo Actuators
+Total Servos:
+- 16
 
-Idle current per servo: 0.2 A  
-Active walking average per servo: 1.5 A  
-Peak torque per servo: 4.0 A  
+Average Operating Current:
+- 16 × 5 A = 80 A
 
-Assume 12 servos.
+Peak Transient Current:
+- 16 × 8 A = 128 A
 
-Idle total:
-0.2 A × 12 = 2.4 A
+Realistic Peak (wave gait, not all stall simultaneously):
+- 60–90 A typical spikes
+- Worst-case electrical design must handle 120 A
 
-Active walking average:
-1.5 A × 12 = 18 A
+--------------------------------------------------
 
-Peak load:
-4.0 A × 12 = 48 A
+LOGIC SYSTEM LOAD
 
-------------------------------------------------------------
+Raspberry Pi:
+- 2.5 – 3.0 A @ 5V
 
-3.2 Compute Stack
+Teensy:
+- ~0.1 A
 
-Main compute: 3.0 A @ 5V → 15 W  
-Reactive MCU: 0.5 A @ 5V → 2.5 W  
-Sensors (camera + depth + IMU): 10 W  
+Sensors + peripherals:
+- ~0.5 A
 
-Total compute power ≈ 27.5 W  
+Total Logic Load:
+- ~3.5 – 4.0 A @ 5V
 
-At 25.6 V system rail:  
-27.5 W ÷ 25.6 V ≈ 1.07 A
+Converted to battery side (~7.4V with 90% efficiency):
+- ~2.5 – 3.0 A
 
-------------------------------------------------------------
+--------------------------------------------------
 
-3.3 Auxiliary Systems
+TOTAL SYSTEM LOAD
 
-Wireless communication: 5 W  
-Cooling fans (if active): 5 W  
+Average Total Current:
+- ~82–85 A
 
-Total auxiliary ≈ 10 W  
-Current at 25.6 V ≈ 0.39 A
+Peak Total Current:
+- ~120–130 A
 
-------------------------------------------------------------
-4. TOTAL CURRENT DRAW ESTIMATION
-------------------------------------------------------------
+--------------------------------------------------
 
-Idle (standing):
+BATTERY REQUIREMENTS
 
-Servo idle: 2.4 A  
-Compute: 1.07 A  
-Auxiliary: 0.39 A  
+Battery Type:
+- LiPo (high discharge)
 
-Total idle ≈ 3.86 A  
+Recommended Configuration:
+- 2S (7.4V nominal)
 
-------------------------------------------------------------
+Capacity:
+- Minimum: 5000 mAh
+- Recommended: 8000–10000 mAh
 
-Walking (average terrain):
+Discharge Rating:
 
-Servo average: 18 A  
-Compute: 1.07 A  
-Auxiliary: 0.39 A  
+Required Continuous Current:
+- ≥ 100 A
 
-Total walking ≈ 19.46 A  
+Required Burst Current:
+- ≥ 130 A
 
-------------------------------------------------------------
+C Rating Calculation (example 8000 mAh):
+- 8 Ah × 20C = 160 A (acceptable)
+- Recommended minimum: 25C
 
-Peak dynamic maneuver:
+FINAL SPEC:
+- 2S 8000 mAh 25C (or higher)
 
-Servo peak: 48 A  
-Compute: 1.07 A  
-Auxiliary: 0.39 A  
+--------------------------------------------------
 
-Total peak ≈ 49.46 A  
+POWER DISTRIBUTION
 
-BMS and wiring must support ≥ 50 A continuous margin.
+Main Battery → XT90 Connector → Main Fuse → Power Bus
 
-------------------------------------------------------------
-5. MISSION DURATION ESTIMATION
-------------------------------------------------------------
+Branches:
+- Servo Power Bus (direct high-current path)
+- Buck Converter → 5V Logic Rail
 
-Using usable energy: 409.6 Wh  
+--------------------------------------------------
 
-Average walking power:
+PROTECTION
 
-Power = Voltage × Current  
-Power = 25.6 V × 19.46 A ≈ 498 W  
+Main Fuse:
+- 120 A automotive fuse (slow-blow)
 
-Mission duration (continuous walking):
+Per-Branch Protection:
+- Optional 20–30 A branch fuses for servo groups
 
-409.6 Wh ÷ 498 W ≈ 0.82 hours  
+Kill Switch:
+- Inline with servo power rail only
 
-≈ 49 minutes continuous walking
+--------------------------------------------------
 
-------------------------------------------------------------
+WIRING REQUIREMENTS
 
-Idle mission duration:
+Main Battery Leads:
+- 10–12 AWG
 
-Idle power ≈ 25.6 V × 3.86 A ≈ 99 W  
+Servo Distribution:
+- 14–16 AWG trunk lines
+- 18 AWG to individual servos
 
-409.6 Wh ÷ 99 W ≈ 4.1 hours idle
+Grounding:
+- Common ground reference required
 
-------------------------------------------------------------
-6. ENERGY SAFETY MARGINS
-------------------------------------------------------------
+--------------------------------------------------
 
-Mandatory reserve margin: 20%
+CAPACITANCE (CRITICAL)
 
-Mission planner must:
+Bulk Capacitors on Servo Rail:
+- Minimum: 2 × 2200 µF low-ESR electrolytic
 
-- Trigger reduced capability at 30% SOC
-- Trigger return-to-base at 25% SOC
-- Trigger critical stop at 15% SOC
-- Never allow drop below 10% SOC during motion
+Placement:
+- Near servo distribution center
 
-Pre-BMS cutoff margin must be enforced.
+Purpose:
+- Absorb transient current spikes
+- Reduce voltage sag
 
-------------------------------------------------------------
-7. THERMAL POWER CONSIDERATION
-------------------------------------------------------------
+--------------------------------------------------
 
-Peak power events generate:
+THERMAL LOAD
 
-Peak servo power:
-25.6 V × 48 A ≈ 1228 W instantaneous
+High Current Areas:
+- Battery leads
+- Connectors
+- Distribution points
 
-Thermal design must dissipate
-sustained loads without exceeding:
+Requirements:
+- Airflow around power components
+- No enclosed heat buildup
 
-Servo temperature limit
-Battery temperature limit
-Regulator temperature limit
+--------------------------------------------------
 
-------------------------------------------------------------
-8. WIRING AND CONNECTOR REQUIREMENTS
-------------------------------------------------------------
+RUNTIME ESTIMATION
 
-Continuous rating must exceed:
+Example: 8000 mAh battery
 
-1.5 × maximum sustained current
+Average draw: 80 A
 
-Recommended continuous rating ≥ 75 A
+Runtime:
+- 8 Ah / 80 A = 0.1 hr ≈ 6 minutes
 
-Voltage drop under peak load must remain
-within acceptable tolerance.
+Realistic mixed usage:
+- 6–10 minutes depending on gait and load
 
-------------------------------------------------------------
-9. RANGE ESTIMATION EXAMPLE
-------------------------------------------------------------
+--------------------------------------------------
 
-If average walking speed = 0.5 m/s  
+FAILURE RISKS
 
-Distance per hour:
-0.5 m/s × 3600 s = 1800 m/hour  
+Undersized battery:
+- Voltage sag
+- System resets
 
-At 49 minutes continuous walking:
+Undersized wiring:
+- Overheating
+- Fire risk
 
-~1470 meters theoretical max range  
+Insufficient capacitance:
+- Control instability
 
-Range must subtract 20% reserve margin.
+--------------------------------------------------
 
-------------------------------------------------------------
-10. DESIGN INTENT
-------------------------------------------------------------
+DESIGN CONSTRAINTS
 
-This power budget ensures:
+- System must handle 120 A peak without failure
+- Voltage must remain stable under load
+- Wiring must be rated above maximum current
+- Logic rail must remain isolated and stable
 
-- Energy-aware navigation remains grounded in physics
-- Battery sizing matches mission expectations
-- Wiring and BMS rated appropriately
-- Thermal envelope not exceeded
-- Brownout risk minimized
+--------------------------------------------------
 
-Energy modeling must remain synchronized
-with real-world telemetry calibration.
-
-------------------------------------------------------------
-END OF FILE
-------------------------------------------------------------
+STATUS: ACTIVE
