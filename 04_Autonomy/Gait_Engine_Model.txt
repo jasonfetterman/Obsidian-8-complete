@@ -1,172 +1,198 @@
-OBSIDIAN-8 V3 – GAIT ENGINE MODEL
-Revision: V3.0
-Status: Baseline Locked
+Gait Engine Model — REV B (High-Torque Quadruped Control)
 
-------------------------------------------------------------
-1. DESIGN PHILOSOPHY
-------------------------------------------------------------
+OVERVIEW
+This document defines the gait generation system for OBSIDIAN-8. The gait engine produces coordinated leg motion patterns that maintain stability, minimize power spikes, and operate within the limits of 150KG-class servos.
 
-Movement must be:
+--------------------------------------------------
 
-- Deterministic
-- Geometry-aware
-- Energy-aware
-- Stability-prioritized
+SYSTEM OBJECTIVES
 
-Motion timing is isolated from AI inference timing.
+- Maintain static and dynamic stability
+- Distribute load across multiple legs
+- Prevent sudden torque spikes
+- Ensure smooth, continuous motion
+- Operate safely within actuator limits
 
-Servo PWM handled by Maestro.
+--------------------------------------------------
 
-Gait logic runs in Jetson autonomy layer.
+GAIT TYPE
 
-------------------------------------------------------------
-2. PRIMARY GAIT – TRIPOD
-------------------------------------------------------------
+Primary Gait:
+- Alternating diagonal gait (trot-style)
 
-Tripod Set A:
-LF, RM, LR
+Groups:
+- Group A: Front Left + Rear Right
+- Group B: Front Right + Rear Left
 
-Tripod Set B:
-RF, LM, RR
+At all times:
+- One group supports load
+- One group transitions (lift + move)
 
-At any time:
-One tripod supports full body weight.
-Opposing tripod swings.
+--------------------------------------------------
 
-CG must remain inside support triangle.
+GAIT PHASES
 
-------------------------------------------------------------
-3. GAIT PHASE MODEL
-------------------------------------------------------------
+Each step cycle consists of two phases:
 
-Phase 1 – Lift
-- Lift swing tripod to defined height
-- Maintain support tripod torque
+Phase 0:
+- Group A: swing phase (lift and move forward)
+- Group B: stance phase (support and stabilize)
 
-Phase 2 – Swing
-- Move swing legs forward
-- Maintain pitch compensation
+Phase 1:
+- Group B: swing phase
+- Group A: stance phase
 
-Phase 3 – Plant
-- Controlled foot placement
-- Confirm contact
+Phase Duration:
+- Default: 0.5 seconds per phase
+- Adjustable based on speed mode
 
-Phase 4 – Transfer
-- Shift load to newly planted tripod
-- Repeat cycle
+--------------------------------------------------
 
-Gait frequency dynamically adjustable.
+MOTION COMPONENTS
 
-------------------------------------------------------------
-4. STRIDE PARAMETERS
-------------------------------------------------------------
+Each leg movement consists of:
 
-Normal Mode:
-Moderate stride length
-Moderate lift height (80–120 mm)
+1. Lift Phase
+   - Knee joint flexion
+   - Reduces ground contact force
 
-Aggression Mode:
-Increased stride length
-Increased frequency
-Higher current draw
+2. Swing Phase
+   - Hip joint advances leg forward
 
-Conservation Mode:
-Short stride
-Reduced frequency
-Energy prioritization
+3. Placement Phase
+   - Leg returns to ground smoothly
 
-------------------------------------------------------------
-5. STAIR MODE
-------------------------------------------------------------
+4. Load Transfer
+   - Weight shifts gradually to the newly placed leg
 
-Activated when:
-Depth sensor detects vertical obstacle ≤200 mm.
+--------------------------------------------------
 
-Behavior:
+STABILITY MODEL
 
-- Reduce gait frequency
-- Increase lift arc ≥200 mm
-- Shift CG forward before lift
-- Use body pitch compensation
+Static Stability:
+- Minimum of two legs on ground at all times
+- Center of gravity must remain within support polygon
 
-Abort Conditions:
+Dynamic Stability:
+- Controlled via smooth transitions between phases
+- Avoid abrupt shifts in load distribution
 
-- Tilt > 10°
-- Current spike beyond threshold
-- Voltage sag
-- Foot contact failure
+Constraints:
+- No simultaneous lift of all legs
+- No rapid center-of-mass shifts
 
-------------------------------------------------------------
-6. LOW-CLEARANCE CROUCH MODE
-------------------------------------------------------------
+--------------------------------------------------
 
-Activated when:
+LOAD MANAGEMENT
 
-- Low overhead clearance detected
-- Energy-critical state
-- Fault escalation
+Critical Requirement:
+- Limit torque spikes on any single joint
 
-Behavior:
+Methods:
+- Stagger leg lift timing slightly within group
+- Smooth motion profiles (handled by motion planner)
+- Avoid full load transfer in a single time step
 
-- Lower body height
-- Reduce stride length
-- Limit maximum pitch
+Target:
+- Keep individual servo load below 70% of rated torque during normal operation
 
-Crouch is mechanically stable safe state.
+--------------------------------------------------
 
-------------------------------------------------------------
-7. ENERGY-AWARE GAIT SCALING
-------------------------------------------------------------
+SPEED CONTROL
 
-If voltage drops below threshold:
+Speed is controlled by:
+- Phase duration
+- Step length (hip angle offset)
 
-- Reduce aggression
-- Shorten stride
-- Increase stability bias
+Modes:
 
-If projected energy < return reserve:
+1. Slow / Precision Mode
+   - Longer phase duration
+   - Smaller step size
+   - Maximum stability
 
-Force RETURN_TO_DOCK.
+2. Normal Mode
+   - Balanced parameters
 
-------------------------------------------------------------
-8. REACTIVE INTERRUPTS
-------------------------------------------------------------
+3. Fast Mode
+   - Shorter phase duration
+   - Larger step size
+   - Increased instability risk
 
-Reactive layer can override gait if:
+--------------------------------------------------
 
-- Obstacle detected mid-swing
-- Foot contact lost
-- Excessive tilt detected
-- Terrain instability detected
+ENERGY EFFICIENCY
 
-Reactive interrupt pauses gait cycle safely.
+Goals:
+- Minimize unnecessary vertical motion
+- Avoid rapid acceleration/deceleration
+- Maintain consistent stride timing
 
-------------------------------------------------------------
-9. STABILITY ENFORCEMENT
-------------------------------------------------------------
+Impact:
+- Reduced current draw
+- Lower thermal load
+- Extended runtime
 
-Before each tripod transfer:
+--------------------------------------------------
 
-Verify CG projection inside support polygon.
+TERRAIN HANDLING (BASELINE)
 
-If outside threshold:
+Current Capability:
+- Flat terrain operation
 
-Delay transfer.
-Adjust body pitch.
-Reduce stride length.
+Limitations:
+- No adaptive height control
+- No terrain sensing integration
 
-------------------------------------------------------------
-10. DESIGN SIGNATURE
-------------------------------------------------------------
+Future Enhancements:
+- Foot contact sensing
+- Adaptive step height
+- Terrain classification integration
 
-OBSIDIan-8 gait engine:
+--------------------------------------------------
 
-- Never relies on servo stall torque
-- Avoids full extension under load
-- Adapts stride based on energy
-- Prioritizes stability over speed
-- Degrades safely under fault conditions
+FAILURE CONDITIONS
 
-------------------------------------------------------------
-END OF GAIT ENGINE MODEL
-------------------------------------------------------------
+Instability may occur if:
+- Phase timing is too fast
+- Load shifts too abruptly
+- Servo limits are exceeded
+
+Symptoms:
+- Slipping
+- Tipping
+- Excessive current draw
+
+Mitigation:
+- Reduce speed
+- Reduce step size
+- Increase phase duration
+
+--------------------------------------------------
+
+SYSTEM INTEGRATION
+
+Inputs:
+- Desired movement direction and speed
+- Base pose from kinematics system
+
+Outputs:
+- Target joint angles for all servos
+
+Dependencies:
+- motion_scheduler.py (phase timing)
+- motion_planner.py (smoothing and limits)
+- servo_driver.cpp (execution)
+
+--------------------------------------------------
+
+DESIGN CONSTRAINTS
+
+- Must operate within actuator torque limits
+- Must maintain continuous ground contact stability
+- Must not generate abrupt motion commands
+- Must remain synchronized with control loop timing
+
+--------------------------------------------------
+
+STATUS: ACTIVE
