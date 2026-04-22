@@ -1,192 +1,269 @@
-OBSIDIAN-8 V3
-Failure_Modes_and_Effects_Analysis.txt
-Revision: V3.3
-Status: Authoritative
+Failure Modes and Effects Analysis (FMEA) — REV B (150KG Servo System)
 
-------------------------------------------------------------
-1. PURPOSE
-------------------------------------------------------------
+OVERVIEW
+This document identifies potential failure modes within OBSIDIAN-8, evaluates their impact, and defines mitigation strategies. This revision reflects the integration of high-torque servo systems, distributed control, and high-current power architecture.
 
-Provide structured Failure Modes and Effects Analysis (FMEA)
-for OBSIDIAN‑8 V3.
+--------------------------------------------------
 
-Each failure mode includes:
-- Failure ID  
-- Subsystem  
-- Failure Mode  
-- Cause  
-- Effect  
-- Severity (S)  
-- Occurrence (O)  
-- Detection (D)  
-- Risk Priority Number (RPN = S × O × D)  
-- Mitigation  
+RISK CLASSIFICATION
 
-Severity, Occurrence, Detection scale: 1 (Low) to 5 (High).
+Severity Levels:
+- LOW: Minor performance degradation
+- MEDIUM: Loss of function, recoverable
+- HIGH: System instability or shutdown
+- CRITICAL: Hardware damage or safety risk
 
-------------------------------------------------------------
-2. FAILURE MODE TABLE
-------------------------------------------------------------
+--------------------------------------------------
 
-FM‑001  
-Subsystem: Reactive Controller  
-Failure Mode: Process crash during motion  
-Cause: Software exception  
-Effect: Loss of motion supervision  
-S: 4  O: 2  D: 1  RPN: 8  
-Mitigation: Watchdog kill‑line activation  
+FAILURE MODE 1 — SERVO OVERCURRENT
 
-------------------------------------------------------------
+Cause:
+- Sudden position changes
+- Mechanical binding
+- Excessive load
 
-FM‑002  
-Subsystem: Mission Compute  
-Failure Mode: Navigation process freeze  
-Cause: Deadlock or memory exhaustion  
-Effect: Stalled commands  
-S: 2  O: 3  D: 2  RPN: 12  
-Mitigation: Reactive heartbeat timeout → STOP  
+Effect:
+- Voltage drop
+- System instability
+- Potential servo damage
 
-------------------------------------------------------------
+Severity:
+- HIGH
 
-FM‑003  
-Subsystem: Battery System  
-Failure Mode: Undervoltage during movement  
-Cause: SOC miscalculation or overload  
-Effect: Brownout, instability  
-S: 4  O: 3  D: 2  RPN: 24  
-Mitigation: Energy‑aware navigation + pre‑cutoff stop  
+Mitigation:
+- Motion smoothing (motion_planner.py)
+- Current-aware gait design
+- Power system sized for peak load
+- Fuse protection per branch
 
-------------------------------------------------------------
+--------------------------------------------------
 
-FM‑004  
-Subsystem: Servo Actuator  
-Failure Mode: Overheating under sustained load  
-Cause: High torque demand  
-Effect: Torque loss or shutdown  
-S: 3  O: 3  D: 3  RPN: 27  
-Mitigation: Thermal monitoring + torque limiting  
+FAILURE MODE 2 — POWER BROWNOUT
 
-------------------------------------------------------------
+Cause:
+- High simultaneous servo load
+- Undersized battery or wiring
+- Voltage sag under load
 
-FM‑005  
-Subsystem: Frame Structure  
-Failure Mode: Structural crack  
-Cause: Fatigue or impact  
-Effect: Reduced stability  
-S: 4  O: 2  D: 3  RPN: 24  
-Mitigation: Scheduled inspection + load testing  
+Effect:
+- Raspberry Pi reset
+- Loss of control
+- Unpredictable behavior
 
-------------------------------------------------------------
+Severity:
+- CRITICAL
 
-FM‑006  
-Subsystem: Watchdog  
-Failure Mode: Pi power failure  
-Cause: Regulator fault  
-Effect: Loss of supervision  
-S: 4  O: 1  D: 1  RPN: 4  
-Mitigation: Fail‑safe kill‑line default open  
+Mitigation:
+- Separate logic and servo power rails
+- Bulk capacitance on servo lines
+- High-discharge battery (50C+)
+- Dedicated voltage regulation for logic
 
-------------------------------------------------------------
+--------------------------------------------------
 
-FM‑007  
-Subsystem: Communication  
-Failure Mode: Encrypted link compromise  
-Cause: Credential leak  
-Effect: Unauthorized command injection  
-S: 4  O: 2  D: 3  RPN: 24  
-Mitigation: Authentication validation + event logging + key revocation  
-Reference: /00_System_Definition/Cybersecurity_Threat_Model.txt  (T1, T2, T7)
+FAILURE MODE 3 — LOSS OF CONTROL SIGNAL
 
-------------------------------------------------------------
+Cause:
+- Communication failure (Pi ↔ Teensy)
+- Software crash
+- Cable disconnection
 
-FM‑008  
-Subsystem: Sensor Suite  
-Failure Mode: IMU drift  
-Cause: Calibration error  
-Effect: Pose misestimation  
-S: 3  O: 3  D: 3  RPN: 27  
-Mitigation: Auto‑calibration routine + sanity checks  
+Effect:
+- Frozen or drifting servo positions
+- Potential instability
 
-------------------------------------------------------------
+Severity:
+- HIGH
 
-FM‑009  
-Subsystem: Power Distribution  
-Failure Mode: Servo rail short circuit  
-Cause: Harness damage  
-Effect: Immediate power instability  
-S: 5  O: 1  D: 2  RPN: 10  
-Mitigation: Current limiting + BMS cutoff  
+Mitigation:
+- Teensy watchdog timeout
+- Hold-last-position behavior
+- Hardware kill line system
 
-------------------------------------------------------------
+--------------------------------------------------
 
-FM‑010  
-Subsystem: Docking System  
-Failure Mode: Misalignment collision  
-Cause: Perception error  
-Effect: Minor structural impact  
-S: 3  O: 2  D: 3  RPN: 18  
-Mitigation: Reduced docking speed + tolerance enforcement  
+FAILURE MODE 4 — RUNAWAY ACTUATION
 
-------------------------------------------------------------
+Cause:
+- Software bug
+- Invalid command data
+- Memory corruption
 
-FM‑011  
-Subsystem: Authority Model  
-Failure Mode: Dual control conflict  
-Cause: Software bug / race condition  
-Effect: Command inconsistency  
-S: 3  O: 2  D: 2  RPN: 12  
-Mitigation: Watchdog authority coherence validation  
+Effect:
+- Uncontrolled servo movement
+- Mechanical damage
+- Safety hazard
 
-------------------------------------------------------------
+Severity:
+- CRITICAL
 
-FM‑012  
-Subsystem: Energy Model  
-Failure Mode: SOC estimation drift  
-Cause: Sensor offset or temperature variance  
-Effect: Premature or delayed shutdown  
-S: 3  O: 3  D: 3  RPN: 27  
-Mitigation: Calibration routine + telemetry validation  
+Mitigation:
+- Command validation
+- Motion limits in firmware
+- Emergency kill line (hardware cutoff)
+- Rate limiting and acceleration limits
 
-------------------------------------------------------------
+--------------------------------------------------
 
-FM‑013  
-Subsystem: Maestro Board Interface  
-Failure Mode: Loss of servo signal update  
-Cause: USB/UART desynchronization or board reset  
-Effect: Stuck servo position / unresponsive actuation  
-S: 4  O: 2  D: 3  RPN: 24  
-Mitigation: Periodic channel heartbeat verification + auto re‑init on loss  
-Reference: /02_Electrical/Maestro_Controller_Interface.txt  
+FAILURE MODE 5 — STRUCTURAL FAILURE
 
-------------------------------------------------------------
-3. RPN INTERPRETATION
-------------------------------------------------------------
+Cause:
+- Frame not rated for servo torque
+- Material fatigue
+- Poor fastener integrity
 
-RPN ≥ 25 → Immediate engineering review + mitigation strengthening  
-RPN 15–24 → Acceptable with active monitoring and validation  
-RPN < 15 → Controlled risk with defined mitigation  
+Effect:
+- Frame deformation
+- Misalignment
+- Catastrophic mechanical failure
 
-------------------------------------------------------------
-4. REVIEW POLICY
-------------------------------------------------------------
+Severity:
+- CRITICAL
 
-FMEA must be reviewed:
-- Before Phase 2 exit  
-- After Class A design changes  
-- After critical field incident  
-- Annually during production  
-- When new board or firmware module added  
+Mitigation:
+- Reinforced frame design
+- Proper material selection (aluminum/steel)
+- Regular inspection and torque checks
+- Load distribution through structure
 
-------------------------------------------------------------
-5. DESIGN INTENT
-------------------------------------------------------------
+--------------------------------------------------
 
-FMEA enforces proactive evaluation of failure pathways,
-prioritizes mitigation effort,
-and supports predictable system behavior.
+FAILURE MODE 6 — THERMAL OVERLOAD
 
-All failures must remain detectable, contained, and recoverable.
+Cause:
+- Sustained high current draw
+- Poor ventilation
+- Undersized components
 
-------------------------------------------------------------
-END OF FILE
-------------------------------------------------------------
+Effect:
+- Servo overheating
+- Battery degradation
+- Component failure
+
+Severity:
+- HIGH
+
+Mitigation:
+- Thermal-aware operation
+- Adequate airflow
+- Temperature monitoring (thermal_monitor.cpp)
+- Conservative duty cycles
+
+--------------------------------------------------
+
+FAILURE MODE 7 — WIRING FAILURE
+
+Cause:
+- Poor routing
+- Lack of strain relief
+- Vibration fatigue
+
+Effect:
+- Intermittent signals
+- Power loss
+- System instability
+
+Severity:
+- HIGH
+
+Mitigation:
+- Proper cable routing and separation
+- Strain relief at all connection points
+- Regular inspection
+
+--------------------------------------------------
+
+FAILURE MODE 8 — GROUNDING / NOISE ISSUES
+
+Cause:
+- Improper grounding
+- Signal interference from high-current lines
+
+Effect:
+- Erratic servo behavior
+- Communication errors
+
+Severity:
+- MEDIUM
+
+Mitigation:
+- Single-point ground design
+- Separation of power and signal wiring
+- Shielding or twisted pair for signals
+
+--------------------------------------------------
+
+FAILURE MODE 9 — GAIT INSTABILITY
+
+Cause:
+- Poor phase timing
+- Excessive speed
+- Uneven load distribution
+
+Effect:
+- Slipping
+- Tipping
+- Increased power draw
+
+Severity:
+- HIGH
+
+Mitigation:
+- Controlled gait scheduling
+- Conservative default parameters
+- Gradual speed scaling
+
+--------------------------------------------------
+
+FAILURE MODE 10 — CONNECTOR FAILURE
+
+Cause:
+- Underrated connectors
+- Vibration loosening
+- Heat buildup
+
+Effect:
+- Power interruption
+- Arcing or damage
+
+Severity:
+- HIGH
+
+Mitigation:
+- Use XT60/XT90 connectors
+- Secure all connections
+- Inspect regularly
+
+--------------------------------------------------
+
+SYSTEM-LEVEL SAFETY STRATEGY
+
+Layered Protection:
+
+1. Software Layer
+   - Motion limits
+   - Watchdog timers
+
+2. Electrical Layer
+   - Fuses
+   - Voltage regulation
+   - Power isolation
+
+3. Hardware Layer
+   - Kill switch
+   - Structural integrity
+
+No single failure should result in uncontrolled behavior.
+
+--------------------------------------------------
+
+VALIDATION REQUIREMENTS
+
+- Simulated fault injection (software)
+- Physical kill switch testing
+- Load testing under worst-case conditions
+- Thermal stress testing
+
+--------------------------------------------------
+
+STATUS: ACTIVE
