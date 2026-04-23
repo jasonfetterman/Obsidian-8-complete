@@ -1,4 +1,4 @@
-# main_controller.py — REV C (Thermal Latch-Aware Integration)
+# main_controller.py — REV D (Fully Integrated + Logging + Thermal Latch Safe)
 
 import time
 import threading
@@ -7,19 +7,21 @@ import serial
 from motion_planner import run_motion_loop, set_pose
 from motion_scheduler import run_scheduler, reset_gait
 
+from system_logger import log_thermal, log_motion, log_system, log_fault
+
 # ---------------- CONFIG ----------------
 
-SERIAL_PORT = "COM3"   # UPDATE if needed
+SERIAL_PORT = "COM3"   # UPDATE THIS
 BAUD_RATE = 115200
 
-HEARTBEAT_INTERVAL = 0.02  # 50 Hz
+HEARTBEAT_INTERVAL = 0.02
 
 BASE_POSE = [90.0] * 16
 
 # ---------------- STATE ----------------
 
 running = True
-thermal_state = "NORMAL"   # NORMAL / WARNING / LATCHED
+thermal_state = "NORMAL"  # NORMAL / WARNING / LATCHED
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.01)
 
@@ -29,11 +31,7 @@ def send_servo_command(servo_id, angle, speed):
     cmd = f"{servo_id},{angle:.2f},{speed}\n"
     ser.write(cmd.encode())
 
-def send_pose(pose, speed):
-    for i, angle in enumerate(pose):
-        send_servo_command(i, angle, speed)
-
-# ---------------- THERMAL HANDLING ----------------
+# ---------------- THERMAL ----------------
 
 def handle_thermal_message(msg):
     global thermal_state
@@ -42,15 +40,18 @@ def handle_thermal_message(msg):
         if thermal_state != "WARNING":
             print("[THERMAL] WARNING — throttling")
         thermal_state = "WARNING"
+        log_thermal("WARNING")
 
     elif "THERMAL_SHUTDOWN_LATCHED" in msg:
         print("[THERMAL] CRITICAL — LATCHED SHUTDOWN")
         thermal_state = "LATCHED"
+        log_thermal("SHUTDOWN_LATCHED")
         emergency_stop(latched=True)
 
     elif "THERMAL_MANUAL_RESET" in msg:
-        print("[THERMAL] MANUAL RESET — awaiting operator restart")
+        print("[THERMAL] MANUAL RESET")
         thermal_state = "NORMAL"
+        log_thermal("MANUAL_RESET")
 
 # ---------------- SERIAL LISTENER ----------------
 
@@ -77,7 +78,6 @@ def heartbeat_loop():
 # ---------------- MOTION CALLBACK ----------------
 
 def motion_send_callback(servo_id, angle):
-    # Block all motion if latched
     if thermal_state == "LATCHED":
         return
 
@@ -86,6 +86,7 @@ def motion_send_callback(servo_id, angle):
         speed = 40
 
     send_servo_command(servo_id, angle, speed)
+    log_motion(servo_id, angle, speed)
 
 # ---------------- BASE POSE ----------------
 
@@ -97,18 +98,18 @@ def get_base_pose():
 def emergency_stop(latched=False):
     global running
 
+    log_fault("Emergency stop triggered")
+
     print("[SYSTEM] Emergency stop")
 
-    # Freeze motion immediately
     set_pose(BASE_POSE)
     reset_gait()
 
-    # If latched, we halt everything until manual restart (new process run)
     if latched:
-        print("[SYSTEM] Latched state — restart required")
+        log_fault("System latched — restart required")
         running = False
 
-# ---------------- THREAD CONTROL ----------------
+# ---------------- THREADS ----------------
 
 def start_threads():
     threading.Thread(target=serial_listener, daemon=True).start()
@@ -130,6 +131,7 @@ def main():
     global running
 
     print("=== OBSIDIAN-8 CONTROL START ===")
+    log_system("Controller started")
 
     start_threads()
 
@@ -143,6 +145,7 @@ def main():
 
     finally:
         ser.close()
+        log_system("Controller stopped")
         print("=== SYSTEM STOPPED ===")
 
 # ---------------- ENTRY ----------------
