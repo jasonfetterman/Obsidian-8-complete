@@ -1,107 +1,134 @@
-// thermal_monitor.cpp — REV B (Multi-Zone Thermal Protection System)
+// thermal_monitor.cpp — REV C (Thermal → Hardware Kill Integration)
 
 #include <Arduino.h>
 
 // ---------------- CONFIG ----------------
 
-// Analog temperature sensors (e.g., LM35 or similar)
+// Analog temp sensors (LM35 or equivalent)
 #define TEMP_SERVO_PIN A0
 #define TEMP_BATTERY_PIN A1
 #define TEMP_BUCK_PIN A2
 
+// Kill line output pin (wired to relay / MOSFET control)
+#define KILL_PIN 22
+
 // Thresholds (°C)
 #define TEMP_WARNING 60.0
 #define TEMP_CRITICAL 70.0
+#define TEMP_RESET 55.0   // hysteresis reset point
 
 // Filtering
 #define FILTER_ALPHA 0.2
 
-// ---------------- STATE ----------------
+// Timing
+#define UPDATE_INTERVAL_MS 100
 
-float tempServo = 25.0;
-float tempBattery = 25.0;
-float tempBuck = 25.0;
+// ---------------- STATE ----------------
 
 float filteredServo = 25.0;
 float filteredBattery = 25.0;
 float filteredBuck = 25.0;
 
+bool thermalShutdownActive = false;
+
 // ---------------- UTIL ----------------
 
-// Convert analog reading to temperature
-// Assumes LM35: 10mV per °C, Teensy ADC 3.3V reference
 float readTemperature(int pin) {
     int raw = analogRead(pin);
     float voltage = (raw / 1023.0) * 3.3;
-    float tempC = voltage * 100.0;
-    return tempC;
+    return voltage * 100.0; // LM35
 }
 
-// Simple low-pass filter
 float filterTemp(float prev, float current) {
     return prev + FILTER_ALPHA * (current - prev);
 }
 
-// ---------------- SAFETY HOOKS ----------------
+// ---------------- KILL CONTROL ----------------
 
-// These should connect to your system logic
+void enableServos() {
+    digitalWrite(KILL_PIN, HIGH);  // ACTIVE HIGH = power ON
+}
+
+void disableServos() {
+    digitalWrite(KILL_PIN, LOW);   // cut power
+}
+
+// ---------------- ACTIONS ----------------
+
 void thermalThrottle() {
-    // Placeholder: integrate with motion system to reduce speed
-    Serial.println("THERMAL WARNING: Throttling motion");
+    // Signal to Pi via serial (you already have comms)
+    Serial.println("THERMAL_WARNING");
 }
 
 void thermalShutdown() {
-    // Placeholder: trigger kill line or stop commands
-    Serial.println("THERMAL CRITICAL: SHUTDOWN");
+    disableServos();  // HARD CUT
+    thermalShutdownActive = true;
+    Serial.println("THERMAL_SHUTDOWN");
 }
 
-// ---------------- MAIN UPDATE ----------------
+// ---------------- CORE ----------------
 
 void updateThermal() {
-    // Read sensors
-    tempServo = readTemperature(TEMP_SERVO_PIN);
-    tempBattery = readTemperature(TEMP_BATTERY_PIN);
-    tempBuck = readTemperature(TEMP_BUCK_PIN);
+    float tServo = readTemperature(TEMP_SERVO_PIN);
+    float tBattery = readTemperature(TEMP_BATTERY_PIN);
+    float tBuck = readTemperature(TEMP_BUCK_PIN);
 
-    // Filter
-    filteredServo = filterTemp(filteredServo, tempServo);
-    filteredBattery = filterTemp(filteredBattery, tempBattery);
-    filteredBuck = filterTemp(filteredBuck, tempBuck);
+    filteredServo = filterTemp(filteredServo, tServo);
+    filteredBattery = filterTemp(filteredBattery, tBattery);
+    filteredBuck = filterTemp(filteredBuck, tBuck);
 
-    // Determine max temp
     float maxTemp = filteredServo;
     if (filteredBattery > maxTemp) maxTemp = filteredBattery;
     if (filteredBuck > maxTemp) maxTemp = filteredBuck;
 
-    // Safety logic
+    // --- CRITICAL SHUTDOWN ---
     if (maxTemp >= TEMP_CRITICAL) {
-        thermalShutdown();
-    } else if (maxTemp >= TEMP_WARNING) {
+        if (!thermalShutdownActive) {
+            thermalShutdown();
+        }
+        return;
+    }
+
+    // --- HYSTERESIS RESET ---
+    if (thermalShutdownActive && maxTemp < TEMP_RESET) {
+        thermalShutdownActive = false;
+        enableServos();
+        Serial.println("THERMAL_RECOVERY");
+    }
+
+    // --- WARNING ---
+    if (maxTemp >= TEMP_WARNING && !thermalShutdownActive) {
         thermalThrottle();
     }
 
-    // Debug output
-    Serial.print("Temps | Servo: ");
+    // Debug
+    Serial.print("TEMP | S:");
     Serial.print(filteredServo);
-    Serial.print("C Battery: ");
+    Serial.print(" B:");
     Serial.print(filteredBattery);
-    Serial.print("C Buck: ");
+    Serial.print(" C:");
     Serial.print(filteredBuck);
-    Serial.println("C");
+    Serial.print(" MAX:");
+    Serial.println(maxTemp);
 }
 
 // ---------------- SETUP ----------------
 
 void setupThermal() {
     analogReadResolution(10);
+
+    pinMode(KILL_PIN, OUTPUT);
+
+    // Default SAFE behavior
+    disableServos();
 }
 
-// ---------------- LOOP EXAMPLE ----------------
+// ---------------- LOOP ----------------
 
 void loopThermal() {
     static unsigned long lastUpdate = 0;
 
-    if (millis() - lastUpdate >= 100) {
+    if (millis() - lastUpdate >= UPDATE_INTERVAL_MS) {
         lastUpdate = millis();
         updateThermal();
     }
