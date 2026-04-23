@@ -1,134 +1,146 @@
+# main_controller.py — REV B (Full System Integration Controller)
+
 import time
 import threading
+import serial
 
-from motion_planner import MotionPlanner
-from sensor_fusion import SensorFusion
-from path_planner import PathPlanner
-from swarm_comms import SwarmComms
-from power_monitor import PowerMonitor
-from mesh_heartbeat import MeshHeartbeat
+from motion_planner import run_motion_loop, set_pose
+from motion_scheduler import run_scheduler, reset_gait
 
-from pi_watchdog.heartbeat_monitor import HeartbeatMonitor
+# ---------------- CONFIG ----------------
 
-# ===== SYSTEM MODES =====
-MODE_IDLE = "IDLE"
-MODE_TELEOP = "TELEOP"
-MODE_AUTONOMOUS = "AUTONOMOUS"
-MODE_EMERGENCY = "EMERGENCY_STOP"
+SERIAL_PORT = "COM3"   # UPDATE if needed
+BAUD_RATE = 115200
 
+HEARTBEAT_INTERVAL = 0.02  # 50 Hz
+THERMAL_POLL_INTERVAL = 0.1
 
-class ObsidianController:
-    def __init__(self):
-        print("[INIT] Starting OBSIDIAN-8 Controller")
+# Default neutral pose (16 servos)
+BASE_POSE = [90.0] * 16
 
-        # Core systems
-        self.sensor_fusion = SensorFusion()
-        self.motion_planner = MotionPlanner()
-        self.path_planner = PathPlanner()
+# ---------------- STATE ----------------
 
-        # Comms
-        self.swarm = SwarmComms()
-        self.mesh = MeshHeartbeat()
+running = True
+thermal_state = "NORMAL"   # NORMAL / WARNING / SHUTDOWN
 
-        # Health
-        self.power = PowerMonitor()
-        self.watchdog = HeartbeatMonitor()
+# ---------------- SERIAL ----------------
 
-        # State
-        self.mode = MODE_IDLE
-        self.running = True
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.01)
 
-        # Thread control
-        self.lock = threading.Lock()
+def send_servo_command(servo_id, angle):
+    # Format: ID,ANGLE,SPEED
+    cmd = f"{servo_id},{angle:.2f},80\n"
+    ser.write(cmd.encode())
 
-    # =========================
-    # MODE CONTROL
-    # =========================
-    def set_mode(self, new_mode):
-        with self.lock:
-            print(f"[MODE] Switching to {new_mode}")
-            self.mode = new_mode
+def send_pose(pose):
+    for i, angle in enumerate(pose):
+        send_servo_command(i, angle)
 
-    # =========================
-    # MAIN LOOP
-    # =========================
-    def run(self):
-        print("[SYSTEM] Entering main loop")
+# ---------------- THERMAL HANDLING ----------------
 
-        while self.running:
-            try:
-                self.watchdog.kick()
+def handle_thermal_message(msg):
+    global thermal_state, running
 
-                # Health check first
-                if not self.power.is_power_safe():
-                    print("[FAILSAFE] Power unsafe!")
-                    self.set_mode(MODE_EMERGENCY)
+    if "THERMAL_WARNING" in msg:
+        if thermal_state != "WARNING":
+            print("[THERMAL] WARNING — reducing motion")
+        thermal_state = "WARNING"
 
-                if self.watchdog.is_system_unhealthy():
-                    print("[FAILSAFE] Watchdog triggered!")
-                    self.set_mode(MODE_EMERGENCY)
+    elif "THERMAL_SHUTDOWN" in msg:
+        print("[THERMAL] CRITICAL — shutting down")
+        thermal_state = "SHUTDOWN"
+        emergency_stop()
 
-                # Mode execution
-                if self.mode == MODE_IDLE:
-                    self.idle_loop()
+    elif "THERMAL_RECOVERY" in msg:
+        print("[THERMAL] RECOVERED")
+        thermal_state = "NORMAL"
 
-                elif self.mode == MODE_TELEOP:
-                    self.teleop_loop()
+# ---------------- SERIAL LISTENER ----------------
 
-                elif self.mode == MODE_AUTONOMOUS:
-                    self.autonomous_loop()
+def serial_listener():
+    global running
 
-                elif self.mode == MODE_EMERGENCY:
-                    self.emergency_stop()
+    while running:
+        try:
+            line = ser.readline().decode().strip()
+            if line:
+                handle_thermal_message(line)
+        except:
+            pass
 
-                time.sleep(0.02)
+# ---------------- HEARTBEAT ----------------
 
-            except Exception as e:
-                print(f"[CRITICAL ERROR] {e}")
-                self.set_mode(MODE_EMERGENCY)
+def heartbeat_loop():
+    while running:
+        ser.write(b"HB\n")
+        time.sleep(HEARTBEAT_INTERVAL)
 
-    # =========================
-    # MODE LOOPS
-    # =========================
-    def idle_loop(self):
-        # Minimal activity
-        self.sensor_fusion.update()
+# ---------------- MOTION CALLBACK ----------------
 
-    def teleop_loop(self):
-        self.sensor_fusion.update()
-        commands = self.swarm.get_teleop_commands()
-        self.motion_planner.execute(commands)
+def motion_send_callback(servo_id, angle):
+    # Reduce speed if thermal warning
+    speed = 80
+    if thermal_state == "WARNING":
+        speed = 40
 
-    def autonomous_loop(self):
-        self.sensor_fusion.update()
+    cmd = f"{servo_id},{angle:.2f},{speed}\n"
+    ser.write(cmd.encode())
 
-        world_state = self.sensor_fusion.get_state()
-        path = self.path_planner.compute_path(world_state)
-        motion_cmds = self.motion_planner.plan(path)
+# ---------------- BASE POSE ----------------
 
-        self.motion_planner.execute(motion_cmds)
+def get_base_pose():
+    return BASE_POSE.copy()
 
-    def emergency_stop(self):
-        print("[EMERGENCY] STOPPING ALL SYSTEMS")
-        self.motion_planner.halt_all()
-        time.sleep(0.1)
+# ---------------- SAFETY ----------------
 
-    # =========================
-    # SHUTDOWN
-    # =========================
-    def shutdown(self):
-        print("[SYSTEM] Shutdown initiated")
-        self.running = False
-        self.motion_planner.halt_all()
+def emergency_stop():
+    global running
+    print("[SYSTEM] Emergency stop triggered")
 
+    # Stop motion planner immediately
+    set_pose(BASE_POSE)
 
-# =========================
-# ENTRY POINT
-# =========================
-if __name__ == "__main__":
-    controller = ObsidianController()
+    # Stop scheduler loop
+    reset_gait()
+
+    running = False
+
+# ---------------- THREADS ----------------
+
+def start_threads():
+    threading.Thread(target=serial_listener, daemon=True).start()
+    threading.Thread(target=heartbeat_loop, daemon=True).start()
+    threading.Thread(
+        target=run_motion_loop,
+        args=(motion_send_callback,),
+        daemon=True
+    ).start()
+    threading.Thread(
+        target=run_scheduler,
+        args=(get_base_pose, set_pose),
+        daemon=True
+    ).start()
+
+# ---------------- MAIN ----------------
+
+def main():
+    print("=== OBSIDIAN-8 CONTROL START ===")
+
+    start_threads()
 
     try:
-        controller.run()
+        while running:
+            time.sleep(1)
+
     except KeyboardInterrupt:
-        controller.shutdown()
+        print("\n[USER] Shutdown requested")
+        emergency_stop()
+
+    finally:
+        ser.close()
+        print("=== SYSTEM STOPPED ===")
+
+# ---------------- ENTRY ----------------
+
+if __name__ == "__main__":
+    main()
