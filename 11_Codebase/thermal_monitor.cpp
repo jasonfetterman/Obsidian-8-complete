@@ -1,28 +1,20 @@
-// thermal_monitor.cpp — REV D (Manual Reset Required After Thermal Shutdown)
+// thermal_monitor.cpp — REV E (Structured Temp Output + Latched Safety)
 
 #include <Arduino.h>
 
 // ---------------- CONFIG ----------------
 
-// Temp sensors (LM35 or equivalent)
 #define TEMP_SERVO_PIN A0
 #define TEMP_BATTERY_PIN A1
 #define TEMP_BUCK_PIN A2
 
-// Kill control
 #define KILL_PIN 22
+#define RESET_BUTTON_PIN 23
 
-// Manual reset button (physical)
-#define RESET_BUTTON_PIN 23  // pull-down or pull-up depending on wiring
-
-// Thresholds (°C)
 #define TEMP_WARNING 60.0
 #define TEMP_CRITICAL 70.0
 
-// Filtering
 #define FILTER_ALPHA 0.2
-
-// Timing
 #define UPDATE_INTERVAL_MS 100
 
 // ---------------- STATE ----------------
@@ -45,14 +37,14 @@ float filterTemp(float prev, float current) {
     return prev + FILTER_ALPHA * (current - prev);
 }
 
-// ---------------- KILL CONTROL ----------------
+// ---------------- CONTROL ----------------
 
 void enableServos() {
-    digitalWrite(KILL_PIN, HIGH);  // ACTIVE HIGH = ON
+    digitalWrite(KILL_PIN, HIGH);
 }
 
 void disableServos() {
-    digitalWrite(KILL_PIN, LOW);   // OFF
+    digitalWrite(KILL_PIN, LOW);
 }
 
 // ---------------- ACTIONS ----------------
@@ -67,16 +59,15 @@ void triggerThermalShutdown() {
     Serial.println("THERMAL_SHUTDOWN_LATCHED");
 }
 
-// ---------------- RESET HANDLING ----------------
+// ---------------- RESET ----------------
 
 void checkManualReset() {
     if (thermalShutdownLatched) {
-        // Button press = HIGH (adjust if using pull-up)
         if (digitalRead(RESET_BUTTON_PIN) == HIGH) {
             thermalShutdownLatched = false;
             enableServos();
             Serial.println("THERMAL_MANUAL_RESET");
-            delay(500); // debounce + prevent rapid re-trigger
+            delay(500);
         }
     }
 }
@@ -96,43 +87,33 @@ void updateThermal() {
     if (filteredBattery > maxTemp) maxTemp = filteredBattery;
     if (filteredBuck > maxTemp) maxTemp = filteredBuck;
 
-    // If already latched, do nothing except wait for reset
+    // --- ALWAYS SEND TEMP DATA ---
+    Serial.print("TEMP:");
+    Serial.print(filteredServo); Serial.print(",");
+    Serial.print(filteredBattery); Serial.print(",");
+    Serial.println(filteredBuck);
+
     if (thermalShutdownLatched) {
         checkManualReset();
         return;
     }
 
-    // Critical shutdown (latching)
     if (maxTemp >= TEMP_CRITICAL) {
         triggerThermalShutdown();
         return;
     }
 
-    // Warning
     if (maxTemp >= TEMP_WARNING) {
         thermalThrottle();
     }
-
-    // Debug
-    Serial.print("TEMP | S:");
-    Serial.print(filteredServo);
-    Serial.print(" B:");
-    Serial.print(filteredBattery);
-    Serial.print(" C:");
-    Serial.print(filteredBuck);
-    Serial.print(" MAX:");
-    Serial.println(maxTemp);
 }
 
 // ---------------- SETUP ----------------
 
 void setupThermal() {
     analogReadResolution(10);
-
     pinMode(KILL_PIN, OUTPUT);
     pinMode(RESET_BUTTON_PIN, INPUT);
-
-    // SAFE DEFAULT
     disableServos();
 }
 
