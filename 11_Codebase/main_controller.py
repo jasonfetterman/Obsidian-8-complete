@@ -1,4 +1,4 @@
-# main_controller.py — REV D (Fully Integrated + Logging + Thermal Latch Safe)
+# main_controller.py — REV F (Ground + Drone Unified Control)
 
 import time
 import threading
@@ -7,91 +7,81 @@ import serial
 from motion_planner import run_motion_loop, set_pose
 from motion_scheduler import run_scheduler, reset_gait
 
-from system_logger import log_thermal, log_motion, log_system, log_fault
+from system_logger import log_system, log_fault, log_motion, log_thermal, log_temp
+from swarm_comms import SwarmController
 
-# ---------------- CONFIG ----------------
-
-SERIAL_PORT = "COM3"   # UPDATE THIS
+SERIAL_PORT = "COM3"
 BAUD_RATE = 115200
 
 HEARTBEAT_INTERVAL = 0.02
-
 BASE_POSE = [90.0] * 16
 
-# ---------------- STATE ----------------
-
 running = True
-thermal_state = "NORMAL"  # NORMAL / WARNING / LATCHED
+thermal_state = "NORMAL"
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.01)
+
+# ---------------- SWARM ----------------
+
+swarm = SwarmController()
+
+# Example drone (SITL or real)
+# Change IP if using real drone over WiFi
+swarm.add_drone("drone1", "udp:127.0.0.1:14550")
 
 # ---------------- SERIAL ----------------
 
 def send_servo_command(servo_id, angle, speed):
-    cmd = f"{servo_id},{angle:.2f},{speed}\n"
-    ser.write(cmd.encode())
+    ser.write(f"{servo_id},{angle:.2f},{speed}\n".encode())
 
-# ---------------- THERMAL ----------------
+# ---------------- SERIAL HANDLER ----------------
 
-def handle_thermal_message(msg):
+def handle_serial_message(msg):
     global thermal_state
 
-    if "THERMAL_WARNING" in msg:
-        if thermal_state != "WARNING":
-            print("[THERMAL] WARNING — throttling")
+    if msg.startswith("TEMP:"):
+        try:
+            s, b, c = map(float, msg.replace("TEMP:", "").split(","))
+            log_temp(s, b, c)
+        except:
+            pass
+
+    elif "THERMAL_WARNING" in msg:
         thermal_state = "WARNING"
         log_thermal("WARNING")
 
     elif "THERMAL_SHUTDOWN_LATCHED" in msg:
-        print("[THERMAL] CRITICAL — LATCHED SHUTDOWN")
         thermal_state = "LATCHED"
         log_thermal("SHUTDOWN_LATCHED")
         emergency_stop(latched=True)
 
     elif "THERMAL_MANUAL_RESET" in msg:
-        print("[THERMAL] MANUAL RESET")
         thermal_state = "NORMAL"
         log_thermal("MANUAL_RESET")
 
-# ---------------- SERIAL LISTENER ----------------
+# ---------------- THREADS ----------------
 
 def serial_listener():
-    global running
     while running:
         try:
             line = ser.readline().decode(errors="ignore").strip()
             if line:
-                handle_thermal_message(line)
+                handle_serial_message(line)
         except:
             pass
-
-# ---------------- HEARTBEAT ----------------
 
 def heartbeat_loop():
     while running:
-        try:
-            ser.write(b"HB\n")
-        except:
-            pass
+        ser.write(b"HB\n")
         time.sleep(HEARTBEAT_INTERVAL)
-
-# ---------------- MOTION CALLBACK ----------------
 
 def motion_send_callback(servo_id, angle):
     if thermal_state == "LATCHED":
         return
 
-    speed = 80
-    if thermal_state == "WARNING":
-        speed = 40
-
+    speed = 80 if thermal_state == "NORMAL" else 40
     send_servo_command(servo_id, angle, speed)
     log_motion(servo_id, angle, speed)
-
-# ---------------- BASE POSE ----------------
-
-def get_base_pose():
-    return BASE_POSE.copy()
 
 # ---------------- SAFETY ----------------
 
@@ -100,55 +90,55 @@ def emergency_stop(latched=False):
 
     log_fault("Emergency stop triggered")
 
-    print("[SYSTEM] Emergency stop")
-
     set_pose(BASE_POSE)
     reset_gait()
 
-    if latched:
-        log_fault("System latched — restart required")
-        running = False
+    # Land all drones immediately
+    try:
+        swarm.land_all()
+    except:
+        pass
 
-# ---------------- THREADS ----------------
+    if latched:
+        running = False
+        log_fault("Latched shutdown — restart required")
+
+# ---------------- START ----------------
 
 def start_threads():
     threading.Thread(target=serial_listener, daemon=True).start()
     threading.Thread(target=heartbeat_loop, daemon=True).start()
-    threading.Thread(
-        target=run_motion_loop,
-        args=(motion_send_callback,),
-        daemon=True
-    ).start()
-    threading.Thread(
-        target=run_scheduler,
-        args=(get_base_pose, set_pose),
-        daemon=True
-    ).start()
+    threading.Thread(target=run_motion_loop, args=(motion_send_callback,), daemon=True).start()
+    threading.Thread(target=run_scheduler, args=(lambda: BASE_POSE.copy(), set_pose), daemon=True).start()
 
 # ---------------- MAIN ----------------
 
 def main():
     global running
 
-    print("=== OBSIDIAN-8 CONTROL START ===")
-    log_system("Controller started")
+    print("=== OBSIDIAN-8 + DRONE CONTROL START ===")
+    log_system("System start with drone integration")
 
     start_threads()
+
+    # Example mission (TEST ONLY)
+    time.sleep(3)
+    print("[MISSION] Drone takeoff")
+    swarm.takeoff_all(2.0)
+
+    time.sleep(10)
+    print("[MISSION] Drone landing")
+    swarm.land_all()
 
     try:
         while running:
             time.sleep(1)
-
     except KeyboardInterrupt:
-        print("\n[USER] Shutdown requested")
         emergency_stop()
-
     finally:
         ser.close()
-        log_system("Controller stopped")
-        print("=== SYSTEM STOPPED ===")
-
-# ---------------- ENTRY ----------------
+        log_system("System stopped")
+        print("=== STOPPED ===")
 
 if __name__ == "__main__":
     main()
