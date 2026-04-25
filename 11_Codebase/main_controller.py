@@ -141,7 +141,7 @@ def main():
     time.sleep(3)
 
     print("[MAIN] Starting scout mission")
-    mission.scout_and_hold(MISSION_LAT, MISSION_LON)
+    mission.scout_and_follow(MISSION_LAT, MISSION_LON)
 
     try:
         while running:
