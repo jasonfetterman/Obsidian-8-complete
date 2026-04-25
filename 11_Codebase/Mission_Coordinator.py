@@ -1,4 +1,4 @@
-# mission_coordinator.py — REV B (Drone → Ground Coordination)
+# mission_coordinator.py — REV C (Directional Drone → Ground Control)
 
 import time
 import threading
@@ -12,39 +12,41 @@ class MissionCoordinator:
         self.active = False
         self.follow_thread = None
 
-        # Simple movement tuning
-        self.step_forward_pose = [95.0] * 16
+        # Pose presets (tuned for simple directional control)
         self.base_pose = [90.0] * 16
+
+        self.forward_pose = [95.0] * 16
+        self.left_turn_pose = [92.0,88.0]*8
+        self.right_turn_pose = [88.0,92.0]*8
 
         # Target tracking
         self.target_lat = None
         self.target_lon = None
 
-    # ---------------- BASIC MISSION ----------------
+        # Last known drone position
+        self.prev_lat = None
+        self.prev_lon = None
+
+    # ---------------- MISSION ----------------
 
     def scout_and_follow(self, lat, lon, alt=3.0):
-        """
-        Drone scouts → ground robot follows directionally
-        """
-        print("[MISSION] Scout + Follow")
+        print("[MISSION] Scout + Directional Follow")
 
         self.active = True
         self.target_lat = lat
         self.target_lon = lon
 
-        # Drone actions
         self.swarm.takeoff_all(alt)
         time.sleep(8)
         self.swarm.goto_all(lat, lon, alt)
 
-        # Start follow loop
         self.follow_thread = threading.Thread(target=self._follow_loop, daemon=True)
         self.follow_thread.start()
 
     # ---------------- FOLLOW LOOP ----------------
 
     def _follow_loop(self):
-        print("[MISSION] Ground follow loop started")
+        print("[MISSION] Directional follow active")
 
         while self.active:
             positions = self.swarm.get_positions()
@@ -53,33 +55,49 @@ class MissionCoordinator:
                 time.sleep(0.2)
                 continue
 
-            # Use first drone
             drone_id = list(positions.keys())[0]
             lat, lon, alt = positions[drone_id]
 
-            # Compute distance to target
-            dist = self._distance(lat, lon, self.target_lat, self.target_lon)
+            # Initialize previous position
+            if self.prev_lat is None:
+                self.prev_lat = lat
+                self.prev_lon = lon
+                time.sleep(0.2)
+                continue
 
-            print(f"[MISSION] Drone dist to target: {dist:.2f}")
+            # Direction vector (drone movement)
+            dlat = lat - self.prev_lat
+            dlon = lon - self.prev_lon
 
-            # Simple logic:
-            # If drone is still far → move forward
-            # If close → stop
+            self.prev_lat = lat
+            self.prev_lon = lon
 
-            if dist > 1.5:
-                self.set_pose(self.step_forward_pose)
-            else:
+            # Convert to meters
+            dx = dlat * 111000
+            dy = dlon * 111000
+
+            distance = math.sqrt(dx*dx + dy*dy)
+
+            print(f"[MISSION] Movement vector: dx={dx:.2f}, dy={dy:.2f}, dist={distance:.2f}")
+
+            # Ignore tiny noise
+            if distance < 0.05:
                 self.set_pose(self.base_pose)
+                time.sleep(0.2)
+                continue
+
+            # Determine direction
+            if abs(dx) > abs(dy):
+                # Forward/back bias
+                self.set_pose(self.forward_pose)
+            else:
+                # Turning
+                if dy > 0:
+                    self.set_pose(self.left_turn_pose)
+                else:
+                    self.set_pose(self.right_turn_pose)
 
             time.sleep(0.2)
-
-    # ---------------- UTIL ----------------
-
-    def _distance(self, lat1, lon1, lat2, lon2):
-        # Rough flat-earth approximation (fine for SITL)
-        dx = (lat2 - lat1) * 111000
-        dy = (lon2 - lon1) * 111000
-        return math.sqrt(dx*dx + dy*dy)
 
     # ---------------- STOP ----------------
 
