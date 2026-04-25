@@ -1,4 +1,4 @@
-# main_controller.py — REV F (Ground + Drone Unified Control)
+# main_controller.py — REV G (Mission Coordinator Integrated)
 
 import time
 import threading
@@ -9,6 +9,7 @@ from motion_scheduler import run_scheduler, reset_gait
 
 from system_logger import log_system, log_fault, log_motion, log_thermal, log_temp
 from swarm_comms import SwarmController
+from mission_coordinator import MissionCoordinator
 
 SERIAL_PORT = "COM3"
 BAUD_RATE = 115200
@@ -25,9 +26,16 @@ ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.01)
 
 swarm = SwarmController()
 
-# Example drone (SITL or real)
-# Change IP if using real drone over WiFi
+# SITL default connection
 swarm.add_drone("drone1", "udp:127.0.0.1:14550")
+
+# ---------------- MISSION ----------------
+
+mission = MissionCoordinator(swarm)
+
+# Test coordinate (ArduPilot default area)
+MISSION_LAT = -35.363261
+MISSION_LON = 149.165230
 
 # ---------------- SERIAL ----------------
 
@@ -93,9 +101,9 @@ def emergency_stop(latched=False):
     set_pose(BASE_POSE)
     reset_gait()
 
-    # Land all drones immediately
+    # Stop mission + land drones
     try:
-        swarm.land_all()
+        mission.stop()
     except:
         pass
 
@@ -103,42 +111,51 @@ def emergency_stop(latched=False):
         running = False
         log_fault("Latched shutdown — restart required")
 
-# ---------------- START ----------------
+# ---------------- THREAD START ----------------
 
 def start_threads():
     threading.Thread(target=serial_listener, daemon=True).start()
     threading.Thread(target=heartbeat_loop, daemon=True).start()
-    threading.Thread(target=run_motion_loop, args=(motion_send_callback,), daemon=True).start()
-    threading.Thread(target=run_scheduler, args=(lambda: BASE_POSE.copy(), set_pose), daemon=True).start()
+    threading.Thread(
+        target=run_motion_loop,
+        args=(motion_send_callback,),
+        daemon=True
+    ).start()
+    threading.Thread(
+        target=run_scheduler,
+        args=(lambda: BASE_POSE.copy(), set_pose),
+        daemon=True
+    ).start()
 
 # ---------------- MAIN ----------------
 
 def main():
     global running
 
-    print("=== OBSIDIAN-8 + DRONE CONTROL START ===")
-    log_system("System start with drone integration")
+    print("=== OBSIDIAN-8 MISSION START ===")
+    log_system("Mission system start")
 
     start_threads()
 
-    # Example mission (TEST ONLY)
+    # ---- RUN MISSION (TEST) ----
     time.sleep(3)
-    print("[MISSION] Drone takeoff")
-    swarm.takeoff_all(2.0)
 
-    time.sleep(10)
-    print("[MISSION] Drone landing")
-    swarm.land_all()
+    print("[MAIN] Starting scout mission")
+    mission.scout_and_hold(MISSION_LAT, MISSION_LON)
 
     try:
         while running:
             time.sleep(1)
+
     except KeyboardInterrupt:
         emergency_stop()
+
     finally:
         ser.close()
         log_system("System stopped")
         print("=== STOPPED ===")
+
+# ---------------- ENTRY ----------------
 
 if __name__ == "__main__":
     main()
