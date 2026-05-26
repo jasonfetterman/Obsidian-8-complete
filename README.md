@@ -1,403 +1,367 @@
-# OBSIDIAN-8
-
 <div align="center">
 
-# 🌐 OBSIDIAN-8 Autonomous Search & Rescue Ecosystem
+# 🌐⚫ OBSIDIAN-8 ⚫🌐
 
-**Multi-domain autonomous response platform integrating aerial systems, ground assets, infrastructure nodes, and swarm command architecture**
+## 🚁🤖 Autonomous Search & Rescue Ecosystem 🤖🚁
 
-![Status](https://img.shields.io/badge/status-active-success)
-![Platform](https://img.shields.io/badge/platform-air%20%7C%20ground%20%7C%20infrastructure-blue)
-![Architecture](https://img.shields.io/badge/architecture-swarm-black)
-![License](https://img.shields.io/badge/license-TBD-lightgrey)
+### **Multi-Domain Swarm Architecture**
+### **Air • Ground • Infrastructure • Command • Mesh**
+
+![Status](https://img.shields.io/badge/STATUS-ACTIVE-success?style=for-the-badge)
+![Fleet](https://img.shields.io/badge/FLEET-MULTI_DOMAIN-blue?style=for-the-badge)
+![Architecture](https://img.shields.io/badge/SYSTEM-SWARM-black?style=for-the-badge)
+![Mission](https://img.shields.io/badge/ROLE-SEARCH_%26_RESCUE-orange?style=for-the-badge)
+![Autonomy](https://img.shields.io/badge/AUTONOMY-DISTRIBUTED-red?style=for-the-badge)
 
 ---
 
-**One network. Many platforms. Coordinated response.**
+### 🚑 **One Network** • 🚁 **Many Platforms** • 🌐 **Coordinated Response**
+
+<img width="100%" src="assets/renders/banner.png">
 
 </div>
 
 ---
 
-# Overview
+# 📖 Overview
 
-OBSIDIAN-8 is a modular autonomous search-and-rescue ecosystem designed around coordinated multi-domain operations.
+**OBSIDIAN-8** is a modular autonomous ecosystem designed around **coordinated multi-domain response operations**.
 
-The project combines:
+The project integrates:
 
-- Autonomous aerial platforms
-- Ground rescue systems
-- Infrastructure assets
-- Mesh communications
-- Command & control nodes
-- Distributed swarm behavior
-- Manufacturing data
-- CAD / printable components
-- Field deployment systems
-
-The architecture allows independent assets to function as a coordinated response network under a unified command layer.
+🚁 **Autonomous aerial systems**  
+🤖 **Ground rescue platforms**  
+🏗️ **Infrastructure assets**  
+🌐 **Mesh communications**  
+🧠 **Command & control**  
+📡 **Distributed networking**  
+🖨️ **Manufacturing workflows**  
+📐 **CAD / printable assets**  
+🧩 **Modular expansion architecture**
 
 ---
 
-# System Architecture
+# 🛰️ System Architecture
 
 ```text
-OBSIDIAN-8 QUEEN
-│
-├── AIR DOMAIN
-│   ├── OBS-AIR-SAR-01
-│   ├── OBS-AIR-RECON-01
-│   ├── OBS-AIR-RELAY-01
-│   └── OBS-AIR-LIGHTDEL-01
-│
-├── GROUND DOMAIN
-│   ├── OBS-GROUND-SAR-01
-│   ├── OBS-GROUND-CARGO-01
-│   ├── OBS-GROUND-SCAN-01
-│   └── OBS-GROUND-EOD-01
-│
-├── INFRASTRUCTURE DOMAIN
-│   ├── OBS-INFRA-DOCK-001
-│   ├── OBS-INFRA-FAB-001
-│   ├── OBS-INFRA-SOLAR-001
-│   └── OBS-INFRA-HANGAR-001
-│
-└── NETWORK LAYER
-    ├── Mesh
-    ├── LTE
-    ├── Telemetry
-    └── SATCOM
+                     🧠 OBSIDIAN-8 QUEEN
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+
+   🚁 AIR DOMAIN         🤖 GROUND DOMAIN      🏗️ INFRA DOMAIN
+
+   SAR / Recon           Rescue / Cargo        Dock / Fab
+   Relay / Delivery      Mapping / EOD         Solar / Hangar
+
+                              │
+                              ▼
+
+                    🌐 NETWORK LAYER
+         Mesh • LTE • Telemetry • SATCOM
 ```
 
 ---
 
-# Fleet Components
+# 🚁 AIR FLEET
 
-## AIR SYSTEMS
+## 🚑 OBS-AIR-SAR-01
 
-### OBS-AIR-SAR-01
-Search & Rescue aerial platform
+**Search & Rescue Aerial Platform**
 
-Capabilities:
+✨ Capabilities
 
-- Thermal search
-- Victim detection
-- Emergency supply delivery
-- Forward scouting
-- Mesh relay support
-
----
-
-### OBS-AIR-RECON-01
-
-Long-range mapping and reconnaissance platform
-
-Capabilities:
-
-- Area mapping
-- Terrain analysis
-- Mission planning support
-- RTK navigation
+✅ Thermal search  
+✅ Victim detection  
+✅ Medical delivery  
+✅ Mesh relay support  
+✅ Forward scouting
 
 ---
 
-### OBS-AIR-RELAY-01
+## 🛰️ OBS-AIR-RECON-01
 
-Network extension platform
+**Recon & Mapping Platform**
 
-Capabilities:
-
-- Mesh extension
-- Signal backbone
-- Emergency communications
-- Telemetry relay
+📍 Terrain mapping  
+🧭 RTK navigation  
+🗺️ Area reconstruction  
+📸 Survey support
 
 ---
 
-### OBS-AIR-LIGHTDEL-01
+## 📡 OBS-AIR-RELAY-01
 
-Logistics support drone
+**Network Extension Unit**
 
-Capabilities:
-
-- Payload transport
-- Medical delivery
-- Supply drops
-
----
-
-## GROUND SYSTEMS
-
-### OBS-GROUND-SAR-01
-
-Tracked casualty extraction platform
-
-Capabilities:
-
-- Patient transport
-- Rescue support
-- Medical telemetry
-- Swarm extraction operations
+🌐 Mesh extension  
+📶 Signal backbone  
+📡 Telemetry relay  
+🛰️ Communications support
 
 ---
 
-### OBS-GROUND-CARGO-01
+## 📦 OBS-AIR-LIGHTDEL-01
 
-Logistics rover
+**Logistics Drone**
 
-Capabilities:
-
-- Equipment movement
-- Supply transport
-- Payload delivery
+💊 Medical delivery  
+📦 Payload transport  
+🚨 Emergency drops
 
 ---
 
-### OBS-GROUND-SCAN-01
+# 🤖 GROUND FLEET
 
-Ground mapping unit
+## 🚑 OBS-GROUND-SAR-01
 
-Capabilities:
+**Tracked Rescue Rover**
 
-- LiDAR mapping
-- Terrain analysis
-- Sensor fusion
-
----
-
-### OBS-GROUND-EOD-01
-
-Hazard inspection platform
-
-Capabilities:
-
-- Remote inspection
-- Dangerous area assessment
-- Sensor deployment
+🛏️ Casualty transport  
+🩺 Medical support  
+🛞 Terrain mobility  
+🚨 Extraction operations
 
 ---
 
-## INFRASTRUCTURE
+## 📦 OBS-GROUND-CARGO-01
 
-### OBS-INFRA-DOCK-001
+**Logistics Rover**
 
-Autonomous support station
-
-Functions:
-
-- Charging
-- Docking
-- Maintenance
-- Fleet servicing
+📦 Equipment transport  
+🧰 Supply movement  
+🔋 Mission support
 
 ---
 
-### OBS-INFRA-FAB-001
+## 🗺️ OBS-GROUND-SCAN-01
 
-Field fabrication unit
+**Mapping Platform**
 
-Functions:
-
-- Component production
-- Spare parts
-- Repair support
+📡 LiDAR scanning  
+🧭 Terrain analysis  
+🛰️ Sensor fusion
 
 ---
 
-### OBS-INFRA-SOLAR-001
+## ⚠️ OBS-GROUND-EOD-01
 
-Energy support node
+**Hazard Inspection Platform**
 
-Functions:
-
-- Solar charging
-- Battery buffering
-- Auxiliary power
+☢️ Remote inspection  
+⚠️ Risk assessment  
+🦾 Sensor deployment
 
 ---
 
-### OBS-INFRA-HANGAR-001
+# 🏗️ INFRASTRUCTURE
 
-Deployable shelter
+## 🔋 OBS-INFRA-DOCK-001
 
-Functions:
+**Autonomous Service Hub**
 
-- Staging
-- Protection
-- Launch operations
+🔋 Charging  
+🛠️ Maintenance  
+🧰 Repairs  
+🚁 Docking
 
 ---
 
-# Repository Structure
+## 🖨️ OBS-INFRA-FAB-001
+
+**Field Manufacturing Unit**
+
+🖨️ Part production  
+🔩 Repair components  
+⚙️ Spare fabrication
+
+---
+
+## ☀️ OBS-INFRA-SOLAR-001
+
+**Energy Support Array**
+
+☀️ Solar charging  
+🔋 Power buffering  
+⚡ Auxiliary supply
+
+---
+
+## 🏠 OBS-INFRA-HANGAR-001
+
+**Deployable Operations Shelter**
+
+🚁 Launch staging  
+🛡️ Weather protection  
+📦 Fleet storage
+
+---
+
+# 🌲 Fleet Tree
 
 ```text
-OBSIDIAN-8/
+🧠 OBSIDIAN-8 QUEEN
 │
-├── docs/
-├── fleet/
-│   ├── AIR/
-│   ├── GROUND/
-│   └── INFRA/
+├── 🚁 AIR
+│   ├── 🚑 OBS-AIR-SAR-01
+│   ├── 🛰️ OBS-AIR-RECON-01
+│   ├── 📡 OBS-AIR-RELAY-01
+│   └── 📦 OBS-AIR-LIGHTDEL-01
 │
-├── command/
-├── swarm/
-├── electronics/
-├── infrastructure/
-├── tests/
-└── assets/
+├── 🤖 GROUND
+│   ├── 🚑 OBS-GROUND-SAR-01
+│   ├── 📦 OBS-GROUND-CARGO-01
+│   ├── 🗺️ OBS-GROUND-SCAN-01
+│   └── ⚠️ OBS-GROUND-EOD-01
+│
+└── 🏗️ INFRA
+    ├── 🔋 DOCK
+    ├── 🖨️ FAB
+    ├── ☀️ SOLAR
+    └── 🏠 HANGAR
 ```
 
 ---
 
-# Technology Stack
+# 📁 Repository Layout
 
-## Flight Systems
-
-- PX4
-- ArduPilot
-- ROS2
-- MAVLink
-
----
-
-## Compute
-
-- NVIDIA Jetson Orin
-- Cube Orange+
-- STM32 controllers
-
----
-
-## Navigation
-
-- RTK GPS
-- Optical flow
-- IMU fusion
-- Terrain sensing
+```text
+📦 OBSIDIAN-8
+│
+├── 📚 docs
+├── 🚁 fleet/AIR
+├── 🤖 fleet/GROUND
+├── 🏗️ fleet/INFRA
+│
+├── 🧠 command
+├── 🌐 swarm
+├── ⚡ electronics
+├── 🔋 infrastructure
+├── 🧪 tests
+└── 🎨 assets
+```
 
 ---
 
-## Communications
+# ⚙️ Technology Stack
 
-- RFD900 telemetry
-- Mesh networking
-- LTE fallback
-- SATCOM integration
+### 🚁 Flight Systems
+
+🛩️ PX4  
+🛩️ ArduPilot  
+🔗 MAVLink  
+🤖 ROS2
 
 ---
 
-# Current Platforms
+### 🧠 Compute
+
+🖥️ NVIDIA Jetson  
+🎛️ Cube Orange+  
+⚙️ STM32
+
+---
+
+### 📡 Networking
+
+📶 RFD900  
+🌐 Mesh  
+📱 LTE  
+🛰️ SATCOM
+
+---
+
+# 📈 Development Status
 
 | Platform | Status |
 |----------|--------|
-| OBS-AIR-SAR-01 | Development |
-| OBS-GROUND-SAR-01 | Development |
-| QUEEN Node | Architecture |
-| Dock Infrastructure | Planning |
+| 🚁 OBS-AIR-SAR-01 | 🟢 Development |
+| 🤖 OBS-GROUND-SAR-01 | 🟢 Development |
+| 🧠 QUEEN Node | 🟡 Architecture |
+| 🏗️ Infrastructure | 🟠 Planning |
 
 ---
 
-# Objectives
+# 🎯 Mission Objectives
 
-- Autonomous SAR operations
-- Distributed fleet coordination
-- Modular manufacturing
-- Open architecture
-- Deployable infrastructure
-- Multi-domain interoperability
-
----
-
-# Development Roadmap
-
-## Phase 1
-
-Core systems
-
-- Air SAR platform
-- Ground SAR platform
-- Initial mesh networking
+🚑 Search & Rescue  
+🌐 Distributed coordination  
+🧠 Autonomous behavior  
+🛠️ Modular manufacturing  
+🏗️ Deployable infrastructure  
+🤝 Cross-domain interoperability
 
 ---
 
-## Phase 2
+# 🗺️ Roadmap
 
-Command systems
+## 🚀 Phase 1
 
-- QUEEN integration
-- Mission allocation
-- Fleet coordination
-
----
-
-## Phase 3
-
-Infrastructure
-
-- Dock
-- Hangar
-- Fabrication
-- Energy nodes
+☑️ Air SAR platform  
+☑️ Ground SAR platform  
+☑️ Mesh architecture
 
 ---
 
-## Phase 4
+## 🧠 Phase 2
 
-Swarm deployment
-
-- Coordinated missions
-- Distributed autonomy
-- Multi-unit operations
+🔲 QUEEN integration  
+🔲 Mission allocation  
+🔲 Fleet coordination
 
 ---
 
-# Documentation
+## 🏗️ Phase 3
 
-Primary documents:
-
-- System Architecture
-- Fleet Tree
-- Specifications
-- Procurement
-- Build Manuals
-- CAD
-- Electronics
-- Firmware
+🔲 Dock systems  
+🔲 Hangar deployment  
+🔲 Fabrication nodes  
+🔲 Energy network
 
 ---
 
-# Contribution
+## 🌐 Phase 4
 
-Project structure is organized by platform.
-
-Each asset contains:
-
-```text
-SPECIFICATION
-PROCUREMENT
-BUILD
-CAD
-STL
-FIRMWARE
-OPERATIONS
-```
-
-Contributors should maintain platform isolation and documentation completeness.
+🔲 Swarm operations  
+🔲 Autonomous coordination  
+🔲 Multi-unit deployment
 
 ---
 
-# Disclaimer
+# 📚 Documentation
 
-OBSIDIAN-8 is an engineering and research project focused on autonomous systems, disaster response concepts, robotics integration, and multi-domain coordination architecture.
+📐 Specifications  
+📦 Procurement  
+🛠️ Build manuals  
+🖨️ STL assets  
+📁 CAD  
+⚡ Electronics  
+🤖 Firmware  
+🚨 Operations
 
-Deployment, testing, and operation should comply with all applicable laws, aviation regulations, safety requirements, and local operating rules.
+---
+
+# ⚠️ Disclaimer
+
+OBSIDIAN-8 is an engineering and research project focused on:
+
+🤖 Robotics  
+🚑 Search & rescue concepts  
+🌐 Autonomous coordination  
+📡 Networking systems  
+🧠 Swarm architecture
+
+All deployment and testing should comply with applicable regulations and safety requirements.
 
 ---
 
 <div align="center">
 
-**OBSIDIAN-8**
+# ⚫ OBSIDIAN-8 ⚫
 
-Autonomous Systems • Search & Rescue • Swarm Coordination
+🚁 Air Systems • 🤖 Ground Robotics • 🌐 Swarm Coordination • 🏗️ Infrastructure
+
+### **Built for coordinated response**
 
 </div>
