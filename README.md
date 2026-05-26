@@ -2,14 +2,14 @@
 
 # 🌐⚫ OBSIDIAN-8 ⚫🌐
 
-# 🤖🚁 Autonomous Search & Rescue Ecosystem 🚁🤖
+# 🚁🤖 Autonomous Search & Rescue Ecosystem 🤖🚁
 
 ### **O.B.S.I.D.I.A.N.-8**
 ### **Omnidomain Behavioral Swarm & Intelligent Distributed Infrastructure for Autonomous Networks**
 
 ---
 
-### 🌍 Multi-Domain Autonomous Architecture
+## 🌍 Multi-Domain Autonomous Architecture
 
 🚁 **AIR** • 🤖 **GROUND** • 🏗️ **INFRASTRUCTURE** • 🧠 **COMMAND** • 🌐 **NETWORK** • ⚡ **ENERGY** • 🛠️ **MANUFACTURING** • 📦 **LOGISTICS**
 
@@ -23,7 +23,7 @@
 
 ---
 
-## 🚑 One Network • 🚁 Many Platforms • 🌐 Coordinated Response
+### 🚑 One Network • 🚁 Many Platforms • 🌐 Coordinated Response
 
 <img width="100%" src="assets/renders/banner.png">
 
@@ -33,38 +33,38 @@
 
 # 📖 Overview
 
-**OBSIDIAN-8** is a modular autonomous ecosystem designed around **coordinated multi-domain response operations**.
+**OBSIDIAN-8** is a modular autonomous ecosystem designed around coordinated multi-domain response operations.
 
 The project integrates:
 
 🚁 Autonomous aerial systems  
 🤖 Ground robotic platforms  
 🏗️ Infrastructure assets  
-🌐 Mesh communications  
 🧠 Command systems  
+🌐 Mesh communications  
 📡 Distributed networking  
-🖨️ Manufacturing workflows  
-📐 CAD + printable assets  
 ⚡ Energy systems  
-📦 Logistics platforms  
+🛠️ Manufacturing workflows  
+📐 CAD + printable assets  
+📦 Logistics systems  
 
-OBSIDIAN-8 represents the **complete ecosystem**.
+OBSIDIAN-8 represents the **complete ecosystem architecture**.
 
-Command units such as **OBS-QUEEN-001** operate as assets within the wider architecture.
+Command assets such as **OBS-NEXUS-001** operate within the larger system.
 
 ---
 
 # 🧩 OBSIDIAN-8 Core Domains
 
-| Domain | Role |
-|---------|------|
-| 🚁 AIR | Recon, SAR, relay, logistics |
-| 🤖 GROUND | Rescue, transport, inspection |
-| 🏗️ INFRA | Docking, support, staging |
-| 🧠 COMMAND | Mission coordination |
-| 🌐 NETWORK | Mesh, telemetry, SATCOM |
+| Domain | Function |
+|---------|----------|
+| 🚁 AIR | Recon, SAR, relay, delivery |
+| 🤖 GROUND | Rescue, logistics, inspection |
+| 🏗️ INFRASTRUCTURE | Support, staging, docking |
+| 🧠 COMMAND | Coordination + mission control |
+| 🌐 NETWORK | Communications + telemetry |
 | ⚡ ENERGY | Charging + field power |
-| 🛠️ MANUFACTURING | Repair + fabrication |
+| 🛠️ MANUFACTURING | Fabrication + repair |
 | 📦 LOGISTICS | Supply movement |
 
 ---
@@ -72,50 +72,63 @@ Command units such as **OBS-QUEEN-001** operate as assets within the wider archi
 # 🌐 System Architecture
 
 ```text
-                    🌐 OBSIDIAN-8 ECOSYSTEM
-                               │
- ┌───────────────┬─────────────┬───────────────┬──────────────┐
- │               │             │               │              │
- ▼               ▼             ▼               ▼              ▼
+                           🌐 OBSIDIAN-8
+                                  │
 
-🚁 AIR        🤖 GROUND      🏗️ INFRA       🧠 COMMAND     🌐 NETWORK
+ ┌───────────────┬───────────────┬──────────────┬───────────────┐
+ │               │               │              │               │
 
-SAR           Rescue         Dock           OBS-QUEEN      Mesh
-Recon         Cargo          Hangar         Control        LTE
-Relay         Mapping        Solar          Planning       SATCOM
-Delivery      Inspection     Fabrication    Coordination   Telemetry
+ ▼               ▼               ▼              ▼               ▼
 
-                               │
-                               ▼
+🚁 AIR       🤖 GROUND      🏗️ INFRA       🧠 COMMAND      🌐 NETWORK
 
-                    ⚡ ENERGY + 🛠️ FABRICATION
+SAR          Rescue         Dock          OBS-NEXUS       Mesh
+Recon        Cargo          Hangar        Coordination    LTE
+Relay        Mapping        Solar         Mission Ctrl    SATCOM
+Delivery     Inspection     Fabrication   Fleet Mgmt      Telemetry
+
+                                  │
+
+                                  ▼
+
+                   ⚡ ENERGY + 🛠️ MANUFACTURING
 ```
 
 ---
 
-# 🧠 Command Systems
+# 🧠 Command Domain
 
-## OBS-QUEEN-001
+## 🧠 OBS-NEXUS-001
 
-**Primary Command Platform**
+**Primary Command & Coordination Platform**
 
-Functions:
+Mission Functions:
 
 🧠 Mission planning  
+
 📡 Fleet coordination  
-🌐 Mesh management  
+
+🌐 Mesh orchestration  
+
 📊 Data fusion  
+
 🚁 Air asset tasking  
+
 🤖 Ground coordination  
-📈 Fleet monitoring  
+
+📈 Fleet health monitoring  
+
+🛰️ Network management  
+
+🧩 Swarm synchronization  
 
 Role:
 
-**Command asset operating within OBSIDIAN-8**
+**Central command asset operating inside the OBSIDIAN-8 ecosystem**
 
 ---
 
-# 🚁 AIR DOMAIN
+# 🚁 Air Domain
 
 ## 🚑 OBS-AIR-SAR-01
 
@@ -124,9 +137,13 @@ Search & Rescue Platform
 Capabilities:
 
 🔥 Thermal search  
+
 🚑 Victim location  
+
 💊 Medical delivery  
+
 📡 Relay support  
+
 🛰️ Forward reconnaissance  
 
 ---
@@ -138,8 +155,11 @@ Recon Platform
 Capabilities:
 
 🗺️ Terrain mapping  
+
 📍 RTK survey  
+
 📷 Area scanning  
+
 🧭 Route planning  
 
 ---
@@ -151,9 +171,12 @@ Communications Platform
 Capabilities:
 
 🌐 Mesh extension  
-📶 Network backbone  
-📡 Signal relay  
-🛰️ Telemetry support  
+
+📶 Signal backbone  
+
+📡 Telemetry relay  
+
+🛰️ Communications support  
 
 ---
 
@@ -164,12 +187,14 @@ Delivery Platform
 Capabilities:
 
 💊 Medical transport  
+
 📦 Payload delivery  
+
 🚨 Emergency resupply  
 
 ---
 
-# 🤖 GROUND DOMAIN
+# 🤖 Ground Domain
 
 ## 🚑 OBS-GROUND-SAR-01
 
@@ -178,8 +203,11 @@ Tracked Rescue Rover
 Capabilities:
 
 🛏️ Casualty extraction  
+
 🩺 Medical support  
-🛞 Rough terrain mobility  
+
+🛞 Terrain mobility  
+
 🚨 Recovery operations  
 
 ---
@@ -191,7 +219,9 @@ Cargo Rover
 Capabilities:
 
 📦 Equipment transport  
+
 🔋 Supply movement  
+
 🧰 Logistics support  
 
 ---
@@ -203,7 +233,9 @@ Mapping Platform
 Capabilities:
 
 📡 LiDAR scanning  
+
 🧭 Terrain analysis  
+
 🛰️ Sensor fusion  
 
 ---
@@ -215,30 +247,37 @@ Inspection Platform
 Capabilities:
 
 ☢️ Hazard inspection  
+
 ⚠️ Risk assessment  
+
 🦾 Remote operation  
 
 ---
 
-# 🏗️ INFRASTRUCTURE DOMAIN
+# 🏗️ Infrastructure Domain
 
 ## 🔋 OBS-INFRA-DOCK-001
 
 Autonomous Service Hub
 
 🔋 Charging  
+
 🛠️ Maintenance  
+
 🚁 Docking  
+
 📦 Fleet support  
 
 ---
 
 ## 🖨️ OBS-INFRA-FAB-001
 
-Fabrication Unit
+Field Fabrication Unit
 
 🖨️ Spare production  
+
 ⚙️ Repair components  
+
 🔩 Field manufacturing  
 
 ---
@@ -248,7 +287,9 @@ Fabrication Unit
 Energy Node
 
 ☀️ Solar support  
+
 🔋 Battery buffering  
+
 ⚡ Auxiliary power  
 
 ---
@@ -258,7 +299,9 @@ Energy Node
 Deployable Hangar
 
 🚁 Launch operations  
+
 🛡️ Protection  
+
 📦 Staging area  
 
 ---
@@ -268,32 +311,42 @@ Deployable Hangar
 ```text
 🌐 OBSIDIAN-8
 │
-├── 🧠 COMMAND
-│   └── OBS-QUEEN-001
+├── 🧠 COMMAND DOMAIN
+│   │
+│   └── 🧠 OBS-NEXUS-001
+│       ├── Mission Coordination
+│       ├── Fleet Monitoring
+│       ├── Data Fusion
+│       ├── Swarm Control
+│       └── Network Management
 │
-├── 🚁 AIR
+├── 🚁 AIR DOMAIN
+│   │
 │   ├── 🚑 OBS-AIR-SAR-01
 │   ├── 🛰️ OBS-AIR-RECON-01
 │   ├── 📡 OBS-AIR-RELAY-01
 │   └── 📦 OBS-AIR-LIGHTDEL-01
 │
-├── 🤖 GROUND
+├── 🤖 GROUND DOMAIN
+│   │
 │   ├── 🚑 OBS-GROUND-SAR-01
 │   ├── 📦 OBS-GROUND-CARGO-01
 │   ├── 🗺️ OBS-GROUND-SCAN-01
 │   └── ⚠️ OBS-GROUND-EOD-01
 │
-├── 🏗️ INFRA
-│   ├── 🔋 DOCK
-│   ├── 🖨️ FAB
-│   ├── ☀️ SOLAR
-│   └── 🏠 HANGAR
+├── 🏗️ INFRASTRUCTURE DOMAIN
+│   │
+│   ├── 🔋 OBS-INFRA-DOCK-001
+│   ├── 🖨️ OBS-INFRA-FAB-001
+│   ├── ☀️ OBS-INFRA-SOLAR-001
+│   └── 🏠 OBS-INFRA-HANGAR-001
 │
-└── 🌐 NETWORK
-    ├── Mesh
-    ├── LTE
-    ├── SATCOM
-    └── Telemetry
+└── 🌐 NETWORK DOMAIN
+    │
+    ├── Mesh Layer
+    ├── LTE Layer
+    ├── SATCOM Layer
+    └── Telemetry Layer
 ```
 
 ---
@@ -325,8 +378,11 @@ Deployable Hangar
 ## 🚁 Flight Systems
 
 🛩️ PX4  
+
 🛩️ ArduPilot  
+
 🔗 MAVLink  
+
 🤖 ROS2  
 
 ---
@@ -334,7 +390,9 @@ Deployable Hangar
 ## 🧠 Compute
 
 🖥️ NVIDIA Jetson  
+
 🎛️ Cube Orange+  
+
 ⚙️ STM32  
 
 ---
@@ -342,8 +400,11 @@ Deployable Hangar
 ## 📡 Communications
 
 📶 RFD900  
+
 🌐 Mesh  
+
 📱 LTE  
+
 🛰️ SATCOM  
 
 ---
@@ -351,8 +412,11 @@ Deployable Hangar
 ## 🧭 Navigation
 
 📍 RTK GPS  
+
 🛰️ Optical navigation  
+
 📡 Sensor fusion  
+
 🧭 Terrain awareness  
 
 ---
@@ -389,9 +453,11 @@ Deployable Hangar
 
 ## 🧠 Phase 2 — Command Layer
 
-🔲 OBS-QUEEN integration  
+🔲 OBS-NEXUS integration  
 
-🔲 Fleet coordination  
+🔲 Swarm coordination layer  
+
+🔲 Fleet synchronization  
 
 🔲 Mission allocation  
 
@@ -449,7 +515,7 @@ OBSIDIAN-8 is an engineering and research project focused on:
 
 🌐 Autonomous coordination  
 
-📡 Networking architecture  
+📡 Network architecture  
 
 🧠 Swarm systems  
 
